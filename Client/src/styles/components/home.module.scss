@@ -1,0 +1,114 @@
+// Homepage.module.scss
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+// Color Variables
+$primary-blue: #3b82f6;
+$secondary-green: #10b981;
+$accent-purple: #8b5cf6;
+$background-light: #f0f9ff;
+$text-dark: #1f2937;
+
+.homepageContainer {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+.backgroundOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  // background: linear-gradient(135deg, $background-light, lighten($primary-blue, 40%));
+  opacity: 0.6;
+  z-index: -1;
+}
+
+.contentWrapper {
+  max-width: 1200px;
+  width: 90%;
+  padding: 2rem;
+  // background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  // box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.headerSection {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.mainTitle {
+  font-size: 3rem;
+  color: $text-dark;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subTitle {
+  font-size: 1.2rem;
+  color: darken($primary-blue, 20%);
+  font-weight: 300;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.featureCard {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.featureIcon {
+  width: 60px;
+  height: 60px;
+  color: $primary-blue;
+  margin-bottom: 1rem;
+}
+
+.featureTitle {
+  font-size: 1.3rem;
+  color: $text-dark;
+  margin-bottom: 0.75rem;
+}
+
+.featureDescription {
+  color: lighten($text-dark, 20%);
+  margin-bottom: 1.5rem;
+}
+
+.featureButton {
+  background-color: $primary-blue;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: darken($primary-blue, 10%);
+  }
+}
