@@ -58,7 +58,7 @@ $text-dark: #1f2937;
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 
   @media (max-width: 768px) {

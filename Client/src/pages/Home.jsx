@@ -23,14 +23,14 @@ const Home = () => {
             <button className={styles.featureButton}>Login Now</button>
           </div>
 
-          <div className={styles.featureCard}>
+          {/* <div className={styles.featureCard}>
             <Users className={styles.featureIcon} />
             <h3 className={styles.featureTitle}>Admin Dashboard</h3>
             <p className={styles.featureDescription}>
               Manage institutional operations, track performance, and generate reports.
             </p>
             <button className={styles.featureButton}>Access System</button>
-          </div>
+          </div> */}
 
           <div className={styles.featureCard}>
             <BookOpen className={styles.featureIcon} />

@@ -1,0 +1,369 @@
+/* login.module.scss */
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  background-image: linear-gradient(135deg, #f8f9fa 0%, var(--light-color) 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 540px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--primary-color, #2E7D32);
+  
+  p {
+    margin-top: 16px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(46, 125, 50, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--primary-color, #2E7D32);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loginFormContainer {
+  padding: 32px;
+}
+
+.logoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  background-color: var(--primary-color, #2E7D32);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  
+  &:before {
+    content: '';
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(2px, 2px);
+  }
+  
+  &:after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-color: var(--primary-color, #2E7D32);
+    border-radius: 50%;
+    transform: translate(2px, 2px);
+  }
+}
+
+.portalTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--dark-color, #1B5E20);
+  margin: 0;
+  text-align: center;
+}
+
+.welcomeText {
+  text-align: center;
+  color: #6c757d;
+  margin-bottom: 32px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.loginForm {
+  .formGroup {
+    margin-bottom: 24px;
+  }
+}
+
+.formGroup {
+  margin-bottom: 24px;
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 14px;
+  }
+}
+
+/* Added for rollNo format */
+.rollNoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .formSelect, .formInput {
+    flex: 1;
+  }
+  
+  .separator {
+    font-weight: bold;
+    color: #495057;
+    margin: 0 2px;
+  }
+}
+
+.formRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.formGroupRow {
+  flex: 1;
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 14px;
+  }
+}
+
+.formInput, .formSelect {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+  color: #495057;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color, #2E7D32);
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+  }
+  
+  &::placeholder {
+    color: #adb5bd;
+  }
+}
+
+.formSelect {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23495057' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 12px;
+  padding-right: 42px;
+  appearance: none;
+}
+
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.submitButton {
+  padding: 12px 30px;
+  background-color: var(--primary-color, #2E7D32);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    background-color: var(--dark-color, #1B5E20);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(1px);
+  }
+  
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+}
+
+.forgotPassword {
+  color: var(--primary-color, #2E7D32);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: var(--dark-color, #1B5E20);
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 480px) {
+    margin-top: 8px;
+  }
+}
+
+/* Success Message */
+.successMessage {
+  padding: 40px 32px;
+  text-align: center;
+  
+  h2 {
+    color: var(--dark-color, #1B5E20);
+    margin: 16px 0 24px;
+    font-size: 24px;
+  }
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  background-color: var(--light-color, #C8E6C9);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 20px;
+  font-size: 36px;
+  color: var(--primary-color, #2E7D32);
+}
+
+.userInfo {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  text-align: left;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  
+  p {
+    margin: 12px 0;
+    color: #495057;
+    font-size: 15px;
+    
+    strong {
+      color: #212529;
+      font-weight: 600;
+    }
+  }
+}
+
+.backButton {
+  padding: 12px 30px;
+  background-color: var(--primary-color, #2E7D32);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    background-color: var(--dark-color, #1B5E20);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+/* Media Query for 768px screen */
+@media (max-width: 768px) {
+  .loginCard {
+    max-width: 90%;
+  }
+  
+  .loginFormContainer {
+    padding: 24px;
+  }
+  
+  .portalTitle {
+    font-size: 24px;
+  }
+  
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .formInput, .formSelect {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  .submitButton, .backButton {
+    padding: 10px 24px;
+    font-size: 15px;
+  }
+  
+  .successIcon {
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+  }
+  
+  .userInfo {
+    padding: 16px;
+  }
+}
