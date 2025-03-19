@@ -38,7 +38,7 @@ const Login = () => {
         
         // For demonstration, we'll use 'student' as the default role
         // In a real app, this would come from the API response
-        const roleFromApi = 'teacher';
+        const roleFromApi = 'student';
         setUserRole(roleFromApi);
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -143,7 +143,7 @@ const Login = () => {
                           required
                           className={styles.formSelect}
                         >
-                          <option value="">Semester</option>
+                          <option value="">Sem</option>
                           {fieldConfig.components[0].options.map((option) => (
                             <option key={option} value={option}>{option}</option>
                           ))}

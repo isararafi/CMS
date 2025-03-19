@@ -141,7 +141,10 @@
   gap: 8px;
   
   .formSelect, .formInput {
-    flex: 1;
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .separator {
@@ -348,8 +351,9 @@
   }
   
   .formInput, .formSelect {
-    padding: 10px 14px;
-    font-size: 14px;
+    padding: 10px 4px;
+    font-size: 11px;
+    background-position: right 0px center;
   }
   
   .submitButton, .backButton {
