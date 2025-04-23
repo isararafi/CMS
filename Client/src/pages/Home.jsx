@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { GraduationCap, Users, BookOpen } from 'lucide-react';//icon packages
 import styles from '../styles/components/home.module.scss';
 
@@ -20,25 +21,31 @@ const Home = () => {
             <p className={styles.featureDescription}>
               Access your academic journey, track progress, and manage your learning.
             </p>
-            <button className={styles.featureButton}>Login Now</button>
+            <Link to="/login?role=student">
+              <button className={styles.featureButton}>Login </button>
+            </Link>
           </div>
 
-          {/* <div className={styles.featureCard}>
+          <div className={styles.featureCard}>
             <Users className={styles.featureIcon} />
             <h3 className={styles.featureTitle}>Admin Dashboard</h3>
             <p className={styles.featureDescription}>
               Manage institutional operations, track performance, and generate reports.
             </p>
-            <button className={styles.featureButton}>Access System</button>
-          </div> */}
+            <Link to="/login?role=admin">
+              <button className={styles.featureButton}>Control Hub</button>
+            </Link>
+          </div>
 
           <div className={styles.featureCard}>
             <BookOpen className={styles.featureIcon} />
             <h3 className={styles.featureTitle}>Teacher Hub</h3>
             <p className={styles.featureDescription}>
-              Collaborate, manage classes, and engage with students effectively and efficiently.
+              Collaborate, manage classes, and engage with students effectively.
             </p>
-            <button className={styles.featureButton}>Login Now</button>
+            <Link to="/login?role=teacher">
+              <button className={styles.featureButton}>Login </button>
+            </Link>
           </div>
         </div>
       </div>

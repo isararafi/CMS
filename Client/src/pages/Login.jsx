@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '../styles/pages/login.module.scss';
 
 const Login = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
   // State to store the user role from API
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -9,6 +13,7 @@ const Login = () => {
     semester: '',
     department: '',
     regNumber: '',
+    email: '',
     password: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -28,17 +33,18 @@ const Login = () => {
     accent: '#81C784' // Green 300
   };
 
-  // Simulating API call to get user role
+  // Get role from URL query parameter
   useEffect(() => {
-    // In a real app, this would be an API call
+    const params = new URLSearchParams(location.search);
+    const roleFromUrl = params.get('role');
+    
     const fetchUserRole = async () => {
       try {
         // Simulating API delay
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // For demonstration, we'll use 'student' as the default role
-        // In a real app, this would come from the API response
-        const roleFromApi = 'student';
+        // Use role from URL if available, otherwise default to 'student'
+        const roleFromApi = roleFromUrl || 'student';
         setUserRole(roleFromApi);
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -48,7 +54,7 @@ const Login = () => {
     };
 
     fetchUserRole();
-  }, []);
+  }, [location]);
 
   // Role-specific configurations
   const roleConfigs = {
@@ -98,11 +104,16 @@ const Login = () => {
     e.preventDefault();
     // Here you would typically make an API call to verify credentials
     console.log('Submitting:', { 
-      role: userRole, 
-      rollNo: `${formData.semester}-${formData.department}-${formData.regNumber}`,
+      role: userRole,
+      credentials: userRole === 'student' 
+        ? `${formData.semester}-${formData.department}-${formData.regNumber}` 
+        : formData.email,
       password: formData.password 
     });
     setIsSubmitted(true);
+    
+    // In a real app, you would redirect to dashboard after successful login
+    // setTimeout(() => navigate('/dashboard'), 2000);
   };
 
   // Get current role configuration
@@ -207,7 +218,11 @@ const Login = () => {
             <h2>Login Successful!</h2>
             <div className={styles.userInfo}>
               <p>Role: <strong>{userRole}</strong></p>
-              <p>Roll No: <strong>{formData.semester}-{formData.department}-{formData.regNumber}</strong></p>
+              {userRole === 'student' ? (
+                <p>Roll No: <strong>{formData.semester}-{formData.department}-{formData.regNumber}</strong></p>
+              ) : (
+                <p>Email: <strong>{formData.email}</strong></p>
+              )}
             </div>
             <button 
               onClick={() => setIsSubmitted(false)}

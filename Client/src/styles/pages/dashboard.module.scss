@@ -1,0 +1,994 @@
+// Dashboard styles
+// This file contains the styles for all dashboard components: Student, Teacher, and Admin
+
+// Variables
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --info-color: #2196f3;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --bg-light: #f5f7fa;
+  --border-color: #e0e0e0;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+// Dashboard Container
+.dashboardContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: var(--bg-light);
+  min-height: 100vh;
+  color: var(--text-primary);
+}
+
+// Dashboard Header
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.welcomeSection {
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    color: var(--text-primary);
+  }
+  
+  .subtitle {
+    margin: 4px 0 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+}
+
+.studentInfo, .teacherInfo, .adminInfo {
+  display: flex;
+  gap: 16px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  .label {
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  
+  .value {
+    color: var(--text-primary);
+  }
+}
+
+// Stats
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--card-shadow);
+  
+  .statIcon {
+    background-color: rgba(67, 97, 238, 0.1);
+    padding: 12px;
+    border-radius: 50%;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .statContent {
+    .statValue {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .statLabel {
+      margin: 4px 0 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+  }
+}
+
+// Tabs
+.tabsContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.tabsHeader {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  
+  .tabButton {
+    padding: 16px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    position: relative;
+    
+    &:hover {
+      color: var(--primary-color);
+    }
+    
+    &.active {
+      color: var(--primary-color);
+      font-weight: 600;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--primary-color);
+      }
+    }
+  }
+}
+
+.tabContent {
+  padding: 24px;
+}
+
+// Overview tab
+.overviewContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.columnLeft, .columnRight {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.widgetCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.widgetHeader {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  
+  .widgetTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+// Course Progress
+.courseProgressList {
+  padding: 16px;
+}
+
+.courseProgressItem {
+  margin-bottom: 16px;
+}
+
+.courseInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  .courseCode {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .courseName {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.progressWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+
+.progressText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.viewAllButton {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  text-align: center;
+  width: 100%;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Assignments
+.assignmentsList {
+  padding: 16px;
+}
+
+.assignmentItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.assignmentInfo {
+  .assignmentTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .assignmentCourse {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.assignmentDueDate {
+  text-align: right;
+  
+  .dueLabel {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: block;
+  }
+  
+  .dueValue {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--warning-color);
+  }
+}
+
+// Announcements
+.announcementsList {
+  padding: 16px;
+}
+
+.announcementItem {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.announcementHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  .announcementTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .announcementDate {
+    font-size: 14px;
+    color: var(--text-tertiary);
+  }
+}
+
+.announcementContent {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+// Courses tab
+.coursesContainer {
+  padding: 16px 0;
+}
+
+.coursesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.courseCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  padding: 16px;
+}
+
+.courseCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  .courseCodeTitle {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .courseCredits {
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+}
+
+.courseCardTitle {
+  margin: 0 0 16px;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.courseCardProgress {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+  
+  .progressCircle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    
+    .progressText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+  }
+}
+
+.courseCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  
+  .courseGrade {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .courseDetailsButton {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    
+    &:hover {
+      background-color: var(--secondary-color);
+    }
+  }
+}
+
+// Assignments tab
+.assignmentsContainer {
+  padding: 16px 0;
+}
+
+.assignmentsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  background-color: #f5f7fa;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.tableHeaderCell {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+}
+
+.tableCell {
+  font-size: 14px;
+}
+
+.statusPending, .statusPublished, .statusDraft, .statusActive, .statusInactive {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.statusPending {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.statusPublished {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.statusDraft {
+  background-color: rgba(158, 158, 158, 0.1);
+  color: #757575;
+}
+
+.statusActive {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.statusInactive {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.actionButton {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 8px;
+  
+  &:hover {
+    background-color: #f5f7fa;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}
+
+// Teacher-specific styles
+.classScheduleList {
+  padding: 16px;
+}
+
+.scheduleItem {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.scheduleTimeBlock {
+  min-width: 100px;
+  
+  .scheduleTime {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  .scheduleRemaining {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+}
+
+.scheduleDetails {
+  .scheduleTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .scheduleLocation {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.tasksList {
+  padding: 16px;
+}
+
+.taskItem {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.taskCheckbox {
+  .checkbox {
+    display: none;
+  }
+  
+  .checkboxLabel {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      display: none;
+      top: 2px;
+      left: 6px;
+      width: 4px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+  
+  .checkbox:checked + .checkboxLabel {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    
+    &::after {
+      display: block;
+    }
+  }
+}
+
+.taskDetails {
+  flex: 1;
+  
+  .taskTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .taskCourse {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.taskMeta {
+  text-align: right;
+  
+  .taskDueDate {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .taskStatus {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  
+  .statusPending {
+    background-color: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+  }
+  
+  .statusInProgress {
+    background-color: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+  }
+  
+  .statusNotStarted {
+    background-color: rgba(158, 158, 158, 0.1);
+    color: #757575;
+  }
+}
+
+// For Admin Dashboard
+.activityList, .approvalsList, .alertsList {
+  padding: 16px;
+}
+
+.activityItem {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.activityContent {
+  .activityTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .activityDetails {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.activityMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  
+  .activityUser, .activityDate {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+}
+
+.alertItem {
+  display: flex;
+  gap: 16px;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  
+  &.error {
+    background-color: rgba(244, 67, 54, 0.1);
+    .alertIcon {
+      color: #f44336;
+    }
+  }
+  
+  &.warning {
+    background-color: rgba(255, 152, 0, 0.1);
+    .alertIcon {
+      color: #ff9800;
+    }
+  }
+  
+  &.info {
+    background-color: rgba(33, 150, 243, 0.1);
+    .alertIcon {
+      color: #2196f3;
+    }
+  }
+  
+  .alertIcon {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .alertContent {
+    flex: 1;
+    
+    .alertMessage {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .alertDate {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+  }
+}
+
+.approvalItem {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.approvalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  .approvalType {
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  
+  .approvalDate {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+}
+
+.approvalTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.approvalDetails {
+  margin-bottom: 16px;
+  
+  p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.approvalActions {
+  display: flex;
+  gap: 12px;
+}
+
+.approveButton, .rejectButton {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 4px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.approveButton {
+  background-color: var(--success-color);
+  color: white;
+  
+  &:hover {
+    background-color: darken(#4caf50, 10%);
+  }
+}
+
+.rejectButton {
+  background-color: white;
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+  
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+  }
+}
+
+.quickActions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  span {
+    font-weight: 500;
+  }
+  
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+}
+
+// User management tab
+.usersContainer, .departmentsContainer {
+  padding: 16px 0;
+}
+
+.managementHeader {
+  margin-bottom: 24px;
+}
+
+.searchAndFilters {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  display: flex;
+  
+  .searchInput {
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    padding: 8px 12px;
+    width: 300px;
+  }
+  
+  .searchButton {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+  }
+}
+
+.filterGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.filterSelect {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 12px;
+  min-width: 150px;
+}
+
+.addButton {
+  background-color: var(--success-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+// Department cards
+.departmentsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.departmentCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.departmentName {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.departmentStats {
+  margin-bottom: 20px;
+}
+
+.departmentStat {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  .statIcon {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    color: var(--primary-color);
+  }
+  
+  .statLabel {
+    font-size: 14px;
+    color: var(--text-secondary);
+    width: 80px;
+  }
+  
+  .statValue {
+    font-weight: 600;
+  }
+}
+
+.departmentActions {
+  display: flex;
+  gap: 12px;
+  
+  .actionButton {
+    flex: 1;
+    text-align: center;
+  }
+} 
