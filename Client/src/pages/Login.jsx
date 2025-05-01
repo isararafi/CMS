@@ -6,9 +6,13 @@ const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // State to store the user role from API
+  // State to store user role (e.g., student, teacher, admin)
   const [userRole, setUserRole] = useState(null);
+
+  // Loading state to show spinner while role is being determined
   const [loading, setLoading] = useState(true);
+
+  // Form data to store user inputs
   const [formData, setFormData] = useState({
     semester: '',
     department: '',
@@ -16,34 +20,40 @@ const Login = () => {
     email: '',
     password: ''
   });
+
+  // Flag to check if form has been submitted
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Semester options for dropdown
+  // Dropdown options for semester
   const semesterOptions = ['Fall 22', 'Spring 22', 'Fall 23', 'Spring 23', 'Fall 24', 'Spring 24'];
-  
-  // Department options for dropdown
+
+  // Dropdown options for department
   const departmentOptions = ['BSSE', 'BSCS', 'BSIT', 'BSAI'];
 
-  // Color scheme
+  // Color theme for styling
   const colorScheme = {
-    primary: '#2E7D32', // Green 800
-    secondary: '#4CAF50', // Green 500
-    light: '#C8E6C9', // Green 100
-    dark: '#1B5E20', // Green 900
-    accent: '#81C784' // Green 300
+    primary: '#2E7D32',
+    secondary: '#4CAF50',
+    light: '#C8E6C9',
+    dark: '#1B5E20',
+    accent: '#81C784'
   };
 
-  // Get role from URL query parameter
+  // Get role from URL and simulate fetching from API
+  /*This useEffect runs every time the location changes 
+  (including the first render). Since location comes from useLocation() 
+  (React Router), it changes whenever the URL changes — like navigating 
+  to /login?role=admin, /login?role=teacher, etc.*/
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roleFromUrl = params.get('role');
     
     const fetchUserRole = async () => {
       try {
-        // Simulating API delay
+        // Simulate delay like fetching from server
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Use role from URL if available, otherwise default to 'student'
+        // If role exists in URL, use it; otherwise default to student
         const roleFromApi = roleFromUrl || 'student';
         setUserRole(roleFromApi);
       } catch (error) {
@@ -56,7 +66,7 @@ const Login = () => {
     fetchUserRole();
   }, [location]);
 
-  // Role-specific configurations
+  // Configurations for different user roles
   const roleConfigs = {
     student: {
       title: 'Student Portal',
@@ -92,6 +102,7 @@ const Login = () => {
     }
   };
 
+  // Handle changes in form input fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -100,9 +111,11 @@ const Login = () => {
     });
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically make an API call to verify credentials
+
+    // Log credentials based on role
     console.log('Submitting:', { 
       role: userRole,
       credentials: userRole === 'student' 
@@ -110,15 +123,18 @@ const Login = () => {
         : formData.email,
       password: formData.password 
     });
+
+    // Mark form as submitted
     setIsSubmitted(true);
-    
-    // In a real app, you would redirect to dashboard after successful login
+
+    // In real app, redirect to dashboard after successful login
     // setTimeout(() => navigate('/dashboard'), 2000);
   };
 
-  // Get current role configuration
+  // Get configuration based on user role
   const currentConfig = userRole ? roleConfigs[userRole] : null;
 
+  // Show loading spinner while role is being determined
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -127,7 +143,7 @@ const Login = () => {
       </div>
     );
   }
-
+  // Main JSX structure of the login page
   return (
     <div className={styles.loginContainer} style={{ '--primary-color': colorScheme.primary, '--secondary-color': colorScheme.secondary, '--light-color': colorScheme.light, '--dark-color': colorScheme.dark, '--accent-color': colorScheme.accent }}>
       <div className={styles.loginCard}>
@@ -138,15 +154,19 @@ const Login = () => {
               <h1 className={styles.portalTitle}>{currentConfig?.title || 'Portal Login'}</h1>
             </div>
             
+            {/* Show welcome message based on role */}
             <p className={styles.welcomeText}>{currentConfig?.welcomeMessage || 'Please log in to continue'}</p>
             
             <form onSubmit={handleSubmit} className={styles.loginForm}>
+              {/* Render fields based on current role */}
               {currentConfig?.fields.map((fieldConfig, index) => {
                 if (fieldConfig.type === 'rollNo') {
+                  // For student roll number fields
                   return (
                     <div key={`field-rollNo`} className={styles.formGroup}>
                       <label>{fieldConfig.label}:</label>
                       <div className={styles.rollNoContainer}>
+                        {/* Semester dropdown */}
                         <select
                           name="semester"
                           value={formData.semester}
@@ -159,7 +179,10 @@ const Login = () => {
                             <option key={option} value={option}>{option}</option>
                           ))}
                         </select>
+
                         <span className={styles.separator}>-</span>
+
+                        {/* Department dropdown */}
                         <select
                           name="department"
                           value={formData.department}
@@ -172,7 +195,10 @@ const Login = () => {
                             <option key={option} value={option}>{option}</option>
                           ))}
                         </select>
+
                         <span className={styles.separator}>-</span>
+
+                        {/* Registration number input */}
                         <input
                           type="text"
                           name="regNumber"
@@ -186,6 +212,7 @@ const Login = () => {
                     </div>
                   );
                 } else {
+                  // For email and password fields
                   return (
                     <div key={`field-${fieldConfig.name}`} className={styles.formGroup}>
                       <label htmlFor={fieldConfig.name}>{fieldConfig.label}:</label>
@@ -204,6 +231,7 @@ const Login = () => {
                 }
               })}
               
+              {/* Submit button and forgot password link */}
               <div className={styles.formFooter}>
                 <button type="submit" className={styles.submitButton}>
                   Sign In
@@ -213,6 +241,7 @@ const Login = () => {
             </form>
           </div>
         ) : (
+          // Show success message after login
           <div className={styles.successMessage}>
             <div className={styles.successIcon}>✓</div>
             <h2>Login Successful!</h2>
@@ -224,6 +253,8 @@ const Login = () => {
                 <p>Email: <strong>{formData.email}</strong></p>
               )}
             </div>
+
+            {/* Button to return to login screen */}
             <button 
               onClick={() => setIsSubmitted(false)}
               className={styles.backButton}

@@ -1,37 +1,46 @@
-import React, { useState } from 'react';
-import { Users, BookOpen, Bell, Settings, BarChart2, Building, Clipboard, UserCheck } from 'lucide-react';
-import styles from '../styles/pages/dashboard.module.scss';
+import React, { useState } from 'react'; // Import React and useState hook
+import { Users, BookOpen, Bell, Settings, BarChart2, Building, Clipboard, UserCheck } from 'lucide-react'; // Import icons
+import styles from '../styles/pages/dashboard.module.scss'; // Import styles
+
+
+
+
+
+
+/*In short, the $ is used in template literals to 
+embed expressions inside a string. This allows you to dynamically construct a string, 
+such as dynamically adding or removing class names based on conditions.*/
 
 const AdminDashboard = () => {
-  // Mock data - would be fetched from API in real application
+  // Mock data - would be fetched from API in a real application
   const adminData = {
-    name: "Sarah Peterson",
-    position: "System Administrator",
-    email: "sarah.peterson@university.edu",
-    department: "IT Department",
+    name: "Sarah Peterson", // Admin name
+    position: "System Administrator", // Admin position
+    email: "sarah.peterson@university.edu", // Admin email
+    department: "IT Department", // Admin department
     stats: {
-      students: 1245,
-      faculty: 87,
-      courses: 125,
-      departments: 12
+      students: 1245, // Total students
+      faculty: 87, // Total faculty members
+      courses: 125, // Total courses
+      departments: 12 // Total departments
     },
-    recentActivity: [
+    recentActivity: [ // List of recent activities
       { id: 1, action: "New Student Registration", date: "2023-05-15", user: "Admin", details: "20 new students were registered for Fall 2023" },
       { id: 2, action: "Course Schedule Updated", date: "2023-05-14", user: "Dr. Johnson", details: "Updated schedule for CSE101 to Mon/Wed instead of Tue/Thu" },
       { id: 3, action: "System Maintenance", date: "2023-05-12", user: "System", details: "Automatic backup completed successfully" },
       { id: 4, action: "New Faculty Onboarded", date: "2023-05-10", user: "Admin", details: "Dr. Lisa Chen added to Computer Science department" }
     ],
-    pendingApprovals: [
+    pendingApprovals: [ // List of pending approvals
       { id: 1, type: "Course Creation", title: "Mobile App Development", requestedBy: "Dr. James Wilson", department: "Computer Science", date: "2023-05-14" },
       { id: 2, type: "Room Change", title: "Discrete Mathematics", requestedBy: "Dr. Sarah Miller", department: "Mathematics", date: "2023-05-13" },
       { id: 3, type: "Special Permission", title: "Advanced Research Methods", requestedBy: "Student: John Doe", department: "Psychology", date: "2023-05-12" }
     ],
-    systemAlerts: [
+    systemAlerts: [ // List of system alerts
       { id: 1, level: "warning", message: "Server load high during registration period", date: "2023-05-15" },
       { id: 2, level: "info", message: "System update scheduled for May 20, 2023", date: "2023-05-14" },
       { id: 3, level: "error", message: "Database backup failed on secondary server", date: "2023-05-13" }
     ],
-    departments: [
+    departments: [ // List of departments
       { id: 1, name: "Computer Science", faculty: 14, students: 220, courses: 28 },
       { id: 2, name: "Electrical Engineering", faculty: 12, students: 185, courses: 24 },
       { id: 3, name: "Business Administration", faculty: 18, students: 310, courses: 32 },
@@ -39,17 +48,19 @@ const AdminDashboard = () => {
     ]
   };
 
-  // State for active tab
+  // State for active tab (default is 'overview')
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className={styles.dashboardContainer}>
+    <div className={styles.dashboardContainer}> {/* Dashboard container */}
       <div className={styles.dashboardHeader}>
+        {/* Header section with admin info */}
         <div className={styles.welcomeSection}>
           <h1>Welcome, {adminData.name}</h1>
           <p className={styles.subtitle}>Admin Dashboard • {adminData.department}</p>
         </div>
         <div className={styles.adminInfo}>
+          {/* Display admin position and email */}
           <div className={styles.infoItem}>
             <span className={styles.label}>Position:</span>
             <span className={styles.value}>{adminData.position}</span>
@@ -62,6 +73,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className={styles.statsContainer}>
+        {/* Stats section with cards for students, faculty, courses, and departments */}
         <div className={styles.statCard}>
           <div className={styles.statIcon}><Users size={24} /></div>
           <div className={styles.statContent}>
@@ -92,8 +104,10 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Tab section for different views */}
       <div className={styles.tabsContainer}>
         <div className={styles.tabsHeader}>
+          {/* Buttons to switch between different tabs */}
           <button 
             className={`${styles.tabButton} ${activeTab === 'overview' ? styles.active : ''}`}
             onClick={() => setActiveTab('overview')}
@@ -115,8 +129,10 @@ const AdminDashboard = () => {
         </div>
 
         <div className={styles.tabContent}>
+          {/* Overview tab content */}
           {activeTab === 'overview' && (
             <div className={styles.overviewContainer}>
+              {/* Left column with recent activities and system alerts */}
               <div className={styles.columnLeft}>
                 <div className={styles.widgetCard}>
                   <div className={styles.widgetHeader}>
@@ -160,26 +176,22 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              {/* Right column with pending approvals and quick actions */}
               <div className={styles.columnRight}>
                 <div className={styles.widgetCard}>
                   <div className={styles.widgetHeader}>
                     <h2 className={styles.widgetTitle}>Pending Approvals</h2>
                   </div>
-                  <div className={styles.approvalsList}>
+                  <div className={styles.pendingApprovals}>
                     {adminData.pendingApprovals.map(approval => (
                       <div key={approval.id} className={styles.approvalItem}>
-                        <div className={styles.approvalHeader}>
-                          <span className={styles.approvalType}>{approval.type}</span>
-                          <span className={styles.approvalDate}>{new Date(approval.date).toLocaleDateString()}</span>
-                        </div>
-                        <h4 className={styles.approvalTitle}>{approval.title}</h4>
                         <div className={styles.approvalDetails}>
-                          <p>{approval.requestedBy}</p>
-                          <p>{approval.department}</p>
+                          <h4 className={styles.approvalTitle}>{approval.title}</h4>
+                          <p className={styles.approvalType}>{approval.type}</p>
                         </div>
-                        <div className={styles.approvalActions}>
-                          <button className={styles.approveButton}>Approve</button>
-                          <button className={styles.rejectButton}>Reject</button>
+                        <div className={styles.approvalMeta}>
+                          <span className={styles.approvalRequestedBy}>{approval.requestedBy}</span>
+                          <span className={styles.approvalDate}>{new Date(approval.date).toLocaleDateString()}</span>
                         </div>
                       </div>
                     ))}
@@ -188,157 +200,19 @@ const AdminDashboard = () => {
 
                 <div className={styles.widgetCard}>
                   <div className={styles.widgetHeader}>
-                    <h2 className={styles.widgetTitle}>Quick Actions</h2>
+                    <h2 className={styles.widgetTitle}>Departments Overview</h2>
                   </div>
-                  <div className={styles.quickActions}>
-                    <button className={styles.actionButton}>
-                      <Users size={18} />
-                      <span>Add New User</span>
-                    </button>
-                    <button className={styles.actionButton}>
-                      <BookOpen size={18} />
-                      <span>Create Course</span>
-                    </button>
-                    <button className={styles.actionButton}>
-                      <Clipboard size={18} />
-                      <span>Generate Reports</span>
-                    </button>
-                    <button className={styles.actionButton}>
-                      <Settings size={18} />
-                      <span>System Settings</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'users' && (
-            <div className={styles.usersContainer}>
-              <div className={styles.managementHeader}>
-                <div className={styles.searchAndFilters}>
-                  <div className={styles.searchBox}>
-                    <input type="text" placeholder="Search users..." className={styles.searchInput} />
-                    <button className={styles.searchButton}>Search</button>
-                  </div>
-                  <div className={styles.filterGroup}>
-                    <select className={styles.filterSelect}>
-                      <option>All Roles</option>
-                      <option>Students</option>
-                      <option>Faculty</option>
-                      <option>Administrators</option>
-                    </select>
-                    <select className={styles.filterSelect}>
-                      <option>All Departments</option>
-                      {adminData.departments.map(dept => (
-                        <option key={dept.id}>{dept.name}</option>
-                      ))}
-                    </select>
-                    <button className={styles.addButton}>Add New User</button>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.usersTable}>
-                <div className={styles.tableHeader}>
-                  <div className={styles.tableHeaderCell}>Name</div>
-                  <div className={styles.tableHeaderCell}>Email</div>
-                  <div className={styles.tableHeaderCell}>Role</div>
-                  <div className={styles.tableHeaderCell}>Department</div>
-                  <div className={styles.tableHeaderCell}>Status</div>
-                  <div className={styles.tableHeaderCell}>Actions</div>
-                </div>
-                
-                <div className={styles.tableRow}>
-                  <div className={styles.tableCell}>John Smith</div>
-                  <div className={styles.tableCell}>john.smith@university.edu</div>
-                  <div className={styles.tableCell}>Student</div>
-                  <div className={styles.tableCell}>Computer Science</div>
-                  <div className={styles.tableCell}>
-                    <span className={styles.statusActive}>Active</span>
-                  </div>
-                  <div className={styles.tableCell}>
-                    <div className={styles.actionButtons}>
-                      <button className={styles.actionButton}>Edit</button>
-                      <button className={styles.actionButton}>Suspend</button>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className={styles.tableRow}>
-                  <div className={styles.tableCell}>Emily Johnson</div>
-                  <div className={styles.tableCell}>emily.johnson@university.edu</div>
-                  <div className={styles.tableCell}>Faculty</div>
-                  <div className={styles.tableCell}>Computer Science</div>
-                  <div className={styles.tableCell}>
-                    <span className={styles.statusActive}>Active</span>
-                  </div>
-                  <div className={styles.tableCell}>
-                    <div className={styles.actionButtons}>
-                      <button className={styles.actionButton}>Edit</button>
-                      <button className={styles.actionButton}>Suspend</button>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className={styles.tableRow}>
-                  <div className={styles.tableCell}>Michael Brown</div>
-                  <div className={styles.tableCell}>michael.brown@university.edu</div>
-                  <div className={styles.tableCell}>Student</div>
-                  <div className={styles.tableCell}>Business Administration</div>
-                  <div className={styles.tableCell}>
-                    <span className={styles.statusInactive}>Inactive</span>
-                  </div>
-                  <div className={styles.tableCell}>
-                    <div className={styles.actionButtons}>
-                      <button className={styles.actionButton}>Edit</button>
-                      <button className={styles.actionButton}>Activate</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'departments' && (
-            <div className={styles.departmentsContainer}>
-              <div className={styles.managementHeader}>
-                <div className={styles.searchAndFilters}>
-                  <div className={styles.searchBox}>
-                    <input type="text" placeholder="Search departments..." className={styles.searchInput} />
-                    <button className={styles.searchButton}>Search</button>
-                  </div>
-                  <button className={styles.addButton}>Add Department</button>
-                </div>
-              </div>
-              
-              <div className={styles.departmentsGrid}>
-                {adminData.departments.map(department => (
-                  <div key={department.id} className={styles.departmentCard}>
-                    <h3 className={styles.departmentName}>{department.name}</h3>
-                    <div className={styles.departmentStats}>
-                      <div className={styles.departmentStat}>
-                        <span className={styles.statIcon}><Users size={16} /></span>
-                        <span className={styles.statLabel}>Students:</span>
-                        <span className={styles.statValue}>{department.students}</span>
+                  <div className={styles.departmentsList}>
+                    {adminData.departments.map(department => (
+                      <div key={department.id} className={styles.departmentItem}>
+                        <h4 className={styles.departmentName}>{department.name}</h4>
+                        <p className={styles.departmentStats}>
+                          Faculty: {department.faculty} | Students: {department.students} | Courses: {department.courses}
+                        </p>
                       </div>
-                      <div className={styles.departmentStat}>
-                        <span className={styles.statIcon}><UserCheck size={16} /></span>
-                        <span className={styles.statLabel}>Faculty:</span>
-                        <span className={styles.statValue}>{department.faculty}</span>
-                      </div>
-                      <div className={styles.departmentStat}>
-                        <span className={styles.statIcon}><BookOpen size={16} /></span>
-                        <span className={styles.statLabel}>Courses:</span>
-                        <span className={styles.statValue}>{department.courses}</span>
-                      </div>
-                    </div>
-                    <div className={styles.departmentActions}>
-                      <button className={styles.actionButton}>View Details</button>
-                      <button className={styles.actionButton}>Manage</button>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           )}
@@ -348,4 +222,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;
