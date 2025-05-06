@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Variables - match with dashboard.module.scss
 $primary-color: #2E7D32; // Green 800
 $secondary-color: #4CAF50; // Green 500
@@ -287,7 +289,7 @@ $info-color: #2196F3;
   padding: 0.75rem 1.25rem;
   background-color: rgba($warning-color, 0.1);
   border-top: 1px solid rgba($warning-color, 0.2);
-  color: darken($warning-color, 15%);
+  color: color.adjust($warning-color, $lightness: -15%);
   font-size: 0.75rem;
   
   svg {
@@ -297,7 +299,7 @@ $info-color: #2196F3;
   &.atRisk {
     background-color: rgba($error-color, 0.1);
     border-top: 1px solid rgba($error-color, 0.2);
-    color: darken($error-color, 10%);
+    color: color.adjust($error-color, $lightness: -10%);
   }
 }
 
