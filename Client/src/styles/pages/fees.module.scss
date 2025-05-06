@@ -1,0 +1,482 @@
+// Import common variables
+@import '../variables';
+
+// Extend common dashboard layout styles
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-color;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  
+  &.expanded {
+    margin-left: 70px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    
+    &.expanded {
+      margin-left: 0;
+    }
+  }
+}
+
+.contentWrapper {
+  padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.welcomeSection {
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: $text-color;
+  }
+  
+  .subtitle {
+    margin: 0.5rem 0 0;
+    color: $light-text;
+  }
+}
+
+.studentInfo {
+  display: flex;
+  gap: 2rem;
+  
+  .infoItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    
+    .label {
+      color: $light-text;
+      margin-right: 0.5rem;
+    }
+    
+    .value {
+      color: $text-color;
+      font-weight: 500;
+    }
+  }
+}
+
+// Fee page specific styles
+.feeControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.semesterSelect {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  label {
+    font-size: 0.875rem;
+    color: $light-text;
+  }
+}
+
+.dropdownContainer {
+  position: relative;
+}
+
+.dropdownToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $white;
+  border: 1px solid $border-color;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  min-width: 150px;
+  
+  &:hover {
+    border-color: $primary-color;
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: $white;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  z-index: $z-index-dropdown;
+  box-shadow: $shadow;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdownItem {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: rgba($primary-color, 0.05);
+  }
+  
+  &.active {
+    background-color: rgba($primary-color, 0.1);
+    color: $primary-color;
+    font-weight: 500;
+  }
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $primary-color;
+  color: $white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: $dark-color;
+  }
+}
+
+.feeContent {
+  margin-top: 1.5rem;
+}
+
+.feeSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.summaryCard {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .summaryIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: $light-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+  }
+  
+  .summaryDetails {
+    h3 {
+      margin: 0;
+      font-size: 0.875rem;
+      color: $light-text;
+      font-weight: normal;
+    }
+  }
+  
+  .amount, .date {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: $text-color;
+    margin-top: 0.25rem;
+  }
+  
+  .dueAmount {
+    color: $error-color;
+  }
+}
+
+.feeDetails {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+  
+  h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.25rem;
+    color: $text-color;
+  }
+}
+
+.feeBreakdown {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+}
+
+.breakdownList {
+  .breakdownItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid $border-color;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .feeLabel {
+      color: $light-text;
+    }
+    
+    .feeValue {
+      font-weight: 500;
+    }
+    
+    &.totalItem {
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      border-top: 2px solid $border-color;
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+  }
+}
+
+.installments {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+}
+
+.installmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.installmentItem {
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1rem;
+  
+  &.statusPaid {
+    border-left: 4px solid $success-color;
+  }
+  
+  &.statusPartiallyPaid {
+    border-left: 4px solid $warning-color;
+  }
+  
+  &.statusPending {
+    border-left: 4px solid $info-color;
+  }
+  
+  &.statusOverdue {
+    border-left: 4px solid $error-color;
+  }
+}
+
+.installmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  
+  .installmentAmount {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .installmentStatus {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    
+    &.paid {
+      color: $success-color;
+    }
+    
+    &.pending {
+      color: $info-color;
+    }
+    
+    &.overdue {
+      color: $error-color;
+    }
+  }
+}
+
+.installmentDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  
+  .label {
+    font-size: 0.75rem;
+    color: $light-text;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  .value {
+    font-weight: 500;
+  }
+}
+
+.installmentActions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  
+  .payNowButton {
+    background-color: $primary-color;
+    color: $white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: $dark-color;
+    }
+  }
+}
+
+.paymentMethods {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  
+  h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.25rem;
+    color: $text-color;
+  }
+}
+
+.methodsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.methodItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  
+  .methodIcon {
+    width: 48px;
+    height: 48px;
+    background-color: $light-color;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+  
+  .methodDetails {
+    flex: 1;
+    
+    h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      color: $text-color;
+    }
+    
+    p {
+      margin: 0 0 1rem;
+      font-size: 0.875rem;
+      color: $light-text;
+    }
+  }
+}
+
+.bankDetails, .upiInfo {
+  margin-top: 1rem;
+  border-top: 1px solid $border-color;
+  padding-top: 1rem;
+  
+  .bankInfo {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    
+    .label {
+      color: $light-text;
+      font-size: 0.875rem;
+    }
+    
+    .value {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.payButton {
+  background-color: $primary-color;
+  color: $white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.5rem;
+  
+  &:hover {
+    background-color: $dark-color;
+  }
+} 

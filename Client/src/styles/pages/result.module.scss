@@ -1,0 +1,432 @@
+// Import common variables
+@import '../variables';
+
+// Extend common dashboard layout styles
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-color;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  
+  &.expanded {
+    margin-left: 70px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    
+    &.expanded {
+      margin-left: 0;
+    }
+  }
+}
+
+.contentWrapper {
+  padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.welcomeSection {
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: $text-color;
+  }
+  
+  .subtitle {
+    margin: 0.5rem 0 0;
+    color: $light-text;
+  }
+}
+
+.studentInfo {
+  display: flex;
+  gap: 2rem;
+  
+  .infoItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    
+    .label {
+      color: $light-text;
+      margin-right: 0.5rem;
+    }
+    
+    .value {
+      color: $text-color;
+      font-weight: 500;
+    }
+  }
+}
+
+// Result page specific styles
+.resultControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.semesterSelect {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  label {
+    font-size: 0.875rem;
+    color: $light-text;
+  }
+}
+
+.dropdownContainer {
+  position: relative;
+}
+
+.dropdownToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $white;
+  border: 1px solid $border-color;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  min-width: 150px;
+  
+  &:hover {
+    border-color: $primary-color;
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: $white;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  z-index: $z-index-dropdown;
+  box-shadow: $shadow;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdownItem {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: rgba($primary-color, 0.05);
+  }
+  
+  &.active {
+    background-color: rgba($primary-color, 0.1);
+    color: $primary-color;
+    font-weight: 500;
+  }
+}
+
+.searchContainer {
+  flex: 1;
+  max-width: 300px;
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .searchInput {
+    position: relative;
+    
+    svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $light-text;
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.5rem 1rem 0.5rem 2.75rem;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+      }
+    }
+  }
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $primary-color;
+  color: $white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: $dark-color;
+  }
+}
+
+.resultContent {
+  margin-top: 1.5rem;
+}
+
+.resultSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.summaryCard {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .summaryIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: $light-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+  }
+  
+  .summaryDetails {
+    h3 {
+      margin: 0;
+      font-size: 0.875rem;
+      color: $light-text;
+      font-weight: normal;
+    }
+  }
+  
+  .gpaValue, .creditValue, .cgpaValue {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: $text-color;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .cgpaChange {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $success-color;
+    background-color: rgba($success-color, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+}
+
+.resultTable {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  
+  .tableHeader {
+    display: grid;
+    grid-template-columns: 1fr 2fr 0.7fr 0.7fr 0.7fr 0.7fr;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: $light-text;
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+  
+  .tableBody {
+    .tableRow {
+      display: grid;
+      grid-template-columns: 1fr 2fr 0.7fr 0.7fr 0.7fr 0.7fr;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid $border-color;
+      align-items: center;
+      font-size: 0.875rem;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      @media (max-width: 768px) {
+        display: block;
+        position: relative;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        
+        div {
+          padding: 0.5rem 0;
+          display: flex;
+          justify-content: space-between;
+          
+          &:before {
+            content: attr(class);
+            text-transform: capitalize;
+            font-weight: 600;
+            color: $light-text;
+          }
+        }
+      }
+      
+      .tdCode {
+        font-weight: 600;
+        color: $primary-color;
+      }
+      
+      .tdGrade {
+        font-weight: 600;
+        text-align: center;
+        border-radius: 4px;
+        padding: 0.25rem;
+      }
+      
+      .tdStatus {
+        font-weight: 500;
+        text-align: center;
+        border-radius: 4px;
+        padding: 0.25rem;
+      }
+    }
+  }
+}
+
+.gradeA {
+  color: #4caf50;
+  background-color: rgba(#4caf50, 0.1);
+}
+
+.gradeB {
+  color: #2196f3;
+  background-color: rgba(#2196f3, 0.1);
+}
+
+.gradeC {
+  color: #ff9800;
+  background-color: rgba(#ff9800, 0.1);
+}
+
+.gradeD {
+  color: #f44336;
+  background-color: rgba(#f44336, 0.1);
+}
+
+.gradeF {
+  color: #f44336;
+  background-color: rgba(#f44336, 0.1);
+}
+
+.statusPassed {
+  color: #4caf50;
+  background-color: rgba(#4caf50, 0.1);
+}
+
+.statusFailed {
+  color: #f44336;
+  background-color: rgba(#f44336, 0.1);
+}
+
+.resultNote {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  padding: 1.5rem;
+  
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    color: $text-color;
+  }
+}
+
+.gradeScale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  
+  .gradeItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .grade {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    .gradePoints {
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    .gradeRange {
+      color: $light-text;
+      font-size: 0.75rem;
+    }
+  }
+} 

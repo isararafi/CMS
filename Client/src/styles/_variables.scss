@@ -1,0 +1,53 @@
+// Color variables
+$primary-color: #2E7D32; // Green 800
+$secondary-color: #4CAF50; // Green 500
+$light-color: #C8E6C9; // Green 100
+$dark-color: #1B5E20; // Green 900
+$accent-color: #81C784; // Green 300
+$text-color: #333;
+$light-text: #666;
+$border-color: #e0e0e0;
+$white: #fff;
+$background-color: #f8f9fa;
+$shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+// State colors
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$error-color: #f44336;
+$info-color: #2196f3;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Font sizes
+$font-xs: 0.75rem;   // 12px
+$font-sm: 0.875rem;  // 14px
+$font-md: 1rem;      // 16px
+$font-lg: 1.25rem;   // 20px
+$font-xl: 1.5rem;    // 24px
+$font-2xl: 2rem;     // 32px
+
+// Spacing
+$spacing-xs: 0.25rem;  // 4px
+$spacing-sm: 0.5rem;   // 8px
+$spacing-md: 1rem;     // 16px
+$spacing-lg: 1.5rem;   // 24px
+$spacing-xl: 2rem;     // 32px
+
+// Border radius
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+
+// Z-index
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070; 
