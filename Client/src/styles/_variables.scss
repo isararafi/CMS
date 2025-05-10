@@ -1,21 +1,33 @@
-// Color variables
-$primary-color: #2E7D32; // Green 800
-$secondary-color: #4CAF50; // Green 500
-$light-color: #C8E6C9; // Green 100
-$dark-color: #1B5E20; // Green 900
-$accent-color: #81C784; // Green 300
-$text-color: #333;
-$light-text: #666;
-$border-color: #e0e0e0;
-$white: #fff;
-$background-color: #f8f9fa;
-$shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+// Global variables for the CMS project
 
-// State colors
-$success-color: #4caf50;
-$warning-color: #ff9800;
-$error-color: #f44336;
-$info-color: #2196f3;
+// Primary color palette - Green theme
+$primary-color: #1B5E20; // Dark Green
+$secondary-color: #2E7D32; // Dark Green
+$light-color: #81C784; // Medium Green
+$dark-color: #1B5E20; // Dark Green
+$accent-color: #4CAF50; // Medium Green
+
+// Text colors
+$text-color: #000000; // Pure black
+$text-primary: #000000; // Pure black  
+$text-secondary: #333333; // Dark gray
+$text-tertiary: #424242; // Darker gray
+$light-text: #333333; // Dark gray
+
+// Structural colors
+$border-color: #bdbdbd; // Light gray border
+$white: #ffffff; // Pure white
+$background-color: #f0f9f0; // Light green background
+
+// Shadows
+$shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // Subtle shadow
+$card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+// Status colors
+$success-color: #1B5E20; // Dark Green
+$warning-color: #E65100; // Dark Orange
+$error-color: #B71C1C; // Dark Red
+$info-color: #01579B; // Dark Blue
 
 // Breakpoints
 $breakpoint-sm: 576px;
@@ -44,7 +56,7 @@ $border-radius-md: 8px;
 $border-radius-lg: 12px;
 
 // Z-index
-$z-index-dropdown: 1000;
+$z-index-dropdown: 10;
 $z-index-sticky: 1020;
 $z-index-fixed: 1030;
 $z-index-modal-backdrop: 1040;

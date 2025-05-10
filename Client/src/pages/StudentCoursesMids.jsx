@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Clock, FileText, BookOpen, AlertCircle, Download } from 'lucide-react';
+import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, Layers, GraduationCap } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/dashboard.module.scss';
 
 const StudentCoursesMids = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState('mids'); // 'sessional', 'mids', 'final'
 
   // Mock data - would be fetched from API
   const studentData = {
@@ -15,7 +16,47 @@ const StudentCoursesMids = () => {
     semester: "Fall 2023"
   };
 
-  const midsData = [
+  // Mock evaluation data for courses
+  const evaluationData = {
+    sessional: [
+      { 
+        id: 1, 
+        courseCode: 'CS301', 
+        courseName: 'Database Systems',
+        assignments: { obtained: 8.5, total: 10 },
+        quizzes: { obtained: 12, total: 15 },
+        attendance: { obtained: 4.5, total: 5 },
+        total: { obtained: 25, total: 30 }
+      },
+      { 
+        id: 2, 
+        courseCode: 'CS302', 
+        courseName: 'Operating Systems',
+        assignments: { obtained: 7, total: 10 },
+        quizzes: { obtained: 10, total: 15 },
+        attendance: { obtained: 5, total: 5 },
+        total: { obtained: 22, total: 30 }
+      },
+      { 
+        id: 3, 
+        courseCode: 'CS303', 
+        courseName: 'Software Engineering',
+        assignments: { obtained: 9, total: 10 },
+        quizzes: { obtained: 13, total: 15 },
+        attendance: { obtained: 5, total: 5 },
+        total: { obtained: 27, total: 30 }
+      },
+      { 
+        id: 4, 
+        courseCode: 'CS304', 
+        courseName: 'Computer Networks',
+        assignments: { obtained: 8, total: 10 },
+        quizzes: { obtained: 11, total: 15 },
+        attendance: { obtained: 4, total: 5 },
+        total: { obtained: 23, total: 30 }
+      }
+    ],
+    mids: [
     { 
       id: 1, 
       courseCode: 'CS301', 
@@ -63,8 +104,55 @@ const StudentCoursesMids = () => {
       obtainedMarks: null,
       status: 'upcoming',
       syllabus: ["Network Models", "Physical Layer", "Data Link Layer", "Network Layer", "Transport Layer"]
-    },
-  ];
+      }
+    ],
+    final: [
+      { 
+        id: 1, 
+        courseCode: 'CS301', 
+        courseName: 'Database Systems',
+        date: '2023-12-10', 
+        time: '09:00 - 12:00', 
+        venue: 'Examination Hall A',
+        totalMarks: 40,
+        obtainedMarks: 32,
+        status: 'completed'
+      },
+      { 
+        id: 2, 
+        courseCode: 'CS302', 
+        courseName: 'Operating Systems',
+        date: '2023-12-15', 
+        time: '09:00 - 12:00', 
+        venue: 'Examination Hall B',
+        totalMarks: 40,
+        obtainedMarks: 34,
+        status: 'completed'
+      },
+      { 
+        id: 3, 
+        courseCode: 'CS303', 
+        courseName: 'Software Engineering',
+        date: '2023-12-20', 
+        time: '14:00 - 17:00', 
+        venue: 'Examination Hall A',
+        totalMarks: 40,
+        obtainedMarks: 35,
+        status: 'completed'
+      },
+      { 
+        id: 4, 
+        courseCode: 'CS304', 
+        courseName: 'Computer Networks',
+        date: '2023-12-25', 
+        time: '09:00 - 12:00', 
+        venue: 'Examination Hall C',
+        totalMarks: 40,
+        obtainedMarks: null,
+        status: 'upcoming'
+      }
+    ]
+  };
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -92,8 +180,474 @@ const StudentCoursesMids = () => {
     }
   };
 
+  // Get performance color
+  const getPerformanceColor = (percentage) => {
+    if (percentage === null) return '#aaa';
+    if (percentage >= 80) return '#2E7D32';
+    if (percentage >= 70) return '#4CAF50';
+    if (percentage >= 60) return '#FFC107';
+    return '#F44336';
+  };
+
+  // Add evaluation grid styles
+  const evaluationGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+    gap: '24px',
+    padding: '8px 4px'
+  };
+
+  // Render tab content based on active tab
+  const renderTabContent = () => {
+    switch(activeTab) {
+      case 'sessional':
+        return (
+          <div className={styles.evaluationGrid} style={evaluationGridStyle}>
+            {evaluationData.sessional.map(course => (
+              <div key={course.id} className={styles.midtermCard} style={{
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                border: '1px solid #e0e0e0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}>
+                <div className={styles.midtermHeader} style={{
+                  borderBottom: '1px solid #f0f0f0',
+                  paddingBottom: '12px'
+                }}>
+                  <h3 style={{ 
+                    fontSize: '18px', 
+                    margin: '0 0 4px 0',
+                    color: '#333',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <BookOpen size={16} />
+                    {course.courseCode} - {course.courseName}
+                  </h3>
+                </div>
+                
+                <div className={styles.sessionComponents}>
+                  {/* Assignments */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <FileText size={16} />
+                        <span>Assignments</span>
+                      </div>
+                      <div>
+                        <span style={{ fontWeight: 'bold' }}>{course.assignments.obtained}</span>
+                        /{course.assignments.total}
+                        <span style={{ 
+                          marginLeft: '8px',
+                          color: getPerformanceColor(calculatePerformance(course.assignments.obtained, course.assignments.total)),
+                          fontWeight: 'bold'
+                        }}>
+                          ({calculatePerformance(course.assignments.obtained, course.assignments.total)}%)
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      height: '10px',
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        height: '100%',
+                        width: `${calculatePerformance(course.assignments.obtained, course.assignments.total)}%`,
+                        backgroundColor: getPerformanceColor(calculatePerformance(course.assignments.obtained, course.assignments.total)),
+                        borderRadius: '5px',
+                        transition: 'width 1s ease-in-out'
+                      }}></div>
+                    </div>
+                  </div>
+                  
+                  {/* Quizzes */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <AlertCircle size={16} />
+                        <span>Quizzes</span>
+                      </div>
+                      <div>
+                        <span style={{ fontWeight: 'bold' }}>{course.quizzes.obtained}</span>
+                        /{course.quizzes.total}
+                        <span style={{ 
+                          marginLeft: '8px',
+                          color: getPerformanceColor(calculatePerformance(course.quizzes.obtained, course.quizzes.total)),
+                          fontWeight: 'bold'
+                        }}>
+                          ({calculatePerformance(course.quizzes.obtained, course.quizzes.total)}%)
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      height: '10px',
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        height: '100%',
+                        width: `${calculatePerformance(course.quizzes.obtained, course.quizzes.total)}%`,
+                        backgroundColor: getPerformanceColor(calculatePerformance(course.quizzes.obtained, course.quizzes.total)),
+                        borderRadius: '5px',
+                        transition: 'width 1s ease-in-out'
+                      }}></div>
+                    </div>
+                  </div>
+                  
+                  {/* Attendance */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Clock size={16} />
+                        <span>Attendance</span>
+                      </div>
+                      <div>
+                        <span style={{ fontWeight: 'bold' }}>{course.attendance.obtained}</span>
+                        /{course.attendance.total}
+                        <span style={{ 
+                          marginLeft: '8px',
+                          color: getPerformanceColor(calculatePerformance(course.attendance.obtained, course.attendance.total)),
+                          fontWeight: 'bold'
+                        }}>
+                          ({calculatePerformance(course.attendance.obtained, course.attendance.total)}%)
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      height: '10px',
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        height: '100%',
+                        width: `${calculatePerformance(course.attendance.obtained, course.attendance.total)}%`,
+                        backgroundColor: getPerformanceColor(calculatePerformance(course.attendance.obtained, course.attendance.total)),
+                        borderRadius: '5px',
+                        transition: 'width 1s ease-in-out'
+                      }}></div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Total */}
+                <div style={{
+                  borderTop: '1px solid #f0f0f0',
+                  paddingTop: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>Total Score:</div>
+                    <div>
+                      <span style={{ fontWeight: 'bold' }}>{course.total.obtained}</span>
+                      /{course.total.total}
+                      <span style={{ 
+                        marginLeft: '8px',
+                        color: getPerformanceColor(calculatePerformance(course.total.obtained, course.total.total)),
+                        fontWeight: 'bold'
+                      }}>
+                        ({calculatePerformance(course.total.obtained, course.total.total)}%)
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div style={{
+                    height: '16px',
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      height: '100%',
+                      width: `${calculatePerformance(course.total.obtained, course.total.total)}%`,
+                      backgroundColor: getPerformanceColor(calculatePerformance(course.total.obtained, course.total.total)),
+                      borderRadius: '8px',
+                      transition: 'width 1s ease-in-out'
+                    }}></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      
+      case 'mids':
+        return (
+          <div className={styles.evaluationGrid} style={evaluationGridStyle}>
+            {evaluationData.mids.map(exam => (
+              <div key={exam.id} className={styles.midtermCard} style={{
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                border: '1px solid #e0e0e0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}>
+                <div className={styles.midtermHeader} style={{
+                  borderBottom: '1px solid #f0f0f0',
+                  paddingBottom: '12px'
+                }}>
+                  <h3 style={{ 
+                    fontSize: '18px', 
+                    margin: '0 0 4px 0',
+                    color: '#333',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <BookOpen size={16} />
+                    {exam.courseCode} - {exam.courseName}
+                  </h3>
+                  <div style={{
+                    fontSize: '14px',
+                    color: '#666',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <Clock size={14} />
+                    <span>{exam.date}</span>
+                  </div>
+                </div>
+                
+                {exam.status === 'completed' ? (
+                  <div className={styles.midtermResult}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ fontWeight: 'bold' }}>Score:</div>
+                      <div>
+                        <span style={{ fontWeight: 'bold' }}>{exam.obtainedMarks}</span>
+                        /{exam.totalMarks}
+                        <span style={{ 
+                          marginLeft: '8px',
+                          color: getPerformanceColor(calculatePerformance(exam.obtainedMarks, exam.totalMarks)),
+                          fontWeight: 'bold'
+                        }}>
+                          ({calculatePerformance(exam.obtainedMarks, exam.totalMarks)}%)
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      height: '20px',
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        height: '100%',
+                        width: `${calculatePerformance(exam.obtainedMarks, exam.totalMarks)}%`,
+                        backgroundColor: getPerformanceColor(calculatePerformance(exam.obtainedMarks, exam.totalMarks)),
+                        borderRadius: '10px',
+                        transition: 'width 1s ease-in-out'
+                      }}></div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'flex', 
+                    gap: '8px', 
+                    alignItems: 'center', 
+                    padding: '12px', 
+                    backgroundColor: '#f8f9fa', 
+                    borderRadius: '8px'
+                  }}>
+                    <AlertCircle size={18} color="#f57c00" />
+                    <span style={{ color: '#f57c00', fontSize: '14px' }}>Upcoming exam</span>
+                  </div>
+                )}
+                
+                <div className={styles.venueLine} style={{
+                  fontSize: '14px',
+                  color: '#666',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <FileText size={14} />
+                  <span>{exam.venue}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      
+      case 'final':
+        return (
+          <div className={styles.evaluationGrid} style={evaluationGridStyle}>
+            {evaluationData.final.map(exam => (
+              <div key={exam.id} className={styles.midtermCard} style={{
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                border: '1px solid #e0e0e0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}>
+                <div className={styles.midtermHeader} style={{
+                  borderBottom: '1px solid #f0f0f0',
+                  paddingBottom: '12px'
+                }}>
+                  <h3 style={{ 
+                    fontSize: '18px', 
+                    margin: '0 0 4px 0',
+                    color: '#333',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <Award size={16} />
+                    {exam.courseCode} - {exam.courseName}
+                  </h3>
+                  <div style={{
+                    fontSize: '14px',
+                    color: '#666',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={14} />
+                      <span>{exam.date}</span>
+                    </div>
+                    <div style={{
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      backgroundColor: exam.status === 'completed' ? '#e8f5e9' : '#fff8e1',
+                      color: exam.status === 'completed' ? '#2E7D32' : '#f57c00'
+                    }}>
+                      {exam.status === 'completed' ? 'Completed' : 'Upcoming'}
+                    </div>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#666' }}>
+                  <FileText size={14} />
+                  <span>{exam.venue}</span>
+                </div>
+                
+                {exam.status === 'completed' ? (
+                  <div className={styles.finalResult}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ fontWeight: 'bold' }}>Score:</div>
+                      <div>
+                        <span style={{ fontWeight: 'bold' }}>{exam.obtainedMarks}</span>
+                        /{exam.totalMarks}
+                        <span style={{ 
+                          marginLeft: '8px',
+                          color: getPerformanceColor(calculatePerformance(exam.obtainedMarks, exam.totalMarks)),
+                          fontWeight: 'bold'
+                        }}>
+                          ({calculatePerformance(exam.obtainedMarks, exam.totalMarks)}%)
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      height: '20px',
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        height: '100%',
+                        width: `${calculatePerformance(exam.obtainedMarks, exam.totalMarks)}%`,
+                        backgroundColor: getPerformanceColor(calculatePerformance(exam.obtainedMarks, exam.totalMarks)),
+                        borderRadius: '10px',
+                        transition: 'width 1s ease-in-out'
+                      }}></div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'flex', 
+                    gap: '8px', 
+                    alignItems: 'center', 
+                    padding: '12px', 
+                    backgroundColor: '#f8f9fa', 
+                    borderRadius: '8px'
+                  }}>
+                    <GraduationCap size={18} />
+                    <span style={{ color: '#666', fontSize: '14px' }}>Final exam not conducted yet</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className={styles.dashboardLayout}>
+      {/* Decorative elements */}
+      <div className={styles.decorativeWave}></div>
+      <div className={styles.decorativeTriangle}></div>
+      <div className={styles.decorativeCircle}></div>
+      <div className={styles.decorativeDots}></div>
+      <div className={styles.decorativeDiamond}></div>
+      
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={toggleSidebar} />
@@ -102,8 +656,8 @@ const StudentCoursesMids = () => {
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
               <div className={styles.welcomeSection}>
-                <h1>Mid-Term Examinations</h1>
-                <p className={styles.subtitle}>View your mid-term exam details and results</p>
+                <h1>Academic Evaluations</h1>
+                <p className={styles.subtitle}>View your academic performance and results</p>
               </div>
               <div className={styles.studentInfo}>
                 <div className={styles.infoItem}>
@@ -117,110 +671,83 @@ const StudentCoursesMids = () => {
               </div>
             </div>
 
-            <div className={styles.statsContainer}>
-              {midsData.map(exam => (
-                <div key={exam.id} className={`${styles.examCard} ${getStatusColor(exam.status)}`}>
-                  <div className={styles.examHeader}>
-                    <div className={styles.courseInfo}>
-                      <h3 className={styles.courseCode}>{exam.courseCode}</h3>
-                      <p className={styles.courseName}>{exam.courseName}</p>
-                    </div>
-                    <div className={`${styles.examStatus} ${getStatusColor(exam.status)}`}>
-                      {exam.status === 'completed' && 'Completed'}
-                      {exam.status === 'upcoming' && 'Upcoming'}
-                      {exam.status === 'missed' && 'Missed'}
-                    </div>
-                  </div>
-                  
-                  <div className={styles.examDetails}>
-                    <div className={styles.examDetailItem}>
-                      <Clock size={16} />
-                      <span>{exam.date} | {exam.time}</span>
-                    </div>
-                    <div className={styles.examDetailItem}>
-                      <FileText size={16} />
-                      <span>{exam.venue}</span>
-                    </div>
-                  </div>
-                  
-                  {exam.status === 'completed' && (
-                    <div className={styles.examResult}>
-                      <div className={styles.examScore}>
-                        <div className={styles.scoreCircle}>
-                          <svg width="80" height="80" viewBox="0 0 100 100">
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="45"
-                              fill="none"
-                              stroke="#e6e6e6"
-                              strokeWidth="10"
-                            />
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="45"
-                              fill="none"
-                              stroke="#2E7D32"
-                              strokeWidth="10"
-                              strokeDasharray={`${2 * Math.PI * 45 * calculatePerformance(exam.obtainedMarks, exam.totalMarks) / 100} ${2 * Math.PI * 45}`}
-                              strokeDashoffset={2 * Math.PI * 45 * 0.25}
-                            />
-                          </svg>
-                          <div className={styles.scoreText}>
-                            {exam.obtainedMarks}/{exam.totalMarks}
-                          </div>
-                        </div>
-                      </div>
-                      <div className={styles.examMarks}>
-                        <div className={styles.markItem}>
-                          <span className={styles.markLabel}>Obtained</span>
-                          <span className={styles.markValue}>{exam.obtainedMarks}</span>
-                        </div>
-                        <div className={styles.markItem}>
-                          <span className={styles.markLabel}>Total</span>
-                          <span className={styles.markValue}>{exam.totalMarks}</span>
-                        </div>
-                        <div className={styles.markItem}>
-                          <span className={styles.markLabel}>Percentage</span>
-                          <span className={styles.markValue}>{calculatePerformance(exam.obtainedMarks, exam.totalMarks)}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {exam.status === 'upcoming' && (
-                    <div className={styles.examCountdown}>
-                      <AlertCircle size={20} />
-                      <span>Prepare for your upcoming exam. Review the syllabus below.</span>
-                    </div>
-                  )}
-                  
-                  <div className={styles.examSyllabus}>
-                    <h4 className={styles.syllabusTitle}>Syllabus Coverage</h4>
-                    <ul className={styles.syllabusList}>
-                      {exam.syllabus.map((topic, index) => (
-                        <li key={index} className={styles.syllabusItem}>{topic}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className={styles.examActions}>
-                    {exam.status === 'completed' ? (
-                      <button className={styles.examActionButton}>
-                        <Download size={16} />
-                        <span>Download Mid Paper</span>
+            <div className={styles.tabsContainer} style={{
+              display: 'flex',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              marginBottom: '24px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+            }}>
+              <button 
+                onClick={() => setActiveTab('sessional')}
+                className={`${styles.tabButton} ${activeTab === 'sessional' ? styles.active : ''}`}
+                style={{
+                  flex: 1,
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  background: activeTab === 'sessional' ? 'rgba(46, 125, 50, 0.1)' : 'transparent',
+                  color: activeTab === 'sessional' ? '#1B5E20' : '#666',
+                  border: 'none',
+                  borderBottom: activeTab === 'sessional' ? '3px solid #1B5E20' : 'none',
+                  fontWeight: activeTab === 'sessional' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <Layers size={18} />
+                <span>Sessional</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('mids')}
+                className={`${styles.tabButton} ${activeTab === 'mids' ? styles.active : ''}`}
+                style={{
+                  flex: 1,
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  background: activeTab === 'mids' ? 'rgba(46, 125, 50, 0.1)' : 'transparent',
+                  color: activeTab === 'mids' ? '#1B5E20' : '#666',
+                  border: 'none',
+                  borderBottom: activeTab === 'mids' ? '3px solid #1B5E20' : 'none',
+                  fontWeight: activeTab === 'mids' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <BarChart2 size={18} />
+                <span>Mid Term</span>
                       </button>
-                    ) : (
-                      <button className={styles.examActionButton}>
-                        <BookOpen size={16} />
-                        <span>Study Material</span>
+              <button 
+                onClick={() => setActiveTab('final')}
+                className={`${styles.tabButton} ${activeTab === 'final' ? styles.active : ''}`}
+                style={{
+                  flex: 1,
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  background: activeTab === 'final' ? 'rgba(46, 125, 50, 0.1)' : 'transparent',
+                  color: activeTab === 'final' ? '#1B5E20' : '#666',
+                  border: 'none',
+                  borderBottom: activeTab === 'final' ? '3px solid #1B5E20' : 'none',
+                  fontWeight: activeTab === 'final' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <Award size={18} />
+                <span>Final Term</span>
                       </button>
-                    )}
-                  </div>
-                </div>
-              ))}
             </div>
+
+            {renderTabContent()}
           </div>
         </div>
       </div>

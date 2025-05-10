@@ -1,30 +1,143 @@
-// Variables
+@use "sass:color";
+
+// Enhanced color palette
 $primary-color: #2E7D32; // Green 800
 $secondary-color: #4CAF50; // Green 500
 $light-color: #C8E6C9; // Green 100
 $dark-color: #1B5E20; // Green 900
 $accent-color: #81C784; // Green 300
+$accent-bright: #00C853; // Green A700
+$accent-blue: #00BFA5; // Teal A700
 $text-color: #333;
 $light-text: #666;
-$border-color: #e0e0e0;
+$border-color: rgba(0, 0, 0, 0.1);
 $white: #fff;
-$background-color: #f8f9fa;
+$background-color: #f4f8f5;
 $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+$card-bg: #ffffff;
 
 .dashboardLayout {
   display: flex;
   height: 100vh;
   width: 100%;
   background-color: $background-color;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(196, 223, 170, 0.5) 0%, transparent 30%),
+    radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.2) 0%, transparent 40%),
+    linear-gradient(to bottom right, rgba(196, 223, 170, 0.3), rgba(76, 175, 80, 0.05)),
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.01) 0px, rgba(0, 0, 0, 0.01) 2px, transparent 2px, transparent 4px);
+  position: relative;
+  
+  // Large circle decoration
+  &::before {
+    content: '';
+    position: absolute;
+    top: 150px;
+    right: 50px;
+    width: 350px;
+    height: 350px;
+    background-image: 
+      repeating-linear-gradient(0deg, rgba(76, 175, 80, 0.05) 0px, rgba(76, 175, 80, 0.05) 1px, transparent 1px, transparent 20px),
+      repeating-linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0px, rgba(76, 175, 80, 0.05) 1px, transparent 1px, transparent 20px);
+    border-radius: 15px;
+    transform: rotate(15deg);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  // Radial gradient decoration
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 10%;
+    left: 10%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(76, 175, 80, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  // Diamond decoration in bottom right
+  .diamond {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    bottom: 10%;
+    right: 5%;
+    background: linear-gradient(135deg, rgba($accent-bright, 0.1) 0%, rgba($accent-bright, 0.03) 100%);
+    transform: rotate(45deg);
+    border: 1px solid rgba($accent-bright, 0.1);
+    z-index: 0;
+  }
+  
+  // Triangle decoration
+  .triangle {
+    position: absolute;
+    top: 15%;
+    left: 40%;
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 70px solid rgba($accent-blue, 0.05);
+    transform: rotate(20deg);
+    z-index: 0;
+  }
+  
+  // Dots pattern
+  .dots {
+    position: absolute;
+    bottom: 30%;
+    right: 25%;
+    width: 200px;
+    height: 120px;
+    background-image: radial-gradient(rgba($accent-bright, 0.15) 2px, transparent 2px);
+    background-size: 18px 18px;
+    transform: rotate(-10deg);
+    z-index: 0;
+  }
   
   .mainContent {
     flex: 1;
     margin-left: 260px;
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     height: 100vh;
     overflow-x: hidden;
+    position: relative;
+    z-index: 1;
+    
+    // Gradient overlay at top
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 250px;
+      background: linear-gradient(180deg, rgba($accent-bright, 0.08) 0%, rgba($accent-bright, 0) 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    // Top right corner decoration
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 150px;
+      background-color: $background-color;
+      border-radius: 0 0 0 100%;
+      box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.05);
+      pointer-events: none;
+      z-index: 1;
+    }
     
     &.expanded {
       margin-left: 70px;
@@ -43,17 +156,186 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      position: relative;
+      z-index: 1;
+      
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.02);
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba($accent-bright, 0.2);
+        border-radius: 4px;
+        
+        &:hover {
+          background-color: rgba($accent-bright, 0.3);
+        }
+      }
       
       .pageContent {
         flex: 1;
-        padding: 1.5rem;
+        padding: 2rem;
+        position: relative;
+        
+        // Curved divider
+        &::before {
+          content: '';
+          position: absolute;
+          top: 30px;
+          left: 30px;
+          right: 30px;
+          height: 20px;
+          background: rgba($accent-bright, 0.07);
+          border-radius: 50%;
+          filter: blur(10px);
+          z-index: -1;
+        }
         
         @media (max-width: 768px) {
           padding: 1rem;
         }
       }
       
-      
+      .footer {
+        padding: 1rem 1.5rem;
+        text-align: center;
+        border-top: 1px solid $border-color;
+        background-color: $card-bg;
+        position: relative;
+        overflow: hidden;
+        
+        // Footer gradient line
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, transparent, $accent-bright, transparent);
+          opacity: 0.4;
+        }
+        
+        p {
+          margin: 0;
+          font-size: 0.85rem;
+          color: $light-text;
+          position: relative;
+          z-index: 1;
+        }
+      }
     }
+  }
+}
+
+// Card styling for dashboard components
+.card {
+  background-color: $card-bg;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid rgba($accent-bright, 0.07);
+  transform-origin: center bottom;
+  
+  // Gradient accent line at top
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $primary-color, $accent-bright, $accent-blue);
+    opacity: 0.8;
+  }
+  
+  &:hover {
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-7px) scale(1.01);
+    
+    .cardHeader h2 {
+      color: $accent-bright;
+    }
+  }
+  
+  .cardHeader {
+    padding: 1.25rem;
+    border-bottom: 1px solid $border-color;
+    background-color: rgba($accent-bright, 0.03);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    // Card header decorative element
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, $accent-bright, transparent);
+    }
+    
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: $primary-color;
+      display: flex;
+      align-items: center;
+      transition: color 0.3s ease;
+      
+      svg {
+        margin-right: 0.5rem;
+        color: $accent-bright;
+      }
+    }
+  }
+  
+  .cardBody {
+    padding: 1.25rem;
+    position: relative;
+    
+    // Card shine effect
+    &::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+  }
+  
+  &:hover .cardBody::after {
+    opacity: 1;
+    animation: shine 1.5s ease-in-out;
+  }
+}
+
+@keyframes shine {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 100%;
   }
 } 

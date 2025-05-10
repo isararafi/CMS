@@ -60,6 +60,13 @@ const StudentDashboard = () => {
 
   return (
     <div className={styles.dashboardLayout}>
+      {/* Decorative elements */}
+      <div className={styles.decorativeWave}></div>
+      <div className={styles.decorativeTriangle}></div>
+      <div className={styles.decorativeCircle}></div>
+      <div className={styles.decorativeDots}></div>
+      <div className={styles.decorativeDiamond}></div>
+      
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={toggleSidebar} />

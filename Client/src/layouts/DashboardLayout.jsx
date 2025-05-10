@@ -28,21 +28,21 @@ const DashboardLayout = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Function to toggle sidebar collapsed state
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
-
   return (
     // Main dashboard layout container
     <div className={styles.dashboardLayout}>
+      {/* Decorative elements */}
+      <div className={styles.diamond}></div>
+      <div className={styles.triangle}></div>
+      <div className={styles.dots}></div>
+
       {/* Sidebar component with collapse state */}
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       
       {/* Main content area that expands when sidebar is collapsed */}
       <div className={`${styles.mainContent} ${collapsed ? styles.expanded : ''}`}>
         {/* Navbar component with toggle sidebar button */}
-        <Navbar toggleSidebar={toggleSidebar} />
+        <Navbar toggleSidebar={() => setCollapsed(!collapsed)} />
         
         {/* Wrapper for the page content */}
         <div className={styles.contentWrapper}>

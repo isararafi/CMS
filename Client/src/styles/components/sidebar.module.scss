@@ -1,35 +1,192 @@
-// Variables
+@use "sass:color";
+
+// Enhanced color palette
 $primary-color: #2E7D32; // Green 800
 $secondary-color: #4CAF50; // Green 500
 $light-color: #C8E6C9; // Green 100
 $dark-color: #1B5E20; // Green 900
 $accent-color: #81C784; // Green 300
-$text-color: #333;
-$light-text: #666;
-$border-color: #e0e0e0;
+$accent-bright: #00C853; // Green A700
+$accent-blue: #00BFA5; // Teal A700
+$text-color: #ffffff;
+$light-text: #e8f5e9;
+$border-color: rgba(255, 255, 255, 0.15);
 $white: #fff;
 $background-color: #f8f9fa;
-$shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+// Lighter gradient with brighter top section
+$sidebar-bg: linear-gradient(135deg, #43a047 0%, #2E7D32 60%, #1c4b25 100%);
+$menu-hover-bg: rgba(255, 255, 255, 0.18);
+$active-item-bg: rgba(255, 255, 255, 0.22);
 
 .sidebar {
   width: 260px;
   height: 100vh;
-  background-color: $white;
-  border-right: 1px solid $border-color;
-  transition: width 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  background: $sidebar-bg;
   position: fixed;
   left: 0;
   top: 0;
   z-index: 1000;
   box-shadow: $shadow;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  
+  // Light overlay at the top
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background: linear-gradient(to bottom, 
+      rgba(255, 255, 255, 0.15) 0%, 
+      rgba(255, 255, 255, 0.05) 60%, 
+      transparent 100%);
+    z-index: 1;
+  }
+  
+  // Bright circle at top right
+  &::after {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
+    z-index: 1;
+  }
+  
+  // Top highlight
+  .topHighlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.7), $accent-bright, rgba(255, 255, 255, 0.7));
+    z-index: 2;
+  }
+  
+  // Additional light circle at top left
+  .lightCircle {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+    z-index: 1;
+  }
+  
+  // Geometric shapes for decoration
+  .diamond {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    top: 40%;
+    right: -40px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    transform: rotate(45deg);
+    z-index: 0;
+    opacity: 0.3;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .circle {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    bottom: 25%;
+    left: -60px;
+    background: linear-gradient(135deg, rgba($accent-bright, 0.15) 0%, rgba($accent-bright, 0.03) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    z-index: 0;
+  }
+  
+  .triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: 60%;
+    right: 40px;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 50px solid rgba(255,255,255,0.07);
+    z-index: 0;
+  }
+  
+  // Cut out shape at top-right
+  .cutout {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: $background-color;
+    z-index: 2;
+    border-bottom-left-radius: 100%;
+    box-shadow: -3px 3px 10px rgba(0,0,0,0.1);
+  }
+  
+  // Wave pattern at bottom
+  .wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z' fill='rgba(255, 255, 255, 0.07)'%3E%3C/path%3E%3C/svg%3E");
+    background-size: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  // Dots pattern
+  .dots {
+    position: absolute;
+    top: 30%;
+    left: 20px;
+    width: 200px;
+    height: 100px;
+    background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
+    background-size: 18px 18px;
+    z-index: 0;
+  }
   
   &.collapsed {
     width: 70px;
     
     .submenu {
       display: none;
+    }
+    
+    // Adjust decorative elements when collapsed
+    &::before {
+      right: -30px;
+    }
+    
+    .cutout {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .circle, .diamond, .triangle, .dots {
+      opacity: 0.15;
+    }
+    
+    .sidebarHeader {
+      .logoContainer {
+        .logo {
+          transform: scale(1.1);
+        }
+      }
     }
   }
   
@@ -45,9 +202,19 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid $border-color;
-    height: 64px;
+    padding: 1.25rem;
+    position: relative;
+    z-index: 5;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
     
     .logoContainer {
       display: flex;
@@ -57,30 +224,39 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         width: 32px;
         height: 32px;
         margin-right: 0.75rem;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+        transition: all 0.3s ease;
       }
       
       .title {
         font-size: 1.25rem;
         font-weight: 600;
-        color: $primary-color;
+        color: $white;
         margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(to right, #ffffff, #e0f2f1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 0.5px;
       }
     }
     
     .toggleButton {
-      background: none;
+      background: rgba(255,255,255,0.15);
       border: none;
-      color: $text-color;
+      color: $white;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0.5rem;
       border-radius: 50%;
-      transition: background-color 0.2s;
+      transition: all 0.3s;
       
       &:hover {
-        background-color: $light-color;
+        background-color: $menu-hover-bg;
+        transform: rotate(90deg);
+        box-shadow: 0 0 15px rgba(255,255,255,0.3);
       }
     }
   }
@@ -88,7 +264,18 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   .sidebarMenu {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem 0;
+    padding: 1.25rem 0;
+    position: relative;
+    z-index: 5;
+    
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
     
     ul {
       list-style: none;
@@ -96,29 +283,68 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       margin: 0;
       
       li {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
+        position: relative;
         
         &.hasSubmenu {
           .menuItem {
             display: flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
-            color: $text-color;
+            color: $light-text;
             text-decoration: none;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             border-radius: 0 24px 24px 0;
             margin-right: 1rem;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            
+            &::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 100%;
+              width: 4px;
+              background: transparent;
+              transition: all 0.2s;
+            }
+
+            // Glow effect on hover
+            &::after {
+              content: '';
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              background: linear-gradient(90deg, rgba($accent-bright, 0.2), transparent);
+              top: 0;
+              left: -100%;
+              z-index: -1;
+              transition: all 0.4s ease;
+            }
             
             &:hover {
-              background-color: $light-color;
-              color: $primary-color;
+              background-color: $menu-hover-bg;
+              color: $white;
+              padding-left: 1.8rem;
+              
+              &::before {
+                background: $accent-bright;
+                box-shadow: 0 0 8px rgba($accent-bright, 0.5);
+              }
+              
+              &::after {
+                left: 0;
+              }
             }
             
             .arrow {
               margin-left: auto;
               font-size: 10px;
               transition: transform 0.2s ease;
+              filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
               
               &.expanded {
                 transform: rotate(180deg);
@@ -128,9 +354,14 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           
           &.active {
             > .menuItem {
-              background-color: $light-color;
-              color: $primary-color;
+              background-color: $active-item-bg;
+              color: $white;
               font-weight: 500;
+              
+              &::before {
+                background: $accent-bright;
+                box-shadow: 0 0 10px rgba($accent-bright, 0.6);
+              }
             }
           }
         }
@@ -139,15 +370,58 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           display: flex;
           align-items: center;
           padding: 0.75rem 1.5rem;
-          color: $text-color;
+          color: $light-text;
           text-decoration: none;
-          transition: background-color 0.2s;
+          transition: all 0.3s;
           border-radius: 0 24px 24px 0;
           margin-right: 1rem;
+          position: relative;
+          overflow: hidden;
+          z-index: 1;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: transparent;
+            transition: all 0.3s;
+          }
+          
+          // Glow effect on hover
+          &::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba($accent-bright, 0.2), transparent);
+            top: 0;
+            left: -100%;
+            z-index: -1;
+            transition: all 0.4s ease;
+          }
           
           &:hover {
-            background-color: $light-color;
-            color: $primary-color;
+            background-color: $menu-hover-bg;
+            color: $white;
+            transform: translateX(3px);
+            padding-left: 1.8rem;
+            
+            &::before {
+              background: $accent-bright;
+              box-shadow: 0 0 8px rgba($accent-bright, 0.5);
+            }
+            
+            &::after {
+              left: 0;
+            }
+            
+            .icon {
+              transform: scale(1.1);
+              color: $accent-bright;
+            }
           }
           
           .icon {
@@ -156,19 +430,58 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             align-items: center;
             justify-content: center;
             width: 20px;
+            height: 20px;
+            transition: all 0.3s;
+            
+            // Enhanced glow effect on icons
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
           }
           
           .menuText {
             font-size: 0.95rem;
             white-space: nowrap;
+            position: relative;
+            letter-spacing: 0.2px;
+            
+            // Underline effect on hover
+            &::after {
+              content: '';
+              position: absolute;
+              bottom: -2px;
+              left: 0;
+              width: 0;
+              height: 1px;
+              background: $accent-bright;
+              transition: width 0.3s ease;
+            }
           }
         }
         
         &.active {
           > a {
-            background-color: $light-color;
-            color: $primary-color;
+            background-color: $active-item-bg;
+            color: $white;
             font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            padding-left: 1.8rem;
+            
+            &::before {
+              background: $accent-bright;
+              box-shadow: 0 0 10px rgba($accent-bright, 0.6);
+            }
+            
+            &::after {
+              left: 0;
+            }
+            
+            .icon {
+              transform: scale(1.1);
+              color: $accent-bright;
+            }
+            
+            .menuText::after {
+              width: 100%;
+            }
           }
         }
         
@@ -176,9 +489,22 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           margin-left: 3.25rem;
           margin-top: 0.25rem;
           display: none;
+          position: relative;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -10px;
+            width: 2px;
+            background: linear-gradient(to bottom, rgba($accent-bright, 0.3), rgba($accent-bright, 0.7), rgba($accent-bright, 0.3));
+            border-radius: 1px;
+          }
           
           &.visible {
             display: block;
+            animation: fadeIn 0.3s ease;
           }
           
           li {
@@ -197,7 +523,7 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }
             
             &.active a {
-              background-color: rgba($primary-color, 0.1);
+              background-color: $active-item-bg;
             }
           }
         }
@@ -217,11 +543,11 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background-color: $light-color;
+        background-color: $active-item-bg;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: $primary-color;
+        color: $white;
         margin-right: 0.75rem;
       }
       
@@ -229,7 +555,7 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         .userName {
           font-weight: 600;
           font-size: 0.9rem;
-          color: $text-color;
+          color: $white;
           margin: 0;
         }
         
@@ -241,6 +567,17 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
     }
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
 }
 
 // Media Queries for Responsiveness
@@ -267,6 +604,7 @@ $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
   }
 }
+
 .dashboardLayout {
   display: flex;
   height: 100vh;

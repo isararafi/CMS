@@ -11,8 +11,6 @@ import StudentResult from './pages/StudentResult';  // Importing Student Result 
 import StudentFees from './pages/StudentFees';  // Importing Student Fees page component
 import StudentCoursesMids from './pages/StudentCoursesMids';  // Importing Student Courses Mids page component
 import StudentCoursesSummary from './pages/StudentCoursesSummary';  // Importing Student Courses Summary page component
-import StudentCoursesProceedings from './pages/StudentCoursesProceedings';  // Importing Student Courses Proceedings page component
-import StudentCoursesIndex from './pages/StudentCoursesIndex';  // Importing Student Courses Index page component
 import StudentSettings from './pages/StudentSettings';  // Importing Student Settings page component
 import StudentAssignments from './pages/StudentAssignments';  // Importing Student Assignments page component
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';  // Importing React Router components for routing
@@ -35,10 +33,8 @@ function App() {
           
           {/* Courses and its subroutes */}
           <Route path="courses">
-            <Route index element={<StudentCoursesIndex />} />
             <Route path="mids" element={<StudentCoursesMids />} />
             <Route path="summary" element={<StudentCoursesSummary />} />
-            <Route path="proceedings" element={<StudentCoursesProceedings />} />
           </Route>
 
           <Route path="registration" element={<CourseRegistration />} />

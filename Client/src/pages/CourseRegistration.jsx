@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { BookOpenCheck, CheckCircle, AlertCircle, Search } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
+import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/dashboard.module.scss';
 
 const CourseRegistration = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [registrationSubmitted, setRegistrationSubmitted] = useState(false);
 
   // Mock data - would be fetched from API
   const availableCourses = [
@@ -45,27 +47,44 @@ const CourseRegistration = () => {
   );
 
   const handleSelectCourse = (course) => {
+    // Find the original course object using the id
+    const originalCourse = availableCourses.find(c => c.id === course.id);
+    if (!originalCourse) return;
+    
     // Check if course is already selected
-    if (selectedCourses.some(selected => selected.id === course.id)) {
-      setSelectedCourses(selectedCourses.filter(selected => selected.id !== course.id));
+    if (selectedCourses.some(selected => selected.id === originalCourse.id)) {
+      setSelectedCourses(selectedCourses.filter(selected => selected.id !== originalCourse.id));
       return;
     }
 
     // Check if course is closed
-    if (course.status === 'closed') {
+    if (originalCourse.status === 'closed') {
       return;
     }
 
     // Check if adding this course would exceed max credits
     const currentCredits = selectedCourses.reduce((sum, course) => sum + course.credits, 0);
-    if (currentCredits + course.credits > studentRegistrationInfo.maxCredits) {
+    if (currentCredits + originalCourse.credits > studentRegistrationInfo.maxCredits) {
       return;
     }
 
-    setSelectedCourses([...selectedCourses, course]);
+    setSelectedCourses([...selectedCourses, originalCourse]);
   };
 
   const currentCredits = selectedCourses.reduce((sum, course) => sum + course.credits, 0);
+
+  const handleSubmitRegistration = () => {
+    // In a real app, this would be an API call
+    console.log("Submitting registration for courses:", selectedCourses);
+    
+    // Show success message
+    setRegistrationSubmitted(true);
+    
+    // Reset after 5 seconds
+    setTimeout(() => {
+      setRegistrationSubmitted(false);
+    }, 5000);
+  };
 
   return (
     <div className={styles.dashboardLayout}>
@@ -101,6 +120,24 @@ const CourseRegistration = () => {
             </div>
 
             <div className={styles.registrationContainer}>
+              {registrationSubmitted && (
+                <div style={{
+                  backgroundColor: '#c8e6c9',
+                  border: '1px solid #81c784',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <CheckCircle size={20} color="#2e7d32" style={{ marginRight: '12px' }} />
+                  <span style={{ color: '#2e7d32', fontWeight: '500' }}>
+                    Registration submitted successfully!
+                  </span>
+                </div>
+              )}
+              
               <div className={styles.registrationSummary}>
                 <h2>Registration Summary</h2>
                 <div className={styles.summaryStats}>
@@ -124,25 +161,26 @@ const CourseRegistration = () => {
                     </div>
                   ) : (
                     <div className={styles.courseList}>
-                      {selectedCourses.map(course => (
-                        <div key={course.id} className={styles.selectedCourseItem}>
-                          <div className={styles.courseInfo}>
-                            <div className={styles.courseCode}>{course.code}</div>
-                            <div className={styles.courseName}>{course.name}</div>
-                          </div>
-                          <div className={styles.courseCredits}>{course.credits} Credits</div>
-                          <button
-                            className={styles.removeButton}
-                            onClick={() => handleSelectCourse(course)}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
+                      <CustomTable 
+                        headers={['Course Code', 'Course Name', 'Credits', 'Instructor', 'Action']}
+                        data={selectedCourses.map(course => ({
+                          'Course Code': course.code,
+                          'Course Name': course.name,
+                          'Credits': course.credits,
+                          'Instructor': course.instructor,
+                          'Action': {
+                            type: 'action',
+                            selected: true,
+                            disabled: false
+                          },
+                          id: course.id
+                        }))}
+                        onView={handleSelectCourse}
+                      />
                     </div>
                   )}
                   {selectedCourses.length > 0 && (
-                    <button className={styles.submitButton}>
+                    <button className={styles.submitButton} onClick={handleSubmitRegistration}>
                       Submit Registration
                     </button>
                   )}
@@ -163,72 +201,38 @@ const CourseRegistration = () => {
                 </div>
                 
                 <div className={styles.coursesTable}>
-                  <div className={styles.tableHeader}>
-                    <div className={styles.thCode}>Course Code</div>
-                    <div className={styles.thName}>Course Name</div>
-                    <div className={styles.thCredits}>Credits</div>
-                    <div className={styles.thInstructor}>Instructor</div>
-                    <div className={styles.thAvailability}>Availability</div>
-                    <div className={styles.thAction}>Action</div>
-                  </div>
-                  
-                  <div className={styles.tableBody}>
-                    {filteredCourses.map(course => (
-                      <div 
-                        key={course.id} 
-                        className={`${styles.tableRow} ${
-                          course.status === 'closed' ? styles.disabledRow : ''
-                        } ${
-                          selectedCourses.some(selected => selected.id === course.id) ? styles.selectedRow : ''
-                        }`}
-                      >
-                        <div className={styles.tdCode}>{course.code}</div>
-                        <div className={styles.tdName}>{course.name}</div>
-                        <div className={styles.tdCredits}>{course.credits}</div>
-                        <div className={styles.tdInstructor}>{course.instructor}</div>
-                        <div className={styles.tdAvailability}>
-                          {course.status === 'open' ? (
-                            <span className={styles.availabilityOpen}>
-                              <span className={styles.seatsInfo}>
-                                {course.seats - course.enrolled} / {course.seats}
-                              </span>
-                            </span>
-                          ) : (
-                            <span className={styles.availabilityClosed}>
-                              <AlertCircle size={16} strokeWidth={1.5} />
-                              <span className={styles.seatsInfo}>Full</span>
-                            </span>
-                          )}
-                        </div>
-                        <div className={styles.tdAction}>
-                          {selectedCourses.some(selected => selected.id === course.id) ? (
-                            <button
-                              className={styles.selectedButton}
-                              onClick={() => handleSelectCourse(course)}
-                            >
-                              <CheckCircle size={16} strokeWidth={1.5} />
-                              Selected
-                            </button>
-                          ) : (
-                            <button
-                              className={`${styles.selectButton} ${
-                                course.status === 'closed' || 
-                                (currentCredits + course.credits > studentRegistrationInfo.maxCredits) ? 
-                                styles.disabledButton : ''
-                              }`}
-                              onClick={() => handleSelectCourse(course)}
-                              disabled={
-                                course.status === 'closed' || 
-                                (currentCredits + course.credits > studentRegistrationInfo.maxCredits)
-                              }
-                            >
-                              Select
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <h3 style={{ marginBottom: '16px' }}>Available Courses</h3>
+                  <CustomTable 
+                    headers={['Course Code', 'Course Name', 'Credits', 'Instructor', 'Availability', 'Action']}
+                    data={filteredCourses.map(course => ({
+                      'Course Code': course.code,
+                      'Course Name': course.name,
+                      'Credits': course.credits,
+                      'Instructor': course.instructor,
+                      'Availability': {
+                        type: 'availability',
+                        status: course.status,
+                        seats: course.seats,
+                        enrolled: course.enrolled
+                      },
+                      'Action': {
+                        type: 'action',
+                        selected: selectedCourses.some(selected => selected.id === course.id),
+                        disabled: course.status === 'closed' || 
+                                 (currentCredits + course.credits > studentRegistrationInfo.maxCredits && 
+                                  !selectedCourses.some(selected => selected.id === course.id))
+                      },
+                      id: course.id, // Keep original data for handlers
+                      status: course.status,
+                      seats: course.seats,
+                      enrolled: course.enrolled
+                    }))}
+                    onView={handleSelectCourse} // Use view action for select/deselect
+                    statusColors={{
+                      open: '#C3F4D0',
+                      closed: '#FFCECE'
+                    }}
+                  />
                 </div>
               </div>
             </div>
