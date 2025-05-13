@@ -1,0 +1,560 @@
+@import '../variables';
+
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-color;
+  color: $text-primary;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: $sidebar-width;
+  transition: margin-left $transition-normal;
+  background-color: $background-color;
+  color: $text-primary;
+  position: relative;
+  overflow: hidden;
+  
+  &.expanded {
+    margin-left: $sidebar-collapsed-width;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    margin-left: 0;
+
+    &.expanded {
+      margin-left: 0;
+    }
+  }
+}
+
+.contentWrapper {
+  padding: $spacing-lg;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+.pageContent {
+  background: $overlay-light;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  backdrop-filter: blur(10px);
+  box-shadow: $shadow-lg;
+  border: 1px solid $border-color;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  
+  .welcomeSection {
+    h1 {
+      margin: 0;
+      font-size: $font-2xl;
+      color: $text-primary;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      margin: $spacing-xs 0 0;
+      color: $text-secondary;
+      font-size: $font-md;
+    }
+  }
+  
+  .studentInfo {
+    display: flex;
+    gap: $spacing-lg;
+    
+    .infoItem {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      .label {
+        color: $text-secondary;
+        font-size: $font-sm;
+      }
+      
+      .value {
+        color: $text-primary;
+        font-weight: 600;
+        font-size: $font-sm;
+      }
+    }
+  }
+}
+
+.feeControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.semesterSelect {
+  label {
+    color: $text-secondary;
+    font-size: $font-sm;
+    margin-right: $spacing-sm;
+  }
+}
+
+.dropdownContainer {
+  position: relative;
+  min-width: 200px;
+}
+
+.dropdownToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-md;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  color: $text-primary;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $primary-color;
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  box-shadow: $dropdown-shadow;
+  z-index: $z-index-dropdown;
+}
+
+.dropdownItem {
+  padding: $spacing-sm $spacing-md;
+  color: $text-primary;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $light-bg;
+  }
+
+  &.active {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: $primary-color;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $dark-color;
+  }
+}
+
+.feeContent {
+  margin-top: $spacing-lg;
+}
+
+.feeSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+}
+
+.summaryCard {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .summaryIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: $border-radius-md;
+    background: rgba($primary-color, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+  }
+
+  .summaryDetails {
+    h3 {
+      margin: 0;
+      font-size: $font-sm;
+      color: $text-secondary;
+      font-weight: normal;
+    }
+
+    .amount {
+      font-size: $font-xl;
+      font-weight: 600;
+      color: $text-primary;
+      margin-top: $spacing-xs;
+
+      &.dueAmount {
+        color: $error-color;
+      }
+    }
+
+    .date {
+      font-size: $font-lg;
+      font-weight: 600;
+      color: $text-primary;
+      margin-top: $spacing-xs;
+    }
+  }
+}
+
+.feeDetails {
+  display: grid;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+}
+
+.feeBreakdown {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+
+  h2 {
+    margin: 0 0 $spacing-md;
+    font-size: $font-lg;
+    color: $text-primary;
+  }
+}
+
+.breakdownList {
+  display: grid;
+  gap: $spacing-sm;
+}
+
+.breakdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.totalItem {
+    margin-top: $spacing-sm;
+    padding-top: $spacing-md;
+    border-top: 2px solid $border-color;
+    font-weight: 600;
+    font-size: $font-md;
+  }
+
+  .feeLabel {
+    color: $text-secondary;
+    font-size: $font-sm;
+  }
+
+  .feeValue {
+    color: $text-primary;
+    font-size: $font-sm;
+    font-weight: 500;
+  }
+}
+
+.installments {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+
+  h2 {
+    margin: 0 0 $spacing-md;
+    font-size: $font-lg;
+    color: $text-primary;
+  }
+}
+
+.installmentsList {
+  display: grid;
+  gap: $spacing-md;
+}
+
+.installmentItem {
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  padding: $spacing-md;
+
+  &.statusPaid {
+    border-left: 4px solid $success-color;
+  }
+
+  &.statusPending {
+    border-left: 4px solid $warning-color;
+  }
+
+  &.statusOverdue {
+    border-left: 4px solid $error-color;
+  }
+}
+
+.installmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+
+  .installmentAmount {
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .installmentStatus {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-sm;
+    font-weight: 500;
+  }
+}
+
+.installmentDetails {
+  display: grid;
+  gap: $spacing-sm;
+
+  .dueDateInfo,
+  .paymentInfo,
+  .paymentMethod,
+  .transactionId {
+    display: flex;
+    gap: $spacing-md;
+    font-size: $font-sm;
+
+    .label {
+      color: $text-secondary;
+      min-width: 120px;
+    }
+
+    .value {
+      color: $text-primary;
+      font-weight: 500;
+    }
+  }
+}
+
+.installmentActions {
+  margin-top: $spacing-md;
+  
+  .payNowButton {
+    background: $primary-color;
+    color: $white;
+    border: none;
+    padding: $spacing-sm $spacing-lg;
+    border-radius: $border-radius-md;
+    font-size: $font-sm;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: $dark-color;
+    }
+  }
+}
+
+.paymentMethods {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+  margin-top: $spacing-xl;
+
+  h2 {
+    margin: 0 0 $spacing-md;
+    font-size: $font-lg;
+    color: $text-primary;
+  }
+}
+
+.methodsList {
+  display: grid;
+  gap: $spacing-lg;
+}
+
+.methodItem {
+  display: flex;
+  gap: $spacing-lg;
+  padding: $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+
+  .methodIcon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .methodDetails {
+    flex: 1;
+
+    h3 {
+      margin: 0;
+      font-size: $font-md;
+      color: $text-primary;
+    }
+
+    p {
+      margin: $spacing-xs 0;
+      color: $text-secondary;
+      font-size: $font-sm;
+    }
+  }
+}
+
+.bankDetails,
+.upiInfo {
+  margin-top: $spacing-sm;
+  display: grid;
+  gap: $spacing-xs;
+
+  .bankInfo {
+    display: flex;
+    gap: $spacing-md;
+    font-size: $font-sm;
+
+    .label {
+      color: $text-secondary;
+      min-width: 120px;
+    }
+
+    .value {
+      color: $text-primary;
+      font-weight: 500;
+    }
+  }
+}
+
+.payButton {
+  margin-top: $spacing-sm;
+  background: $primary-color;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $dark-color;
+  }
+}
+
+// Decorative elements
+.decorativeWave {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' opacity='.15' fill='%2381C784'%3E%3C/path%3E%3C/svg%3E");
+  background-size: cover;
+  z-index: 0;
+}
+
+.decorativeTriangle {
+  position: fixed;
+  top: 15%;
+  right: 10%;
+  width: 150px;
+  height: 150px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,15 100,100 0,100' fill='%232E7D32' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.decorativeCircle {
+  position: fixed;
+  bottom: 20%;
+  right: 20%;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba($light-color, 0.2) 0%, rgba($light-color, 0) 70%);
+  z-index: 0;
+}
+
+.decorativeDots {
+  position: fixed;
+  top: 40%;
+  left: 5%;
+  width: 200px;
+  height: 100px;
+  background-image: radial-gradient(rgba($secondary-color, 0.2) 2px, transparent 2px);
+  background-size: 16px 16px;
+  z-index: 0;
+}
+
+.decorativeDiamond {
+  position: fixed;
+  top: 70%;
+  right: 30%;
+  width: 80px;
+  height: 80px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, rgba($light-color, 0.2), rgba($secondary-color, 0.1));
+  z-index: 0;
+} 

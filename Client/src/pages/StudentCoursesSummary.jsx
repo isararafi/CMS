@@ -3,7 +3,7 @@ import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, PieChart, Lay
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
-import styles from '../styles/pages/dashboard.module.scss';
+import styles from '../styles/pages/studentCoursesSummary.module.scss';
 
 const StudentCoursesSummary = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

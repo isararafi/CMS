@@ -1,5 +1,7 @@
-// Import the common variables
+// Import variables correctly
 @import '../_variables';
+// Remove the commented @use line as it's causing confusion
+// (We'll continue to use the @import approach consistently)
 
 // Define the styles directly instead of extending
 .dashboardLayout {
@@ -19,14 +21,14 @@
   color: $text-color;
   position: relative;
   overflow: hidden;
-  
+
   &.expanded {
     margin-left: 70px;
   }
-  
+
   @media (max-width: 768px) {
     margin-left: 0;
-    
+
     &.expanded {
       margin-left: 0;
     }
@@ -37,7 +39,7 @@
   padding: 2rem;
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -53,7 +55,7 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
@@ -74,7 +76,7 @@
     font-size: 2rem;
     color: $text-color;
   }
-  
+
   .subtitle {
     margin: 0.5rem 0 0;
     color: $light-text;
@@ -84,17 +86,17 @@
 .studentInfo {
   display: flex;
   gap: 2rem;
-  
+
   .infoItem {
     display: flex;
     align-items: center;
     gap: 6px;
-    
+
     .label {
       color: $light-text;
       margin-right: 0.5rem;
     }
-    
+
     .value {
       color: $text-color;
       font-weight: 500;
@@ -112,7 +114,7 @@
   gap: 1rem;
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
@@ -123,7 +125,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+
   label {
     font-size: 0.875rem;
     color: $light-text;
@@ -145,7 +147,7 @@
   font-size: 0.875rem;
   cursor: pointer;
   min-width: 150px;
-  
+
   &:hover {
     border-color: $primary-color;
   }
@@ -169,11 +171,11 @@
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   cursor: pointer;
-  
+
   &:hover {
     background-color: rgba($primary-color, 0.05);
   }
-  
+
   &.active {
     background-color: rgba($primary-color, 0.1);
     color: $primary-color;
@@ -184,15 +186,15 @@
 .searchContainer {
   flex: 1;
   max-width: 300px;
-  
+
   @media (max-width: 768px) {
     max-width: 100%;
     width: 100%;
   }
-  
+
   .searchInput {
     position: relative;
-    
+
     svg {
       position: absolute;
       left: 1rem;
@@ -200,7 +202,7 @@
       transform: translateY(-50%);
       color: $light-text;
     }
-    
+
     input {
       width: 100%;
       padding: 0.5rem 1rem 0.5rem 2.75rem;
@@ -229,7 +231,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: $dark-color;
   }
@@ -254,7 +256,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  
+
   .summaryIcon {
     width: 48px;
     height: 48px;
@@ -265,7 +267,7 @@
     justify-content: center;
     color: $primary-color;
   }
-  
+
   .summaryDetails {
     h3 {
       margin: 0;
@@ -274,7 +276,7 @@
       font-weight: normal;
     }
   }
-  
+
   .gpaValue, .creditValue, .cgpaValue {
     font-size: 1.75rem;
     font-weight: 600;
@@ -284,7 +286,7 @@
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .cgpaChange {
     font-size: 0.875rem;
     font-weight: 500;
@@ -301,7 +303,7 @@
   box-shadow: $shadow;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  
+
   .tableHeader {
     display: grid;
     grid-template-columns: 1fr 2fr 0.7fr 0.7fr 0.7fr 0.7fr;
@@ -313,12 +315,12 @@
     font-weight: 600;
     font-size: 0.875rem;
     color: $light-text;
-    
+
     @media (max-width: 768px) {
       display: none;
     }
   }
-  
+
   .tableBody {
     .tableRow {
       display: grid;
@@ -328,7 +330,7 @@
       border-bottom: 1px solid $border-color;
       align-items: center;
       font-size: 0.875rem;
-      
+
       &:last-child {
         border-bottom: none;
       }
@@ -379,37 +381,37 @@
 
 .gradeA {
   color: #4caf50;
-  background-color: rgba(#4caf50, 0.1);
+  background-color: rgba(76, 175, 80, 0.1);
 }
 
 .gradeB {
   color: #2196f3;
-  background-color: rgba(#2196f3, 0.1);
+  background-color: rgba(33, 150, 243, 0.1);
 }
 
 .gradeC {
   color: #ff9800;
-  background-color: rgba(#ff9800, 0.1);
+  background-color: rgba(255, 152, 0, 0.1);
 }
 
 .gradeD {
   color: #f44336;
-  background-color: rgba(#f44336, 0.1);
+  background-color: rgba(244, 67, 54, 0.1);
 }
 
 .gradeF {
   color: #f44336;
-  background-color: rgba(#f44336, 0.1);
+  background-color: rgba(244, 67, 54, 0.1);
 }
 
 .statusPassed {
   color: #4caf50;
-  background-color: rgba(#4caf50, 0.1);
+  background-color: rgba(76, 175, 80, 0.1);
 }
 
 .statusFailed {
   color: #f44336;
-  background-color: rgba(#f44336, 0.1);
+  background-color: rgba(244, 67, 54, 0.1);
 }
 
 .resultNote {
@@ -417,7 +419,7 @@
   border-radius: 12px;
   box-shadow: $shadow;
   padding: 1.5rem;
-  
+
   h3 {
     margin: 0 0 1rem;
     font-size: 1rem;
@@ -429,12 +431,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  
+
   .gradeItem {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    
+
     .grade {
       width: 32px;
       height: 32px;
@@ -445,12 +447,12 @@
       font-weight: 600;
       font-size: 0.875rem;
     }
-    
+
     .gradePoints {
       font-weight: 600;
       font-size: 0.875rem;
     }
-    
+
     .gradeRange {
       color: $light-text;
       font-size: 0.75rem;
@@ -513,4 +515,4 @@
   transform: rotate(45deg);
   background: linear-gradient(135deg, rgba(129, 199, 132, 0.2), rgba(46, 125, 50, 0.1));
   z-index: 0;
-} 
+}

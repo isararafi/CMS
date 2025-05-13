@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
-import styles from '../styles/pages/fees.module.scss';
+import styles from '../styles/pages/studentFees.module.scss';
 
 const StudentFees = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

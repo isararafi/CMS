@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Mail, Phone, Key, MapPin, Calendar, Edit2, Camera, Save, AlertCircle } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
-import styles from '../styles/pages/dashboard.module.scss';
+import styles from '../styles/pages/studentSettings.module.scss';
 import settingStyles from '../styles/pages/settings.module.scss';
 
 const StudentSettings = () => {

@@ -95,12 +95,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                     <span className={styles.menuText}>Summary</span>
                   </Link>
                 </li>
-                <li className={isActive('/courses/proceedings') ? styles.active : ''}>
-                  <Link to="/student/courses/proceedings">
-                    <span className={styles.icon}><PenTool size={18} strokeWidth={1.5} /></span>
-                    <span className={styles.menuText}>Class Proceedings</span>
-                  </Link>
-                </li>
+               
               </ul>
             )}
           </li>

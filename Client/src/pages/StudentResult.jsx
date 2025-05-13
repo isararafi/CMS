@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BarChart2, Download, ChevronDown, Search, FileText } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
-import styles from '../styles/pages/result.module.scss';
+import styles from '../styles/pages/studentResult.module.scss';
 
 const StudentResult = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

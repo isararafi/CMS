@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, Layers, GraduationCap } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
-import styles from '../styles/pages/dashboard.module.scss';
+import styles from '../styles/pages/studentCoursesMids.module.scss';
 
 const StudentCoursesMids = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

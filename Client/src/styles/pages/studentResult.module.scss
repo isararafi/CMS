@@ -1,0 +1,437 @@
+@import '../variables';
+
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-color;
+  color: $text-primary;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: $sidebar-width;
+  transition: margin-left $transition-normal;
+  background-color: $background-color;
+  color: $text-primary;
+  position: relative;
+  overflow: hidden;
+  
+  &.expanded {
+    margin-left: $sidebar-collapsed-width;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    margin-left: 0;
+
+    &.expanded {
+      margin-left: 0;
+    }
+  }
+}
+
+.contentWrapper {
+  padding: $spacing-lg;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+.pageContent {
+  background: $overlay-light;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  backdrop-filter: blur(10px);
+  box-shadow: $shadow-lg;
+  border: 1px solid $border-color;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  
+  .welcomeSection {
+    h1 {
+      margin: 0;
+      font-size: $font-2xl;
+      color: $text-primary;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      margin: $spacing-xs 0 0;
+      color: $text-secondary;
+      font-size: $font-md;
+    }
+  }
+  
+  .studentInfo {
+    display: flex;
+    gap: $spacing-lg;
+    
+    .infoItem {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      .label {
+        color: $text-secondary;
+        font-size: $font-sm;
+      }
+      
+      .value {
+        color: $text-primary;
+        font-weight: 600;
+        font-size: $font-sm;
+      }
+    }
+  }
+}
+
+.resultControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.semesterSelect {
+  label {
+    color: $text-secondary;
+    font-size: $font-sm;
+    margin-right: $spacing-sm;
+  }
+}
+
+.dropdownContainer {
+  position: relative;
+  min-width: 200px;
+}
+
+.dropdownToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-md;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  color: $text-primary;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $primary-color;
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  box-shadow: $dropdown-shadow;
+  z-index: $z-index-dropdown;
+}
+
+.dropdownItem {
+  padding: $spacing-sm $spacing-md;
+  color: $text-primary;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $light-bg;
+  }
+
+  &.active {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+}
+
+.searchContainer {
+  flex: 1;
+  max-width: 300px;
+
+  .searchInput {
+    position: relative;
+    
+    svg {
+      position: absolute;
+      left: $spacing-md;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-secondary;
+    }
+
+    input {
+      width: 100%;
+      padding: $spacing-sm $spacing-md $spacing-sm $spacing-xl;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      font-size: $font-sm;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+      }
+    }
+  }
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: $primary-color;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $dark-color;
+  }
+}
+
+.resultContent {
+  margin-top: $spacing-lg;
+}
+
+.resultSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+}
+
+.summaryCard {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .summaryIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: $border-radius-md;
+    background: rgba($primary-color, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+  }
+
+  .summaryDetails {
+    h3 {
+      margin: 0;
+      font-size: $font-sm;
+      color: $text-secondary;
+      font-weight: normal;
+    }
+  }
+
+  .gpaValue, .creditValue, .cgpaValue {
+    font-size: $font-xl;
+    font-weight: 600;
+    color: $text-primary;
+    margin-top: $spacing-xs;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  .cgpaChange {
+    font-size: $font-sm;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+}
+
+.resultTable {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+  margin-bottom: $spacing-lg;
+
+  .tableHeader {
+    display: grid;
+    grid-template-columns: 1fr 2fr 0.7fr 0.7fr 0.7fr 0.7fr;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    background: $light-bg;
+    border-radius: $border-radius-md;
+    margin-bottom: $spacing-sm;
+    font-weight: 600;
+    color: $text-secondary;
+    font-size: $font-sm;
+  }
+
+  .tableBody {
+    .tableRow {
+      display: grid;
+      grid-template-columns: 1fr 2fr 0.7fr 0.7fr 0.7fr 0.7fr;
+      gap: $spacing-sm;
+      padding: $spacing-sm $spacing-md;
+      border-bottom: 1px solid $border-color;
+      align-items: center;
+      font-size: $font-sm;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .tdCode {
+        color: $primary-color;
+        font-weight: 600;
+      }
+
+      .tdGrade {
+        text-align: center;
+        border-radius: $border-radius-sm;
+        padding: $spacing-xs;
+      }
+    }
+  }
+}
+
+.gradeA { background: $grade-a-bg; color: $success-color; }
+.gradeB { background: $grade-b-bg; color: $primary-color; }
+.gradeC { background: $grade-c-bg; color: $warning-color; }
+.gradeD { background: $grade-d-bg; color: $error-color; }
+.gradeF { background: $grade-f-bg; color: $error-color; }
+
+.resultNote {
+  background: $white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow;
+
+  h3 {
+    margin: 0 0 $spacing-md;
+    font-size: $font-lg;
+    color: $text-primary;
+  }
+}
+
+.gradeScale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  .gradeItem {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .grade {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: $border-radius-sm;
+      font-weight: 600;
+      font-size: $font-sm;
+    }
+
+    .gradePoints {
+      font-weight: 600;
+      font-size: $font-sm;
+      color: $text-primary;
+    }
+
+    .gradeRange {
+      color: $text-secondary;
+      font-size: $font-xs;
+    }
+  }
+}
+
+.decorativeWave {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' opacity='.15' fill='%2381C784'%3E%3C/path%3E%3C/svg%3E");
+  background-size: cover;
+  z-index: 0;
+}
+
+.decorativeTriangle {
+  position: fixed;
+  top: 15%;
+  right: 10%;
+  width: 150px;
+  height: 150px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,15 100,100 0,100' fill='%232E7D32' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.decorativeCircle {
+  position: fixed;
+  bottom: 20%;
+  right: 20%;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba($light-color, 0.2) 0%, rgba($light-color, 0) 70%);
+  z-index: 0;
+}
+
+.decorativeDots {
+  position: fixed;
+  top: 40%;
+  left: 5%;
+  width: 200px;
+  height: 100px;
+  background-image: radial-gradient(rgba($secondary-color, 0.2) 2px, transparent 2px);
+  background-size: 16px 16px;
+  z-index: 0;
+}
+
+.decorativeDiamond {
+  position: fixed;
+  top: 70%;
+  right: 30%;
+  width: 80px;
+  height: 80px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, rgba($light-color, 0.2), rgba($secondary-color, 0.1));
+  z-index: 0;
+} 

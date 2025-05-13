@@ -1,0 +1,338 @@
+@import '../variables';
+
+.mainContent {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  
+  &.expanded {
+    margin-left: 80px;
+  }
+}
+
+.contentWrapper {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.pageContent {
+  margin-top: 24px;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  
+  .welcomeSection {
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-primary;
+    }
+    
+    .subtitle {
+      margin: 8px 0 0;
+      font-size: 16px;
+      color: $text-secondary;
+    }
+  }
+}
+
+.settingsContainer {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settingsNav {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  overflow: hidden;
+  height: fit-content;
+  
+  .navList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    .navItem {
+      &:not(:last-child) {
+        border-bottom: 1px solid $border-color;
+      }
+      
+      button {
+        width: 100%;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: $text-primary;
+        transition: all 0.2s;
+        
+        &:hover {
+          background-color: rgba($primary-color, 0.05);
+        }
+        
+        &.active {
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+          font-weight: 500;
+        }
+        
+        svg {
+          width: 20px;
+          height: 20px;
+          color: inherit;
+        }
+      }
+    }
+  }
+}
+
+.settingsContent {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  padding: 24px;
+  
+  .sectionTitle {
+    margin: 0 0 24px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.formGroup {
+  margin-bottom: 24px;
+  
+  .formLabel {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-primary;
+  }
+  
+  .formInput {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 14px;
+    color: $text-primary;
+    transition: border-color 0.2s;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+    
+    &:disabled {
+      background-color: $light-bg;
+      cursor: not-allowed;
+    }
+  }
+  
+  .formSelect {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 14px;
+    color: $text-primary;
+    background-color: $white;
+    cursor: pointer;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+  
+  .formTextarea {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 14px;
+    color: $text-primary;
+    resize: vertical;
+    min-height: 100px;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+  
+  button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &.cancelButton {
+      background-color: transparent;
+      border: 1px solid $border-color;
+      color: $text-primary;
+      
+      &:hover {
+        background-color: $light-bg;
+      }
+    }
+    
+    &.saveButton {
+      background-color: $primary-color;
+      border: none;
+      color: $white;
+      
+      &:hover {
+        background-color: darken($primary-color, 5%);
+      }
+      
+      &:disabled {
+        background-color: rgba($primary-color, 0.5);
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.profileSection {
+  .profileHeader {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: $light-bg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .profileInfo {
+      h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+      
+      p {
+        margin: 4px 0 0;
+        font-size: 14px;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+.notificationSettings {
+  .settingItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid $border-color;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .settingInfo {
+      h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-primary;
+      }
+      
+      p {
+        margin: 4px 0 0;
+        font-size: 12px;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    
+    &:checked + .slider {
+      background-color: $primary-color;
+      
+      &:before {
+        transform: translateX(20px);
+      }
+    }
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $border-color;
+    transition: 0.4s;
+    border-radius: 34px;
+    
+    &:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: $white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+  }
+} 

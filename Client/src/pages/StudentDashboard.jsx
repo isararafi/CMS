@@ -26,7 +26,7 @@ import {
 } from 'recharts';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
-import styles from '../styles/pages/dashboard.module.scss';
+import styles from '../styles/pages/studentDashboard.module.scss';
 
 const StudentDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

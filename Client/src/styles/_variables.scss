@@ -1,6 +1,3 @@
-// Global variables for the CMS project
-
-// Primary color palette - Green theme
 $primary-color: #1B5E20; // Dark Green
 $secondary-color: #2E7D32; // Dark Green
 $light-color: #81C784; // Medium Green
@@ -9,24 +6,24 @@ $accent-color: #4CAF50; // Medium Green
 
 // Text colors
 $text-color: #000000; // Pure black
-$text-primary: #000000; // Pure black  
-$text-secondary: #333333; // Dark gray
+$text-primary: #2c3e50;
+$text-secondary: #6c757d;
 $text-tertiary: #424242; // Darker gray
 $light-text: #333333; // Dark gray
 
 // Structural colors
-$border-color: #bdbdbd; // Light gray border
-$white: #ffffff; // Pure white
-$background-color: #f0f9f0; // Light green background
+$border-color: #e0e0e0;
+$white: #ffffff;
+$background-color: #f8f9fa;
 
 // Shadows
-$shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // Subtle shadow
-$card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08);
 
 // Status colors
-$success-color: #1B5E20; // Dark Green
-$warning-color: #E65100; // Dark Orange
-$error-color: #B71C1C; // Dark Red
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$error-color: #f44336;
 $info-color: #01579B; // Dark Blue
 
 // Breakpoints
@@ -44,11 +41,12 @@ $font-xl: 1.5rem;    // 24px
 $font-2xl: 2rem;     // 32px
 
 // Spacing
-$spacing-xs: 0.25rem;  // 4px
-$spacing-sm: 0.5rem;   // 8px
-$spacing-md: 1rem;     // 16px
-$spacing-lg: 1.5rem;   // 24px
-$spacing-xl: 2rem;     // 32px
+$spacing-unit: 8px;
+$spacing-xs: $spacing-unit * 0.5;  // 4px
+$spacing-sm: $spacing-unit;        // 8px
+$spacing-md: $spacing-unit * 2;    // 16px
+$spacing-lg: $spacing-unit * 3;    // 24px
+$spacing-xl: $spacing-unit * 4;    // 32px
 
 // Border radius
 $border-radius-sm: 4px;
@@ -56,10 +54,166 @@ $border-radius-md: 8px;
 $border-radius-lg: 12px;
 
 // Z-index
-$z-index-dropdown: 10;
+$z-index-dropdown: 1000;
 $z-index-sticky: 1020;
 $z-index-fixed: 1030;
 $z-index-modal-backdrop: 1040;
 $z-index-modal: 1050;
 $z-index-popover: 1060;
-$z-index-tooltip: 1070; 
+$z-index-tooltip: 1100;
+
+// Assignment status colors
+$status-pending-bg: rgba($warning-color, 0.1);
+$status-pending-color: $warning-color;
+$status-submitted-bg: rgba($success-color, 0.1);
+$status-submitted-color: $success-color;
+$status-graded-bg: rgba($primary-color, 0.1);
+$status-graded-color: $primary-color;
+$status-overdue-bg: rgba($error-color, 0.1);
+$status-overdue-color: $error-color;
+
+// Assignment card styles
+$card-padding: 20px;
+$card-border-radius: 12px;
+$card-header-height: 60px;
+$card-title-size: 16px;
+
+// Assignment details
+$details-padding: 16px;
+$details-gap: 16px;
+$details-border: 1px solid $border-color;
+
+// Assignment actions
+$action-button-padding: 8px 16px;
+$action-button-radius: 6px;
+$action-button-gap: 8px;
+
+// Assignment filters
+$filter-height: 40px;
+$filter-padding: 0 16px;
+$filter-border: 1px solid $border-color;
+$filter-radius: 8px;
+$filter-menu-width: 200px;
+
+// Assignment icons
+$icon-size-sm: 16px;
+$icon-size-md: 20px;
+$icon-size-lg: 24px;
+
+// Assignment typography
+$assignment-title-size: 16px;
+$assignment-meta-size: 14px;
+$assignment-desc-size: 14px;
+
+// Assignment layout
+$assignment-grid-gap: 24px;
+$assignment-card-min-width: 300px;
+
+// Dropdown shadows
+$dropdown-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+// Light background colors
+$light-bg: #f8f9fa;
+$green-50: #e8f5e9;
+$green-100: #c8e6c9;
+$green-200: #a5d6a7;
+$green-300: #81c784;
+$green-400: #66bb6a;
+$green-600: #43a047;
+$green-700: #388e3c;
+$green-800: #2e7d32;
+$green-900: #1b5e20;
+
+// Gradients
+$sidebar-bg: linear-gradient(135deg, #43a047 0%, #2E7D32 60%, #1c4b25 100%);
+$menu-hover-bg: rgba(255, 255, 255, 0.18);
+$active-item-bg: rgba(255, 255, 255, 0.22);
+
+// Overlays and transparencies
+$overlay-light: rgba(255, 255, 255, 0.8);
+$overlay-dark: rgba(0, 0, 0, 0.1);
+
+// Additional shadows
+$hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+$card-hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+
+// Grade colors
+$grade-a-bg: rgba($success-color, 0.1);
+$grade-b-bg: rgba($primary-color, 0.1);
+$grade-c-bg: rgba($warning-color, 0.1);
+$grade-d-bg: rgba($error-color, 0.1);
+$grade-f-bg: rgba($error-color, 0.1);
+
+// Animation durations
+$transition-fast: 0.2s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.5s;
+
+// Layout dimensions
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
+$navbar-height: 60px;
+$footer-height: 60px;
+
+// Container max widths
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1140px;
+$container-xxl: 1320px;
+
+// Typography
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+$font-size-base: 16px;
+$font-size-sm: 14px;
+$font-size-lg: 18px;
+
+// Status colors
+$status-approved-bg: #C3F4D0;
+$status-rejected-bg: #FFCECE;
+
+// Course registration specific
+$registration-card-padding: 20px;
+$registration-header-height: 60px;
+$registration-border: 1px solid $border-color;
+
+// Assignment specific shadows
+$card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+// Assignment container
+$assignment-container-radius: 12px;
+$assignment-card-radius: 8px;
+$assignment-padding: 16px;
+
+// Assignment search
+$search-input-height: 40px;
+$search-icon-size: 20px;
+$search-padding-left: 40px;
+
+// Assignment filter
+$filter-button-height: 40px;
+$filter-menu-spacing: 8px;
+$filter-option-padding: 10px 16px;
+
+// Assignment card
+$card-header-padding: 16px;
+$card-content-line-height: 1.5;
+$card-grid-min-width: 200px;
+$card-detail-label-size: 12px;
+$card-detail-value-size: 14px;
+
+// Assignment button styles
+$button-padding: 8px 16px;
+$button-radius: 6px;
+$button-gap: 6px;
+$button-font-size: 14px;
+$button-hover-darken: 5%;
+
+// Assignment typography
+$course-code-size: 14px;
+$description-size: 14px;
+$meta-text-size: 14px;
+
+// Assignment layout
+$grid-gap: 16px;
+$detail-grid-columns: repeat(auto-fit, minmax(200px, 1fr));

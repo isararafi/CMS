@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bookmark, Calendar, CheckCircle, Clock, Download, ExternalLink, FileText, Filter, Search, Upload, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
-import styles from '../styles/pages/dashboard.module.scss';
+import styles from '../styles/pages/studentAssignments.module.scss';
 import assignmentStyles from '../styles/pages/assignments.module.scss';
 
 const StudentAssignments = () => {

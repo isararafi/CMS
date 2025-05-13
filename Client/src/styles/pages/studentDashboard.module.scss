@@ -1,0 +1,161 @@
+@import '../variables';
+
+.mainContent {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  
+  &.expanded {
+    margin-left: 80px;
+  }
+}
+
+.contentWrapper {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.pageContent {
+  margin-top: 24px;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  
+  .welcomeSection {
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-primary;
+    }
+    
+    .subtitle {
+      margin: 8px 0 0;
+      font-size: 16px;
+      color: $text-secondary;
+    }
+  }
+}
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background-color: $white;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  
+  .statIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: rgba($primary-color, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+  }
+  
+  .statContent {
+    flex: 1;
+    
+    .statValue {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: $text-primary;
+    }
+    
+    .statLabel {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: $text-secondary;
+    }
+  }
+}
+
+.widgetsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.widgetCard {
+  background-color: $white;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  overflow: hidden;
+  
+  .widgetHeader {
+    padding: 16px;
+    border-bottom: 1px solid $border-color;
+    
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+}
+
+.courseProgressList {
+  padding: 16px;
+}
+
+.courseProgressItem {
+  margin-bottom: 16px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .courseInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    
+    .courseTitle {
+      font-size: 14px;
+      font-weight: 500;
+      color: $text-primary;
+    }
+    
+    .progressText {
+      font-size: 14px;
+      font-weight: 600;
+      color: $primary-color;
+    }
+  }
+  
+  .progressBar {
+    height: 6px;
+    background-color: rgba($primary-color, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    
+    .progress {
+      height: 100%;
+      background-color: $primary-color;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+  }
+} 

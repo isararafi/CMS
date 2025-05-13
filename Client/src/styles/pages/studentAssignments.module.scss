@@ -1,0 +1,310 @@
+@import '../variables';
+
+.mainContent {
+  flex: 1;
+  margin-left: $sidebar-width;
+  transition: margin-left $transition-normal;
+  
+  &.expanded {
+    margin-left: $sidebar-collapsed-width;
+  }
+}
+
+.contentWrapper {
+  padding: $spacing-lg;
+  max-width: $container-xxl;
+  margin: 0 auto;
+}
+
+.pageContent {
+  margin-top: $spacing-lg;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-xl;
+  
+  .welcomeSection {
+    h1 {
+      margin: 0;
+      font-size: $font-2xl;
+      font-weight: 700;
+      color: $text-primary;
+    }
+    
+    .subtitle {
+      margin: $spacing-xs 0 0;
+      font-size: $font-md;
+      color: $text-secondary;
+    }
+  }
+  
+  .studentInfo {
+    display: flex;
+    gap: $spacing-lg;
+    
+    .infoItem {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      .label {
+        font-size: $font-sm;
+        color: $text-secondary;
+      }
+      
+      .value {
+        font-size: $font-sm;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+  }
+}
+
+.assignmentsContainer {
+  background-color: $white;
+  border-radius: $assignment-container-radius;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  overflow: hidden;
+}
+
+.filterSection {
+  padding: $assignment-padding;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $grid-gap;
+  
+  .searchInput {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+    
+    input {
+      width: 100%;
+      padding: $spacing-sm $spacing-md $spacing-sm $search-padding-left;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      font-size: $font-sm;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+      }
+    }
+    
+    svg {
+      position: absolute;
+      left: $spacing-md;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-secondary;
+    }
+  }
+  
+  .filterDropdown {
+    position: relative;
+    
+    .filterButton {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $filter-option-padding;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      background-color: $white;
+      cursor: pointer;
+      font-size: $font-sm;
+      color: $text-primary;
+      
+      &:hover {
+        border-color: $primary-color;
+      }
+    }
+    
+    .filterMenu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: $filter-menu-spacing;
+      background-color: $white;
+      border-radius: $border-radius-md;
+      box-shadow: $dropdown-shadow;
+      border: 1px solid $border-color;
+      z-index: $z-index-dropdown;
+      
+      .filterOption {
+        padding: $filter-option-padding;
+        cursor: pointer;
+        font-size: $font-sm;
+        color: $text-primary;
+        
+        &:hover {
+          background-color: rgba($primary-color, 0.1);
+        }
+        
+        &.active {
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+.assignmentsList {
+  padding: $assignment-padding;
+  display: grid;
+  gap: $grid-gap;
+}
+
+.assignmentCard {
+  background-color: $white;
+  border-radius: $assignment-card-radius;
+  border: 1px solid $border-color;
+  overflow: hidden;
+  
+  .assignmentHeader {
+    padding: $card-header-padding;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    
+    .headerLeft {
+      .courseCode {
+        font-size: $course-code-size;
+        font-weight: 600;
+        color: $primary-color;
+        margin: 0;
+      }
+      
+      .assignmentTitle {
+        margin: $spacing-xs 0 0;
+        font-size: $assignment-title-size;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+    
+    .headerRight {
+      .dueDate {
+        display: flex;
+        align-items: center;
+        gap: $button-gap;
+        font-size: $meta-text-size;
+        color: $text-secondary;
+        
+        &.overdue {
+          color: $error-color;
+        }
+      }
+    }
+  }
+  
+  .assignmentContent {
+    padding: $assignment-padding;
+    
+    .description {
+      font-size: $description-size;
+      color: $text-primary;
+      line-height: $card-content-line-height;
+      margin: 0 0 $spacing-md;
+    }
+    
+    .assignmentDetails {
+      display: grid;
+      grid-template-columns: $detail-grid-columns;
+      gap: $grid-gap;
+      
+      .detailItem {
+        .label {
+          font-size: $card-detail-label-size;
+          color: $text-secondary;
+          margin-bottom: $spacing-xs;
+        }
+        
+        .value {
+          font-size: $card-detail-value-size;
+          font-weight: 500;
+          color: $text-primary;
+        }
+      }
+    }
+  }
+  
+  .assignmentFooter {
+    padding: $assignment-padding;
+    border-top: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .status {
+      display: flex;
+      align-items: center;
+      gap: $button-gap;
+      font-size: $meta-text-size;
+      
+      &.pending {
+        color: $warning-color;
+      }
+      
+      &.submitted {
+        color: $success-color;
+      }
+      
+      &.overdue {
+        color: $error-color;
+      }
+    }
+    
+    .actions {
+      display: flex;
+      gap: $spacing-xs;
+      
+      button {
+        display: flex;
+        align-items: center;
+        gap: $button-gap;
+        padding: $button-padding;
+        border-radius: $button-radius;
+        font-size: $button-font-size;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all $transition-fast;
+        
+        &.viewButton {
+          background-color: transparent;
+          border: 1px solid $primary-color;
+          color: $primary-color;
+          
+          &:hover {
+            background-color: rgba($primary-color, 0.1);
+          }
+        }
+        
+        &.submitButton {
+          background-color: $primary-color;
+          border: none;
+          color: $white;
+          
+          &:hover {
+            background-color: darken($primary-color, $button-hover-darken);
+          }
+          
+          &:disabled {
+            background-color: rgba($primary-color, 0.5);
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+} 
