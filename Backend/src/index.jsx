@@ -13,7 +13,7 @@ app.post("/login", (req, res) => {
   const newuser = { id: 1, name, email };
   res.status(201).json({
     success: true,
-    message: "coorect",
+    message: "coorect", 
     data: newuser,
   });
 });
