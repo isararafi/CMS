@@ -91,19 +91,48 @@ exports.register = async (req, res) => {
 
 // LOGIN
 exports.login = (roleType) => async (req, res) => {
-  const { email, password } = req.body;
-
-  // Basic validation
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Validation failed",
-      error: { details: "Please provide email and password" }
-    });
-  }
-
   try {
-    const user = await User.findOne({ email, role: roleType });
+    let user;
+    
+    if (roleType === "student") {
+      // Student login with regNo, batch, and department
+      const { regNo, batch, department, password } = req.body;
+
+      // Basic validation for student
+      if (!regNo || !batch || !department || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          error: { details: "Please provide registration number, batch, department and password" }
+        });
+      }
+
+      // Find student by their unique credentials
+      user = await User.findOne({ 
+        regNo, 
+        batch, 
+        department,
+        role: "student"
+      });
+
+    } else {
+      // Admin and Tutor login with email
+      const { email, password } = req.body;
+
+      // Basic validation for admin/tutor
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          error: { details: "Please provide email and password" }
+        });
+      }
+
+      // Find admin/tutor by email
+      user = await User.findOne({ email, role: roleType });
+    }
+
+    // Check if user exists
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -112,7 +141,8 @@ exports.login = (roleType) => async (req, res) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Verify password
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
       return res.status(400).json({
         success: false,
@@ -142,15 +172,16 @@ exports.login = (roleType) => async (req, res) => {
         regNo: user.regNo,
         department: user.department
       });
+    } else {
+      // Add email for admin and tutor
+      userData.email = user.email;
     }
 
     res.json({
       success: true,
       message: "Login successful",
-      data: {
-        token,
-        user: userData
-      }
+      data: userData,
+      token
     });
   } catch (err) {
     res.status(500).json({
