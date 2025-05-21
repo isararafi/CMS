@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import store from '../redux/store';
+import { studentLogin } from '../redux/slices/studentSlice';
+import { tutorLogin } from '../redux/slices/teacherSlice';
+import { adminLogin } from '../redux/slices/adminSlice';
 import styles from '../styles/pages/login.module.scss';
 
 const Login = () => {
@@ -8,9 +12,6 @@ const Login = () => {
   
   // State to store user role (e.g., student, teacher, admin)
   const [userRole, setUserRole] = useState(null);
-
-  // Loading state to show spinner while role is being determined
-  const [loading, setLoading] = useState(true);
 
   // Form data to store user inputs
   const [formData, setFormData] = useState({
@@ -21,8 +22,8 @@ const Login = () => {
     password: ''
   });
 
-  // Flag to check if form has been submitted
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  // Redux selectors for login state
+  const [currentState, setCurrentState] = useState(store.getState().student);
 
   // Dropdown options for semester
   const semesterOptions = ['Fall 22', 'Spring 22', 'Fall 23', 'Spring 23', 'Fall 24', 'Spring 24'];
@@ -40,10 +41,6 @@ const Login = () => {
   };
 
   // Get role from URL and simulate fetching from API
-  /*This useEffect runs every time the location changes 
-  (including the first render). Since location comes from useLocation() 
-  (React Router), it changes whenever the URL changes — like navigating 
-  to /login?role=admin, /login?role=teacher, etc.*/
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roleFromUrl = params.get('role');
@@ -58,13 +55,26 @@ const Login = () => {
         setUserRole(roleFromApi);
       } catch (error) {
         console.error('Error fetching user role:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchUserRole();
   }, [location]);
+
+  // Subscribe to store changes
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      // Update the correct state based on userRole
+      if (userRole === 'student') {
+        setCurrentState(store.getState().student);
+      } else if (userRole === 'teacher') {
+        setCurrentState(store.getState().tutor);
+      } else if (userRole === 'admin') {
+        setCurrentState(store.getState().admin);
+      }
+    });
+    return unsubscribe;
+  }, [userRole]);
 
   // Configurations for different user roles
   const roleConfigs = {
@@ -114,28 +124,20 @@ const Login = () => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Log credentials based on role
-    console.log('Submitting:', { 
-      role: userRole,
-      credentials: userRole === 'student' 
-        ? `${formData.semester}-${formData.department}-${formData.regNumber}` 
-        : formData.email,
-      password: formData.password 
-    });
-
-    // Mark form as submitted
-    setIsSubmitted(true);
-
-    // In real app, redirect to dashboard after successful login
-    // setTimeout(() => navigate('/dashboard'), 2000);
+    if (userRole === 'student') {
+      store.dispatch(studentLogin(formData));
+    } else if (userRole === 'teacher') {
+      store.dispatch(tutorLogin(formData));
+    } else if (userRole === 'admin') {
+      store.dispatch(adminLogin(formData));
+    }
   };
 
   // Get configuration based on user role
   const currentConfig = userRole ? roleConfigs[userRole] : null;
 
   // Show loading spinner while role is being determined
-  if (loading) {
+  if (!userRole) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
@@ -143,11 +145,12 @@ const Login = () => {
       </div>
     );
   }
+
   // Main JSX structure of the login page
   return (
     <div className={styles.loginContainer} style={{ '--primary-color': colorScheme.primary, '--secondary-color': colorScheme.secondary, '--light-color': colorScheme.light, '--dark-color': colorScheme.dark, '--accent-color': colorScheme.accent }}>
       <div className={styles.loginCard}>
-        {!isSubmitted ? (
+        {!currentState.success ? (
           <div className={styles.loginFormContainer}>
             <div className={styles.logoContainer}>
               <div className={styles.logo}></div>
