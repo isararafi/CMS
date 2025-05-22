@@ -95,8 +95,8 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                     <span className={styles.menuText}>Summary</span>
                   </Link>
                 </li>
-               
-              </ul>
+                
+              </ul>  
             )}
           </li>
 

@@ -8,6 +8,8 @@ const port = process.env.PORT || 5000;
 
 const db = require("./db");
 const authRoutes = require("./routes/authRoutes");
+const studentRoutes = require("./routes/studentRoutes");
+const evaluationRoutes = require("./routes/evaluationRoutes");
 
 db();
 // Allow CORS for only http://localhost:5173
@@ -19,6 +21,8 @@ app.use(
 );
 app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/evaluations", evaluationRoutes);
 
 app.listen(port, () => {
   console.log("server started...");
