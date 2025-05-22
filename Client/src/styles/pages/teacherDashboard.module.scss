@@ -1,0 +1,78 @@
+@import '../variables';
+
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background: $light-bg;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  &.expanded {
+    margin-left: 80px;
+  }
+}
+
+.contentWrapper {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.pageContent {
+  margin-top: 24px;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  .welcomeSection {
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-primary;
+    }
+    .subtitle {
+      margin: 8px 0 0;
+      font-size: 16px;
+      color: $text-secondary;
+    }
+  }
+}
+
+.tabsContainer {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: 32px;
+}
+
+.tab, .activeTab {
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: $text-secondary;
+  cursor: pointer;
+  position: relative;
+  background: none;
+  border: none;
+  text-decoration: none;
+}
+
+.tab:hover {
+  color: $primary-color;
+}
+
+.activeTab {
+  color: $primary-color;
+  border-bottom: 2px solid $primary-color;
+}
+
+.tabContent {
+  margin-top: 24px;
+} 

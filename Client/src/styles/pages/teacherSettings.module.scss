@@ -1,0 +1,56 @@
+@import '../variables';
+
+.settingsPage {
+  background: $white;
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  padding: 32px;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 400px;
+}
+
+.profileField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  label {
+    font-size: 14px;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+  input {
+    padding: 8px 12px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    font-size: 14px;
+    color: $text-primary;
+    margin-top: 2px;
+  }
+  span {
+    font-size: 15px;
+    color: $text-primary;
+    font-weight: 500;
+  }
+}
+
+.editButton {
+  margin-top: 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: $primary-color;
+  color: $white;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: darken($primary-color, 5%);
+  }
+} 
