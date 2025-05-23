@@ -260,21 +260,20 @@
   margin-bottom: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
-  
+  color: $text-color;
+  background-color: transparent;
   &:hover {
-    background-color: rgba($light-color, 0.3);
+    background-color: rgba($primary-color, 0.08);
+    color: $primary-color;
   }
-  
   &.active {
     background-color: $primary-color;
     color: $white;
   }
-  
   @media (max-width: 768px) {
     margin-bottom: 0;
     margin-right: 0.5rem;
     white-space: nowrap;
-    
     &:last-child {
       margin-right: 0;
     }
@@ -299,6 +298,7 @@
     margin: 0;
     font-size: 1.25rem;
     color: $text-color;
+    font-weight: 700;
   }
   
   .sectionSubtitle {

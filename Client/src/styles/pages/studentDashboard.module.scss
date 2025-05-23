@@ -38,6 +38,7 @@
       margin: 8px 0 0;
       font-size: 16px;
       color: $text-secondary;
+      // color:black
     }
   }
 }
@@ -83,7 +84,7 @@
     .statLabel {
       margin: 4px 0 0;
       font-size: 14px;
-      color: $text-secondary;
+      color: $text-primary;
     }
   }
 }
@@ -156,6 +157,33 @@
       background-color: $primary-color;
       border-radius: 3px;
       transition: width 0.3s ease;
+    }
+  }
+}
+
+body, .dashboardLayout, .mainContent {
+  background-color: #f0f9f0;
+}
+
+.studentInfo {
+  // display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+
+  .infoItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    
+    .label {
+      color: #111;
+      margin-right: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .value {
+      color: #111;
+      font-weight: 600;
     }
   }
 } 

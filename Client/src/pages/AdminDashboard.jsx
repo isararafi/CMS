@@ -3,6 +3,7 @@ import { Users, BookOpen, Bell, Settings, BarChart2, Building, Clipboard, UserCh
 import styles from '../styles/pages/dashboard.module.scss'; // Import styles
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
+import CustomTable from '../components/common/CustomTable';
 
 
 
@@ -53,8 +54,6 @@ const AdminDashboard = ({ displayList }) => {
   // State for active tab (default is 'overview')
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [createRole, setCreateRole] = useState(null);
   const [formData, setFormData] = useState({});
   const [formMessage, setFormMessage] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -80,18 +79,9 @@ const AdminDashboard = ({ displayList }) => {
   const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
-    setShowCreateForm(false);
-    setCreateRole(null);
     setFormData({});
     setFormMessage(null);
   }, [displayList]);
-
-  const handleCreateClick = (role) => {
-    setShowCreateForm(true);
-    setCreateRole(role);
-    setFormData({});
-    setFormMessage(null);
-  };
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -101,11 +91,13 @@ const AdminDashboard = ({ displayList }) => {
     e.preventDefault();
     setFormLoading(true);
     setFormMessage(null);
-    // Prepare payload based on role
-    let payload = { ...formData, role: createRole };
-    // For student, combine batch/year/rollno into regNo if needed
-    if (createRole === 'student' && formData.batch && formData.year && formData.rollno) {
+    // Prepare payload based on displayList
+    let payload = { ...formData };
+    if (displayList === 'createStudent' && formData.batch && formData.year && formData.rollno) {
       payload.regNo = `${formData.batch}-${formData.year}-${formData.rollno}`;
+      payload.role = 'student';
+    } else if (displayList === 'createTeacher') {
+      payload.role = 'teacher';
     }
     try {
       const res = await fetch('/api/admin/register', {
@@ -185,9 +177,71 @@ const AdminDashboard = ({ displayList }) => {
     }
   };
 
+  // Form style for create student/teacher
+  const formCardStyle = {
+    marginTop: '2rem',
+    marginBottom: '2rem',
+    background: 'rgba(255,255,255,0.95)',
+    padding: '2rem',
+    borderRadius: '20px',
+    maxWidth: 500,
+    width: '100%',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+    border: '1px solid #e0e0e0',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: '1.5rem',
+  };
+  const formFieldStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+  };
+  const inputStyle = {
+    padding: '12px 16px',
+    border: '1px solid #bdbdbd',
+    borderRadius: '8px',
+    fontSize: '1rem',
+    background: '#f8f9fa',
+    color: '#222',
+    outline: 'none',
+    transition: 'border 0.2s',
+  };
+  const labelStyle = {
+    fontWeight: 500,
+    color: '#1B5E20',
+    fontSize: '1rem',
+    marginBottom: '2px',
+  };
+  const buttonStyle = {
+    padding: '12px',
+    background: '#2E7D32',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontWeight: 600,
+    fontSize: '1rem',
+    cursor: 'pointer',
+    marginTop: '0.5rem',
+    transition: 'background 0.2s',
+  };
+  const dividerStyle = {
+    height: '1px',
+    background: 'linear-gradient(90deg, #e0e0e0, #bfe4bf, #e0e0e0)',
+    border: 'none',
+    margin: '0.5rem 0 1.5rem 0',
+  };
+  // Responsive tweaks
+  const formCardResponsive = {
+    width: '100%',
+    minWidth: 0,
+    boxSizing: 'border-box',
+  };
+
   return (
     <div className={styles.dashboardLayout}>
-      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="admin" onCreateClick={handleCreateClick} />
+      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="admin" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <div className={styles.contentWrapper}>
@@ -229,203 +283,215 @@ const AdminDashboard = ({ displayList }) => {
               </div>
             </div>
 
-            {/* Inline create form for student or teacher */}
-            {showCreateForm ? (
-              <div style={{ marginTop: '2rem', marginBottom: '2rem', background: '#f9f9f9', padding: '2rem', borderRadius: '8px', maxWidth: 600 }}>
-                <h2>Create {createRole === 'student' ? 'Student' : 'Teacher'}</h2>
-                <form onSubmit={handleFormSubmit}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {createRole === 'student' ? (
-                      <>
-                        <label>
-                          Name
-                          <input name="name" value={formData.name || ''} onChange={handleFormChange} placeholder="Name" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Batch
-                          <input name="batch" value={formData.batch || ''} onChange={handleFormChange} placeholder="Batch" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Year
-                          <input name="year" value={formData.year || ''} onChange={handleFormChange} placeholder="Year" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Roll No
-                          <input name="rollno" value={formData.rollno || ''} onChange={handleFormChange} placeholder="Roll No" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Department
-                          <input name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Email
-                          <input name="email" value={formData.email || ''} onChange={handleFormChange} placeholder="Email" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                      </>
-                    ) : (
-                      <>
-                        <label>
-                          Name
-                          <input name="name" value={formData.name || ''} onChange={handleFormChange} placeholder="Name" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Email
-                          <input name="email" value={formData.email || ''} onChange={handleFormChange} placeholder="Email" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Education
-                          <input name="education" value={formData.education || ''} onChange={handleFormChange} placeholder="Education" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                        <label>
-                          Department
-                          <input name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={{ padding: '8px', marginTop: 4 }} />
-                        </label>
-                      </>
-                    )}
-                    <label>
-                      Password
-                      <input name="password" type="password" value={formData.password || ''} onChange={handleFormChange} placeholder="Password" required style={{ padding: '8px', marginTop: 4 }} />
-                    </label>
-                    <label>
-                      Confirm Password
-                      <input name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleFormChange} placeholder="Confirm Password" required style={{ padding: '8px', marginTop: 4 }} />
-                    </label>
-                    <button type="submit" disabled={formLoading} style={{ padding: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>ADD</button>
+            {/* Render create form or tables based on displayList */}
+            {displayList === 'createStudent' && (
+              <div style={{ ...formCardStyle, ...formCardResponsive }}>
+                <h2 style={{ color: '#1B5E20', fontWeight: 700, fontSize: '1.5rem', margin: 0 }}>Create Student</h2>
+                <hr style={dividerStyle} />
+                <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-name">Name</label>
+                    <input id="student-name" name="name" value={formData.name || ''} onChange={handleFormChange} placeholder="Name" required style={inputStyle} />
                   </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-batch">Batch</label>
+                    <input id="student-batch" name="batch" value={formData.batch || ''} onChange={handleFormChange} placeholder="Batch" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-year">Year</label>
+                    <input id="student-year" name="year" value={formData.year || ''} onChange={handleFormChange} placeholder="Year" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-rollno">Roll No</label>
+                    <input id="student-rollno" name="rollno" value={formData.rollno || ''} onChange={handleFormChange} placeholder="Roll No" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-department">Department</label>
+                    <input id="student-department" name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-email">Email</label>
+                    <input id="student-email" name="email" value={formData.email || ''} onChange={handleFormChange} placeholder="Email" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-password">Password</label>
+                    <input id="student-password" name="password" type="password" value={formData.password || ''} onChange={handleFormChange} placeholder="Password" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-confirmPassword">Confirm Password</label>
+                    <input id="student-confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleFormChange} placeholder="Confirm Password" required style={inputStyle} />
+                  </div>
+                  <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
                 </form>
                 {formMessage && (
-                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red' }}>{formMessage.text}</div>
+                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{formMessage.text}</div>
                 )}
               </div>
-            ) : (
-              <>
-                {displayList === 'students' && !showCreateForm && (
-                  <div style={{ marginTop: '2rem' }}>
-                    <h2>All Students</h2>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                      <thead>
-                        <tr style={{ background: '#f5f5f5' }}>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Name</th>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Reg No</th>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Department</th>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {students.map(student => (
-                          <tr key={student.id}>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{student.name}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{student.regNo}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{student.department}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>
-                              <button onClick={() => handleUpdateClick('student', student)} style={{ marginRight: 8 }}>Update</button>
-                              <button onClick={() => handleDeleteClick('student', student)} style={{ color: 'red' }}>Delete</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+            )}
+            {displayList === 'createTeacher' && (
+              <div style={{ ...formCardStyle, ...formCardResponsive }}>
+                <h2 style={{ color: '#1B5E20', fontWeight: 700, fontSize: '1.5rem', margin: 0 }}>Create Teacher</h2>
+                <hr style={dividerStyle} />
+                <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="teacher-name">Name</label>
+                    <input id="teacher-name" name="name" value={formData.name || ''} onChange={handleFormChange} placeholder="Name" required style={inputStyle} />
                   </div>
-                )}
-                {displayList === 'teachers' && !showCreateForm && (
-                  <div style={{ marginTop: '2rem' }}>
-                    <h2>All Teachers</h2>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                      <thead>
-                        <tr style={{ background: '#f5f5f5' }}>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Name</th>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Email</th>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Department</th>
-                          <th style={{ padding: '8px', border: '1px solid #ddd' }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {teachers.map(teacher => (
-                          <tr key={teacher.id}>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{teacher.name}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{teacher.email}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{teacher.department}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>
-                              <button onClick={() => handleUpdateClick('teacher', teacher)} style={{ marginRight: 8 }}>Update</button>
-                              <button onClick={() => handleDeleteClick('teacher', teacher)} style={{ color: 'red' }}>Delete</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="teacher-email">Email</label>
+                    <input id="teacher-email" name="email" value={formData.email || ''} onChange={handleFormChange} placeholder="Email" required style={inputStyle} />
                   </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="teacher-education">Education</label>
+                    <input id="teacher-education" name="education" value={formData.education || ''} onChange={handleFormChange} placeholder="Education" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="teacher-department">Department</label>
+                    <input id="teacher-department" name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="teacher-password">Password</label>
+                    <input id="teacher-password" name="password" type="password" value={formData.password || ''} onChange={handleFormChange} placeholder="Password" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="teacher-confirmPassword">Confirm Password</label>
+                    <input id="teacher-confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleFormChange} placeholder="Confirm Password" required style={inputStyle} />
+                  </div>
+                  <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
+                </form>
+                {formMessage && (
+                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{formMessage.text}</div>
                 )}
-              </>
+              </div>
+            )}
+            {displayList === 'students' && (
+              <div style={{ marginTop: '2rem' }}>
+                <h2>All Students</h2>
+                <CustomTable
+                  headers={['Name', 'Reg No', 'Department', 'Actions']}
+                  data={students.map(student => ({
+                    Name: student.name,
+                    'Reg No': student.regNo,
+                    Department: student.department,
+                    actions: {
+                      view: true,
+                      cancel: true
+                    },
+                    _original: student // for action handlers
+                  }))}
+                  onView={row => handleUpdateClick('student', row._original)}
+                  onCancel={row => handleDeleteClick('student', row._original)}
+                  role="admin"
+                />
+              </div>
+            )}
+            {displayList === 'teachers' && (
+              <div style={{ marginTop: '2rem' }}>
+                <h2>All Teachers</h2>
+                <CustomTable
+                  headers={['Name', 'Email', 'Department', 'Actions']}
+                  data={teachers.map(teacher => ({
+                    Name: teacher.name,
+                    Email: teacher.email,
+                    Department: teacher.department,
+                    actions: {
+                      view: true,
+                      cancel: true
+                    },
+                    _original: teacher // for action handlers
+                  }))}
+                  onView={row => handleUpdateClick('teacher', row._original)}
+                  onCancel={row => handleDeleteClick('teacher', row._original)}
+                  role="admin"
+                />
+              </div>
             )}
 
             {/* Update Modal */}
             {showUpdateModal && (
               <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                <div style={{ background: '#fff', padding: '2rem', borderRadius: '8px', minWidth: 350, maxWidth: 500, position: 'relative' }}>
-                  <button onClick={() => setShowUpdateModal(false)} style={{ position: 'absolute', top: 10, right: 10, background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }}>×</button>
-                  <h2>Update {updateRole === 'student' ? 'Student' : 'Teacher'}</h2>
-                  <form onSubmit={handleUpdateSubmit}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      {updateRole === 'student' ? (
-                        <>
-                          <label>
-                            Name
-                            <input name="name" value={updateForm.name || ''} onChange={handleUpdateFormChange} placeholder="Name" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Registration Number
-                            <input name="regNo" value={updateForm.regNo || ''} onChange={handleUpdateFormChange} placeholder="Registration Number" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Batch
-                            <input name="batch" value={updateForm.batch || ''} onChange={handleUpdateFormChange} placeholder="Batch" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Year
-                            <input name="year" value={updateForm.year || ''} onChange={handleUpdateFormChange} placeholder="Year" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Department
-                            <input name="department" value={updateForm.department || ''} onChange={handleUpdateFormChange} placeholder="Department" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Password
-                            <input name="password" type="password" value={updateForm.password || ''} onChange={handleUpdateFormChange} placeholder="Password" style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Email
-                            <input name="email" value={updateForm.email || ''} onChange={handleUpdateFormChange} placeholder="Email" style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                        </>
-                      ) : (
-                        <>
-                          <label>
-                            Name
-                            <input name="name" value={updateForm.name || ''} onChange={handleUpdateFormChange} placeholder="Name" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Email
-                            <input name="email" value={updateForm.email || ''} onChange={handleUpdateFormChange} placeholder="Email" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Education
-                            <input name="education" value={updateForm.education || ''} onChange={handleUpdateFormChange} placeholder="Education" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Department
-                            <input name="department" value={updateForm.department || ''} onChange={handleUpdateFormChange} placeholder="Department" required style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                          <label>
-                            Password
-                            <input name="password" type="password" value={updateForm.password || ''} onChange={handleUpdateFormChange} placeholder="Password" style={{ padding: '8px', marginTop: 4 }} />
-                          </label>
-                        </>
-                      )}
-                      <button type="submit" disabled={updateLoading} style={{ padding: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Update</button>
-                    </div>
+                <div style={{ ...formCardStyle, ...formCardResponsive, minWidth: 350, maxWidth: 500, position: 'relative', boxShadow: '0 10px 30px rgba(0,0,0,0.08)', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+                  <button
+                    onClick={() => setShowUpdateModal(false)}
+                    style={{
+                      position: 'absolute',
+                      top: 16,
+                      right: 16,
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: 28,
+                      cursor: 'pointer',
+                      color: '#000',
+                      zIndex: 2,
+                      padding: 0,
+                      lineHeight: 1
+                    }}
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+                  <h2 style={{ color: '#1B5E20', fontWeight: 700, fontSize: '1.5rem', margin: 0, textAlign: 'center' }}>Update {updateRole === 'student' ? 'Student' : 'Teacher'}</h2>
+                  <hr style={dividerStyle} />
+                  <form onSubmit={handleUpdateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {updateRole === 'student' ? (
+                      <>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-name">Name</label>
+                          <input id="update-student-name" name="name" value={updateForm.name || ''} onChange={handleUpdateFormChange} placeholder="Name" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-regNo">Registration Number</label>
+                          <input id="update-student-regNo" name="regNo" value={updateForm.regNo || ''} onChange={handleUpdateFormChange} placeholder="Registration Number" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-batch">Batch</label>
+                          <input id="update-student-batch" name="batch" value={updateForm.batch || ''} onChange={handleUpdateFormChange} placeholder="Batch" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-year">Year</label>
+                          <input id="update-student-year" name="year" value={updateForm.year || ''} onChange={handleUpdateFormChange} placeholder="Year" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-department">Department</label>
+                          <input id="update-student-department" name="department" value={updateForm.department || ''} onChange={handleUpdateFormChange} placeholder="Department" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-password">Password</label>
+                          <input id="update-student-password" name="password" type="password" value={updateForm.password || ''} onChange={handleUpdateFormChange} placeholder="Password" style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-student-email">Email</label>
+                          <input id="update-student-email" name="email" value={updateForm.email || ''} onChange={handleUpdateFormChange} placeholder="Email" style={inputStyle} />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-teacher-name">Name</label>
+                          <input id="update-teacher-name" name="name" value={updateForm.name || ''} onChange={handleUpdateFormChange} placeholder="Name" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-teacher-email">Email</label>
+                          <input id="update-teacher-email" name="email" value={updateForm.email || ''} onChange={handleUpdateFormChange} placeholder="Email" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-teacher-education">Education</label>
+                          <input id="update-teacher-education" name="education" value={updateForm.education || ''} onChange={handleUpdateFormChange} placeholder="Education" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-teacher-department">Department</label>
+                          <input id="update-teacher-department" name="department" value={updateForm.department || ''} onChange={handleUpdateFormChange} placeholder="Department" required style={inputStyle} />
+                        </div>
+                        <div style={formFieldStyle}>
+                          <label style={labelStyle} htmlFor="update-teacher-password">Password</label>
+                          <input id="update-teacher-password" name="password" type="password" value={updateForm.password || ''} onChange={handleUpdateFormChange} placeholder="Password" style={inputStyle} />
+                        </div>
+                      </>
+                    )}
+                    <button type="submit" disabled={updateLoading} style={buttonStyle}>Update</button>
                   </form>
                   {updateMessage && (
-                    <div style={{ marginTop: '1rem', color: updateMessage.type === 'success' ? 'green' : 'red' }}>{updateMessage.text}</div>
+                    <div style={{ marginTop: '1rem', color: updateMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{updateMessage.text}</div>
                   )}
                 </div>
               </div>

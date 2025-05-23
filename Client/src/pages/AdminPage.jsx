@@ -8,8 +8,8 @@ const AdminPage = () => (
     <Route path="/" element={<AdminDashboard />} />
     <Route path="student/display" element={<AdminDashboard displayList="students" />} />
     <Route path="teacher/display" element={<AdminDashboard displayList="teachers" />} />
-    <Route path="student/create" element={<ManageUserTemplate role="student" action="create" />} />
-    <Route path="teacher/create" element={<ManageUserTemplate role="teacher" action="create" />} />
+    <Route path="student/create" element={<AdminDashboard displayList="createStudent" />} />
+    <Route path="teacher/create" element={<AdminDashboard displayList="createTeacher" />} />
     {/* Default to dashboard if no subroute matches */}
     <Route path="*" element={<Navigate to="/admin" replace />} />
   </Routes>

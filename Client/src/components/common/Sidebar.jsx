@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../../assets/logo.avif';
 import { 
   Home,
   BookOpen,
@@ -14,7 +15,9 @@ import {
   BarChart2,
   PenTool,
   User,
-  Users
+  Users,
+  UserPlus,
+  UserCheck
 } from 'lucide-react';
 import styles from '../../styles/components/sidebar.module.scss';
 
@@ -79,12 +82,23 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
 
       <div className={styles.sidebarHeader}>
         <div className={styles.logoContainer}>
-          <img src="/logo.png" alt="Logo" className={styles.logo} />
+          <img src={logo} alt="Logo" className={styles.logo} />
           {!collapsed && <h1 className={styles.title}>CMS</h1>}
+          {collapsed && (
+            <button
+              className={`${styles.toggleButton} ${styles.toggleOverLogo}`}
+              onClick={toggleSidebar}
+              aria-label="Expand sidebar"
+            >
+              <Menu size={20} strokeWidth={1.5} />
+            </button>
+          )}
         </div>
-        <button className={styles.toggleButton} onClick={toggleSidebar}>
-          <Menu size={20} strokeWidth={1.5} />
-        </button>
+        {!collapsed && (
+          <button className={styles.toggleButton} onClick={toggleSidebar}>
+            <Menu size={20} strokeWidth={1.5} />
+          </button>
+        )}
       </div>
 
       <div className={styles.sidebarMenu}>
@@ -102,7 +116,8 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
                   <span className={styles.icon}><BookOpen size={20} strokeWidth={1.5} /></span>
                   {!collapsed && (
                     <>
-                      <span className={styles.menuText}>Courses</span>
+                     <span className={styles.menuText}>&nbsp;&nbsp;&nbsp;&nbsp;Courses</span>
+
                       <ChevronDown 
                         size={16} 
                         strokeWidth={1.5} 
@@ -192,10 +207,10 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
             <>
               <li className={`${styles.hasSubmenu} ${isActive('/admin/student') ? styles.active : ''}`}>
                 <div className={styles.menuItem} onClick={toggleStudentSubmenu}>
-                  <span className={styles.icon}><User size={20} strokeWidth={1.5} /></span>
+                  <span className={styles.icon} style={{ marginRight: '1rem' }}><User size={20} strokeWidth={1.5} /></span>
                   {!collapsed && (
                     <>
-                      <span className={styles.menuText}>Student</span>
+                      <span className={styles.menuText} style={{ marginRight: '0.5rem' }}>Student</span>
                       <ChevronDown size={16} strokeWidth={1.5} className={`${styles.arrow} ${studentSubmenuOpen ? styles.expanded : ''}`} />
                     </>
                   )}
@@ -203,20 +218,26 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
                 {!collapsed && (
                   <ul className={`${styles.submenu} ${studentSubmenuOpen ? styles.visible : ''}`}>
                     <li>
-                      <button type="button" className={styles.menuButton} onClick={() => onCreateClick && onCreateClick('student')} style={{ background: 'none', border: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}>Create</button>
+                      <Link to="/admin/student/create" className={styles.menuButton} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <UserPlus size={16} style={{ marginRight: 8 }} />
+                        Create
+                      </Link>
                     </li>
                     <li className={isActive('/admin/student/display') ? styles.active : ''}>
-                      <Link to="/admin/student/display">Display All Students</Link>
+                      <Link to="/admin/student/display" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <Users size={16} style={{ marginRight: 8 }} />
+                         All Students
+                      </Link>
                     </li>
                   </ul>
                 )}
               </li>
               <li className={`${styles.hasSubmenu} ${isActive('/admin/teacher') ? styles.active : ''}`}>
                 <div className={styles.menuItem} onClick={toggleTeacherSubmenu}>
-                  <span className={styles.icon}><Users size={20} strokeWidth={1.5} /></span>
+                  <span className={styles.icon} style={{ marginRight: '1rem' }}><Users size={20} strokeWidth={1.5} /></span>
                   {!collapsed && (
                     <>
-                      <span className={styles.menuText}>Teacher</span>
+                      <span className={styles.menuText} style={{ marginRight: '0.5rem' }}>Teacher</span>
                       <ChevronDown size={16} strokeWidth={1.5} className={`${styles.arrow} ${teacherSubmenuOpen ? styles.expanded : ''}`} />
                     </>
                   )}
@@ -224,10 +245,16 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
                 {!collapsed && (
                   <ul className={`${styles.submenu} ${teacherSubmenuOpen ? styles.visible : ''}`}>
                     <li>
-                      <button type="button" className={styles.menuButton} onClick={() => onCreateClick && onCreateClick('teacher')} style={{ background: 'none', border: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}>Create</button>
+                      <Link to="/admin/teacher/create" className={styles.menuButton} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <UserPlus size={16} style={{ marginRight: 8 }} />
+                        Create
+                      </Link>
                     </li>
                     <li className={isActive('/admin/teacher/display') ? styles.active : ''}>
-                      <Link to="/admin/teacher/display">Display All Teachers</Link>
+                      <Link to="/admin/teacher/display" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <UserCheck size={16} style={{ marginRight: 8 }} />
+                         All Teachers
+                      </Link>
                     </li>
                   </ul>
                 )}

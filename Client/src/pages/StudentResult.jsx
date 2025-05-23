@@ -137,7 +137,7 @@ const StudentResult = () => {
                 </div>
               </div>
 
-              <div className={styles.searchContainer}>
+              {/* <div className={styles.searchContainer}>
                 <div className={styles.searchInput}>
                   <Search size={20} strokeWidth={1.5} />
                   <input
@@ -147,7 +147,7 @@ const StudentResult = () => {
                     onChange={handleSearch}
                   />
                 </div>
-              </div>
+              </div> */}
 
               <button className={styles.downloadButton}>
                 <Download size={16} strokeWidth={1.5} />

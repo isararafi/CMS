@@ -14,7 +14,7 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 
 .navbar {
   padding: 0.75rem 1.5rem;
-  background-color: $white;
+  background-color: #bfe4bf;
   border-bottom: 1px solid $border-color;
   box-shadow: $shadow;
   height: 55px;
@@ -22,10 +22,10 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
 
   @media (max-width: 768px) {
-    padding: 0.5rem 1rem; 
+    padding: 0.5rem 0.5rem;
+    height: 48px;
   }
   
   .mobileMenuToggle {
@@ -59,8 +59,14 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
     max-width: 1440px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
+
+    @media (max-width: 768px) {
+      padding: 0;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
   }
 
   .searchContainer {
@@ -107,6 +113,10 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     
+    @media (max-width: 768px) {
+      gap: 0.5rem;
+    }
+    
     .notificationIcon {
       position: relative;
       margin-right: 1.5rem;
@@ -124,6 +134,12 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
       &:hover {
         transform: translateY(-2px);
         background-color: rgba($light-color, 0.8);
+      }
+      
+      @media (max-width: 768px) {
+        margin-right: 0.5rem;
+        width: 28px;
+        height: 28px;
       }
       
       .badge {
@@ -156,6 +172,10 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
         background-color: rgba($light-color, 0.5);
       }
       
+      @media (max-width: 768px) {
+        padding: 3px 6px;
+      }
+      
       .avatar {
         width: 36px;
         height: 36px;
@@ -167,6 +187,12 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
         color: $primary-color;
         margin-right: 0.75rem;
         border: 2px solid $primary-color;
+
+        @media (max-width: 768px) {
+          width: 28px;
+          height: 28px;
+          margin-right: 0.5rem;
+        }
       }
       
       .userInfo {
@@ -185,6 +211,12 @@ $shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
           font-size: 0.75rem;
           color: $primary-color;
           margin: 0;
+        }
+
+        @media (max-width: 768px) {
+          .userName, .userRole {
+            font-size: 12px;
+          }
         }
       }
     }

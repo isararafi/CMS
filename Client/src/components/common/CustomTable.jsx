@@ -18,7 +18,8 @@ const CustomTable = ({
     closed: '#FFCECE'    // Light red for course status
   },
   showActionColumn = true,
-  onRowClick = null
+  onRowClick = null,
+  role = 'student' // default to student
 }) => {
   // Add debugging log
   console.log("CustomTable rendered with data:", data);
@@ -111,7 +112,7 @@ const CustomTable = ({
               onClick={(e) => handleViewClick(data[rowIndex], e)}
             >
               <CheckCircle size={14} />
-              Selected
+              {role === 'admin' ? 'Edit' : 'Selected'}
             </button>
           ) : (
             <button 
@@ -123,7 +124,7 @@ const CustomTable = ({
               onClick={(e) => !value.disabled && handleViewClick(data[rowIndex], e)}
               disabled={value.disabled}
             >
-              Select
+              {role === 'admin' ? 'Edit' : 'Select'}
             </button>
           )}
         </td>
@@ -211,7 +212,7 @@ const CustomTable = ({
                       className={styles.viewButton}
                       onClick={(e) => handleViewClick(row, e)}
                     >
-                      View
+                      {role === 'admin' ? 'Edit' : 'View'}
                     </button>
                   )}
                   {row.actions.cancel && (
@@ -219,7 +220,7 @@ const CustomTable = ({
                       className={styles.cancelButton}
                       onClick={(e) => handleCancelClick(row, e)}
                     >
-                      Cancel
+                      {role === 'admin' ? 'Delete' : 'Cancel'}
                     </button>
                   )}
                 </td>
@@ -239,7 +240,8 @@ CustomTable.propTypes = {
   onCancel: PropTypes.func,
   statusColors: PropTypes.object,
   showActionColumn: PropTypes.bool,
-  onRowClick: PropTypes.func
+  onRowClick: PropTypes.func,
+  role: PropTypes.string
 };
 
 export default CustomTable; 

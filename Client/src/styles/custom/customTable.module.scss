@@ -1,5 +1,5 @@
 @use '../variables' as vars;
-
+$dark-color: #1B5E20;
 .tableContainer {
   width: 100%;
   overflow-x: auto;
@@ -63,6 +63,14 @@
   }
 }
 
+.customTable thead th {
+  background-color: #bfe4bf; /* Green 800 */
+  color: $dark-color;
+  font-weight: 600;
+  font-size: 1rem;
+  border-bottom: 2px solid #1B5E20;
+}
+
 .statusPill {
   display: inline-block;
   padding: 4px 12px;
@@ -113,5 +121,20 @@
   
   &:hover {
     background-color: #fedddd;
+  }
+}
+
+@media (max-width: 768px) {
+  .tableContainer {
+    overflow-x: auto;
+    width: 100%;
+  }
+  .customTable {
+    min-width: 600px;
+    font-size: 13px;
+  }
+  .customTable th, .customTable td {
+    padding: 8px 8px;
+    font-size: 13px;
   }
 } 

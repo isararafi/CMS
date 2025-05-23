@@ -307,7 +307,7 @@ const StudentCoursesSummary = () => {
     position: 'absolute',
     top: '16px',
     right: '16px',
-    backgroundColor: 'transparent',
+    backgroundColor: 'black',
     border: 'none',
     cursor: 'pointer',
     padding: '4px',
@@ -824,7 +824,8 @@ const StudentCoursesSummary = () => {
       <div style={detailsModalOverlayStyle}>
         <div style={detailsModalContentStyle}>
           <button style={modalCloseStyle} onClick={handleCloseDetailsModal}>
-            <X size={24} />
+          <X size={24} style={{ color: 'black' }} />
+
           </button>
           
           {selectedAttendanceDetail && (
