@@ -9,7 +9,7 @@ const TeacherDashboard = () => {
 
   return (
     <div className={styles.dashboardLayout}>
-      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="tutor" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <div className={styles.contentWrapper}>
@@ -19,12 +19,6 @@ const TeacherDashboard = () => {
                 <h1>Teacher Dashboard</h1>
                 <p className={styles.subtitle}>Faculty Portal</p>
               </div>
-            </div>
-            <div className={styles.tabsContainer}>
-              <NavLink to="attendance" className={({isActive}) => isActive ? styles.activeTab : styles.tab}>Attendance</NavLink>
-              <NavLink to="marks" className={({isActive}) => isActive ? styles.activeTab : styles.tab}>Marks</NavLink>
-              <NavLink to="assignments" className={({isActive}) => isActive ? styles.activeTab : styles.tab}>Assignments</NavLink>
-              <NavLink to="settings" className={({isActive}) => isActive ? styles.activeTab : styles.tab}>Settings</NavLink>
             </div>
             <div className={styles.tabContent}>
               <Outlet />

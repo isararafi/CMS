@@ -14,6 +14,7 @@ import StudentCoursesSummary from './pages/StudentCoursesSummary';  // Importing
 import StudentSettings from './pages/StudentSettings';  // Importing Student Settings page component
 import StudentAssignments from './pages/StudentAssignments';  // Importing Student Assignments page component
 import TeacherPage from './pages/TeacherPage';  // Importing Teacher Page component
+import AdminPage from './pages/AdminPage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';  // Importing React Router components for routing
 
 function App() {
@@ -49,7 +50,7 @@ function App() {
         <Route path="/teacher/*" element={<TeacherPage />} />
 
         {/* Route for the Admin Dashboard */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/*" element={<AdminPage />} />
 
         {/* Fallback route - If no path matches, show Unauthorized page */}
         <Route path="*" element={<UnauthorizedPage />} />
