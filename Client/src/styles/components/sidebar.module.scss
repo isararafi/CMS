@@ -662,3 +662,10 @@ $active-item-bg: rgba(255, 255, 255, 0.22);
     }
   }
 }
+
+// Defensive rule to ensure all sidebar menu items are always visible
+.sidebarMenu ul li {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

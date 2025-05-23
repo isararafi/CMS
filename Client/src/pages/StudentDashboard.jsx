@@ -67,7 +67,7 @@ const StudentDashboard = () => {
       <div className={styles.decorativeDots}></div>
       <div className={styles.decorativeDiamond}></div>
       
-      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="student" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={toggleSidebar} />
         

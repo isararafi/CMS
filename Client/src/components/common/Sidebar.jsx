@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home,
@@ -13,8 +13,6 @@ import {
   BookOpenCheck,
   BarChart2,
   PenTool,
-  ListChecks,
-  BookMarked,
   User,
   Users
 } from 'lucide-react';
@@ -26,16 +24,37 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
   const [studentSubmenuOpen, setStudentSubmenuOpen] = useState(false);
   const [teacherSubmenuOpen, setTeacherSubmenuOpen] = useState(false);
 
+  // Check if the current route is active
   const isActive = (path) => {
     return location.pathname.includes(path);
   };
 
-  const toggleCoursesSubmenu = () => {
-    setCoursesSubmenuOpen(!coursesSubmenuOpen);
+  // Automatically manage the courses submenu state based on the current route
+  useEffect(() => {
+    if (location.pathname.includes('/student/courses')) {
+      setCoursesSubmenuOpen(true);
+    } else {
+      setCoursesSubmenuOpen(false);
+    }
+  }, [location.pathname]);
+
+  // Toggle submenu only when clicking the parent "Courses" menu item
+  const toggleCoursesSubmenu = (e) => {
+    // Only toggle if the click is on the parent menu item (not a submenu link)
+    if (e.target.closest('.submenu') === null) {
+      if (collapsed) {
+        setCollapsed(false); // Expand sidebar if collapsed
+        setCoursesSubmenuOpen(true); // Open submenu
+      } else {
+        setCoursesSubmenuOpen(!coursesSubmenuOpen);
+      }
+    }
   };
+
   const toggleStudentSubmenu = () => {
     setStudentSubmenuOpen(!studentSubmenuOpen);
   };
+
   const toggleTeacherSubmenu = () => {
     setTeacherSubmenuOpen(!teacherSubmenuOpen);
   };
@@ -70,7 +89,7 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
 
       <div className={styles.sidebarMenu}>
         <ul>
-          {role === 'student' && (
+          {(role === 'student' || !role) && (
             <>
               <li className={isActive('/dashboard') ? styles.active : ''}>
                 <Link to="/student/dashboard">
@@ -143,12 +162,6 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
           )}
           {role === 'tutor' && (
             <>
-              {/* <li className={isActive('/teacher/dashboard') ? styles.active : ''}>
-                <Link to="/teacher/dashboard">
-                  <span className={styles.icon}><Home size={20} strokeWidth={1.5} /></span>
-                  {!collapsed && <span className={styles.menuText}>Dashboard</span>}
-                </Link>
-              </li> */}
               <li className={isActive('/teacher/attendance') ? styles.active : ''}>
                 <Link to="/teacher/attendance">
                   <span className={styles.icon}><ClipboardList size={20} strokeWidth={1.5} /></span>
