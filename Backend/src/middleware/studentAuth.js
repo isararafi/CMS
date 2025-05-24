@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin');
+const Student = require('../models/Student');
 
-const auth = async (req, res, next) => {
+const studentAuth = async (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
         
@@ -10,18 +10,18 @@ const auth = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const admin = await Admin.findById(decoded.id);
+        const student = await Student.findById(decoded.id);
 
-        if (!admin) {
+        if (!student) {
             throw new Error();
         }
 
         req.token = token;
-        req.admin = admin;
+        req.student = student;
         next();
     } catch (error) {
-        res.status(401).json({ error: 'Please authenticate.' });
+        res.status(401).json({ error: 'Please authenticate as a student.' });
     }
 };
 
-module.exports = auth; 
+module.exports = studentAuth; 

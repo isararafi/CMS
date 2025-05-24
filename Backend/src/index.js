@@ -7,9 +7,9 @@ const cors = require("cors");
 const port = process.env.PORT || 5000;
 
 const db = require("./db");
-const authRoutes = require("./routes/authRoutes");
-const studentRoutes = require("./routes/studentRoutes");
-const evaluationRoutes = require("./routes/evaluationRoutes");
+const adminRoutes = require('./routes/adminRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 
 db();
 // Allow CORS for only http://localhost:5173
@@ -20,9 +20,15 @@ app.use(
   })
 );
 app.use(express.json());
-app.use("/api/auth", authRoutes);
-app.use("/api/students", studentRoutes);
-app.use("/api/evaluations", evaluationRoutes);
+
+// Admin routes
+app.use('/api/admin', adminRoutes);
+
+// Teacher routes
+app.use('/api/teacher', teacherRoutes);
+
+// Student routes
+app.use('/api/student', studentRoutes);
 
 app.listen(port, () => {
   console.log("server started...");
