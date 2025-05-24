@@ -13,7 +13,7 @@ router.use(teacherAuth);
 // Teacher Profile
 router.get('/profile', teacherController.getProfile);
 router.post('/profile/update-request', teacherController.requestProfileUpdate);
-router.get('/profile/update-requests', teacherController.getProfileUpdateRequests);
+router.get('/profile/update-request', teacherController.getProfileUpdateRequests);
 
 // Course Management
 router.get('/courses', teacherController.getCourses);
