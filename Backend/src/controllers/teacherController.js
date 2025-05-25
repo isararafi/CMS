@@ -162,11 +162,12 @@ exports.getAttendance = async (req, res) => {
     }
 };
 
-// Add or Update Marks
-exports.addOrUpdateMarks = async (req, res) => {
+// Add Marks
+exports.addMarks = async (req, res) => {
     try {
         const { studentId, courseId, type, marks, totalMarks, examDate } = req.body;
 
+        // Validate required fields
         if (!studentId || !courseId || !type || marks === undefined || !totalMarks || !examDate) {
             return res.status(400).json({ error: 'All fields are required' });
         }
@@ -177,21 +178,92 @@ exports.addOrUpdateMarks = async (req, res) => {
             return res.status(404).json({ error: 'Course not found or unauthorized' });
         }
 
-        const markRecord = await Marks.findOneAndUpdate(
-            { student: studentId, course: courseId, type },
+        // Check if marks already exist
+        const existingMarks = await Marks.findOne({ 
+            student: studentId, 
+            course: courseId, 
+            type 
+        });
+
+        if (existingMarks) {
+            return res.status(400).json({ 
+                error: 'Marks already exist for this student in this course and exam type. Use update marks API instead.' 
+            });
+        }
+
+        // Create new marks record
+        const markRecord = new Marks({
+            student: studentId,
+            course: courseId,
+            teacher: req.teacher._id,
+            type,
+            marks,
+            totalMarks,
+            examDate
+        });
+
+        await markRecord.save();
+
+        const populatedRecord = await Marks.findById(markRecord._id)
+            .populate('student', 'name rollNo')
+            .populate('course', 'courseName courseCode');
+
+        res.status(201).json({
+            message: 'Marks added successfully',
+            markRecord: populatedRecord
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// Update Marks
+exports.updateMarks = async (req, res) => {
+    try {
+        const { studentId, courseId, type, marks, totalMarks, examDate } = req.body;
+
+        // Validate required fields
+        if (!studentId || !courseId || !type || marks === undefined || !totalMarks || !examDate) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        // Verify the course belongs to the teacher
+        const course = await Course.findOne({ _id: courseId, teacher: req.teacher._id });
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found or unauthorized' });
+        }
+
+        // Find existing marks
+        const existingMarks = await Marks.findOne({ 
+            student: studentId, 
+            course: courseId, 
+            type 
+        });
+
+        if (!existingMarks) {
+            return res.status(404).json({ 
+                error: 'No marks found for this student in this course and exam type. Use add marks API instead.' 
+            });
+        }
+
+        // Update marks
+        const updatedMarks = await Marks.findByIdAndUpdate(
+            existingMarks._id,
             {
-                student: studentId,
-                course: courseId,
-                teacher: req.teacher._id,
-                type,
                 marks,
                 totalMarks,
-                examDate
+                examDate,
+                updatedAt: Date.now()
             },
-            { upsert: true, new: true }
-        ).populate('student', 'name rollNo');
+            { new: true }
+        )
+        .populate('student', 'name rollNo')
+        .populate('course', 'courseName courseCode');
 
-        res.json(markRecord);
+        res.json({
+            message: 'Marks updated successfully',
+            markRecord: updatedMarks
+        });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -237,6 +309,9 @@ exports.uploadAssignment = async (req, res) => {
             return res.status(404).json({ error: 'Course not found or unauthorized' });
         }
 
+        // Create file URL
+        const fileUrl = `/api/assignments/download/${req.file.filename}`;
+
         const assignment = new Assignment({
             title,
             description,
@@ -244,13 +319,19 @@ exports.uploadAssignment = async (req, res) => {
             teacher: req.teacher._id,
             filePath: req.file.path,
             fileName: req.file.originalname,
+            fileUrl: fileUrl,
             fileSize: req.file.size,
             mimeType: req.file.mimetype,
             dueDate
         });
 
         await assignment.save();
-        res.status(201).json(assignment);
+
+        // Return assignment with download URL
+        res.status(201).json({
+            ...assignment.toObject(),
+            downloadUrl: `${req.protocol}://${req.get('host')}${fileUrl}`
+        });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -270,9 +351,32 @@ exports.getAssignments = async (req, res) => {
         const assignments = await Assignment.find({ course: courseId })
             .sort({ uploadDate: -1 });
 
-        res.json(assignments);
+        // Add download URLs to each assignment
+        const assignmentsWithUrls = assignments.map(assignment => ({
+            ...assignment.toObject(),
+            downloadUrl: `${req.protocol}://${req.get('host')}${assignment.fileUrl}`
+        }));
+
+        res.json(assignmentsWithUrls);
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
+    }
+};
+
+// Download Assignment
+exports.downloadAssignment = async (req, res) => {
+    try {
+        const { filename } = req.params;
+        const assignment = await Assignment.findOne({ filePath: `uploads/assignments/${filename}` });
+
+        if (!assignment) {
+            return res.status(404).json({ error: 'Assignment file not found' });
+        }
+
+        // Send file for download
+        res.download(assignment.filePath, assignment.fileName);
+    } catch (error) {
+        res.status(500).json({ error: 'Error downloading file' });
     }
 };
 

@@ -1,6 +1,7 @@
 const Admin = require('../models/Admin');
 const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
+const Course = require('../models/Course');
 const jwt = require('jsonwebtoken');
 
 // Admin Login
@@ -326,6 +327,125 @@ exports.registerTeacher = async (req, res) => {
                 department: teacher.department
             }
         });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+// Course Management
+exports.createCourse = async (req, res) => {
+    try {
+        const { courseName, courseCode, creditHours, semester, department, teacherId } = req.body;
+
+        // Validate required fields
+        if (!courseName || !courseCode || !creditHours || !semester || !department || !teacherId) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        // Check if course with courseCode already exists
+        const existingCourse = await Course.findOne({ courseCode });
+        if (existingCourse) {
+            return res.status(400).json({ error: 'Course with this code already exists' });
+        }
+
+        // Verify if teacher exists
+        const teacher = await Teacher.findById(teacherId);
+        if (!teacher) {
+            return res.status(404).json({ error: 'Teacher not found' });
+        }
+
+        // Create new course
+        const course = new Course({
+            courseName,
+            courseCode,
+            creditHours,
+            semester,
+            department,
+            teacher: teacherId
+        });
+
+        await course.save();
+
+        res.status(201).json({
+            message: 'Course created successfully',
+            course
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.updateCourse = async (req, res) => {
+    try {
+        const updates = req.body;
+        const courseId = req.params.id;
+
+        // Check if course exists
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+
+        // If updating courseCode, check if it already exists
+        if (updates.courseCode && updates.courseCode !== course.courseCode) {
+            const existingCourse = await Course.findOne({ courseCode: updates.courseCode });
+            if (existingCourse) {
+                return res.status(400).json({ error: 'Course code already exists' });
+            }
+        }
+
+        // If updating teacher, verify if new teacher exists
+        if (updates.teacherId) {
+            const teacher = await Teacher.findById(updates.teacherId);
+            if (!teacher) {
+                return res.status(404).json({ error: 'Teacher not found' });
+            }
+            updates.teacher = updates.teacherId;
+            delete updates.teacherId;
+        }
+
+        // Update course
+        const updatedCourse = await Course.findByIdAndUpdate(
+            courseId,
+            { $set: updates },
+            { new: true, runValidators: true }
+        ).populate('teacher', 'name email');
+
+        res.json({
+            message: 'Course updated successfully',
+            course: updatedCourse
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.deleteCourse = async (req, res) => {
+    try {
+        const courseId = req.params.id;
+
+        // Check if course exists and delete it
+        const course = await Course.findByIdAndDelete(courseId);
+        
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+
+        res.json({ 
+            message: 'Course deleted successfully',
+            deletedCourse: course
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getAllCourses = async (req, res) => {
+    try {
+        const courses = await Course.find()
+            .populate('teacher', 'name email')
+            .populate('students', 'name rollNo');
+        res.json(courses);
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }

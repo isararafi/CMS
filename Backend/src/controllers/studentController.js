@@ -3,6 +3,7 @@ const Course = require('../models/Course');
 const Marks = require('../models/Marks');
 const Attendance = require('../models/Attendance');
 const Assignment = require('../models/Assignment');
+const Lecture = require('../models/Lecture');
 const StudentUpdateRequest = require('../models/StudentUpdateRequest');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -10,16 +11,26 @@ const bcrypt = require('bcryptjs');
 // Student Login
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { batch, department, rollNo, password } = req.body;
         
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+        // Validate required fields
+        if (!batch || !department || !rollNo || !password) {
+            return res.status(400).json({ 
+                error: 'Batch, department, registration number, and password are required' 
+            });
         }
 
-        const student = await Student.findOne({ email });
+        // Find student by batch, department and rollNo
+        const student = await Student.findOne({ 
+            batch, 
+            department, 
+            rollNo 
+        });
 
         if (!student || !(await student.comparePassword(password))) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ 
+                error: 'Invalid credentials. Please check your registration details and password.' 
+            });
         }
 
         const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
@@ -33,8 +44,10 @@ exports.login = async (req, res) => {
                 id: student._id,
                 name: student.name,
                 rollNo: student.rollNo,
+                batch: student.batch,
                 semester: student.semester,
-                department: student.department
+                department: student.department,
+                email: student.email
             }
         });
     } catch (error) {
@@ -166,7 +179,7 @@ exports.getDetailedCourseAttendance = async (req, res) => {
     try {
         const { courseId } = req.params;
 
-        // Verify student is enrolled in the course
+        // Step 1: Verify student is enrolled
         const student = await Student.findById(req.student._id);
         const isEnrolled = student.enrolledCourses.some(
             enrollment => enrollment.course.toString() === courseId
@@ -176,18 +189,35 @@ exports.getDetailedCourseAttendance = async (req, res) => {
             return res.status(403).json({ error: 'Not enrolled in this course' });
         }
 
-        const attendance = await Attendance.find({
+        // Step 2: Get all lectures of the course
+        const lectures = await Lecture.find({ course: courseId }).sort({ date: 1 });
+
+        // Step 3: Get student's attendance records for this course
+        const attendanceRecords = await Attendance.find({
             course: courseId,
             student: req.student._id
-        })
-        .populate('lecture', 'title date')
-        .sort({ date: 1 });
+        }).populate('lecture', 'title date');
 
-        res.json(attendance);
+        // Step 4: Create a map of attended lecture IDs
+        const attendedLectureIds = new Set(
+            attendanceRecords.map(record => record.lecture._id.toString())
+        );
+
+        // Step 5: Build final attendance status list
+        const detailedAttendance = lectures.map(lecture => ({
+            lectureId: lecture._id,
+            title: lecture.title,
+            date: lecture.date,
+            status: attendedLectureIds.has(lecture._id.toString()) ? 'Present' : 'Absent'
+        }));
+
+        res.json(detailedAttendance);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Server error' });
     }
 };
+
 
 // Get Available Courses
 exports.getAvailableCourses = async (req, res) => {

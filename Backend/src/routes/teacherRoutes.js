@@ -27,11 +27,13 @@ router.post('/attendance/mark', teacherController.markAttendance);
 router.get('/attendance/lecture/:lectureId', teacherController.getAttendance);
 
 // Marks Management
-router.post('/marks', teacherController.addOrUpdateMarks);
+router.post('/marks', teacherController.addMarks);
+router.put('/marks', teacherController.updateMarks);
 router.get('/courses/:courseId/marks', teacherController.getMarks);
 
 // Assignment Management
-router.post('/assignments/upload', upload.single('assignmentFile'), teacherController.uploadAssignment);
+router.post('/assignments/upload', upload.single('file'), teacherController.uploadAssignment);
 router.get('/courses/:courseId/assignments', teacherController.getAssignments);
+router.get('/assignments/download/:filename', teacherController.downloadAssignment);
 
 module.exports = router; 

@@ -39,6 +39,10 @@ router.patch('/teachers/:id', adminController.updateTeacher);
 router.delete('/teachers/:id', adminController.deleteTeacher);
 router.delete('/teachers', adminController.deleteTeacher); // Alternative delete by email
 
-
+// Course Management
+router.post('/courses', adminController.createCourse);
+router.get('/courses', adminController.getAllCourses);
+router.patch('/courses/:id', adminController.updateCourse);
+router.delete('/courses/:id', adminController.deleteCourse);
 
 module.exports = router; 
