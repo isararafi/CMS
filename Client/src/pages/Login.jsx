@@ -23,10 +23,10 @@ const Login = () => {
   });
 
   // Dropdown options for semester
-  const semesterOptions = ['Fall 22', 'Spring 22', 'Fall 23', 'Spring 23', 'Fall 24', 'Spring 24'];
+  const semesterOptions = ['2022', 'Spring 22', 'Fall 23', 'Spring 23', 'Fall 24', 'Spring 24'];
 
   // Dropdown options for department
-  const departmentOptions = ['BSSE', 'BSCS', 'BSIT', 'BSAI'];
+  const departmentOptions = ['Computer Science', 'BSCS', 'BSIT', 'BSAI'];
 
   // Color theme for styling
   const colorScheme = {
@@ -38,11 +38,17 @@ const Login = () => {
   };
 
   // Redirect if already logged in
-  useEffect(() => {
-    if (token) {
-      navigate('/dashboard');
-    }
-  }, [token, navigate]);
+  // useEffect(() => {
+  //   if (token && userRole) {
+  //     if (userRole === 'student') {
+  //       navigate('/student/dashboard');
+  //     } else if (userRole === 'teacher') {
+  //       navigate('/teacher');
+  //     } else if (userRole === 'admin') {
+  //       navigate('/admin');
+  //     }
+  //   }
+  // }, [token, userRole, navigate]);
 
   // Get role from URL and simulate fetching from API
   useEffect(() => {
@@ -124,7 +130,9 @@ const Login = () => {
             password: formData.password
           };
           response = await dispatch(loginStudent(credentials)).unwrap();
+          navigate('/student/dashboard');
           break;
+
           
         case 'teacher':
           credentials = {
@@ -132,6 +140,7 @@ const Login = () => {
             password: formData.password
           };
           response = await dispatch(loginTeacher(credentials)).unwrap();
+          navigate('/teacher');
           break;
           
         case 'admin':
@@ -140,6 +149,7 @@ const Login = () => {
             password: formData.password
           };
           response = await dispatch(loginAdmin(credentials)).unwrap();
+          navigate('/admin');
           break;
           
         default:
