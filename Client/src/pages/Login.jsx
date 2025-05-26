@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import store from '../redux/store';
-import { studentLogin } from '../redux/slices/studentSlice';
-import { tutorLogin } from '../redux/slices/teacherSlice';
-import { adminLogin } from '../redux/slices/adminSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { loginStudent, loginTeacher, loginAdmin } from '../features/auth/authSlice';
 import styles from '../styles/pages/login.module.scss';
 
 const Login = () => {
-  const location = useLocation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isLoading, error, token } = useSelector((state) => state.auth);
   
   // State to store user role (e.g., student, teacher, admin)
   const [userRole, setUserRole] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Form data to store user inputs
   const [formData, setFormData] = useState({
@@ -21,9 +21,6 @@ const Login = () => {
     email: '',
     password: ''
   });
-
-  // Redux selectors for login state
-  const [currentState, setCurrentState] = useState(store.getState().student);
 
   // Dropdown options for semester
   const semesterOptions = ['Fall 22', 'Spring 22', 'Fall 23', 'Spring 23', 'Fall 24', 'Spring 24'];
@@ -40,6 +37,13 @@ const Login = () => {
     accent: '#81C784'
   };
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [token, navigate]);
+
   // Get role from URL and simulate fetching from API
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -47,10 +51,7 @@ const Login = () => {
     
     const fetchUserRole = async () => {
       try {
-        // Simulate delay like fetching from server
         await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // If role exists in URL, use it; otherwise default to student
         const roleFromApi = roleFromUrl || 'student';
         setUserRole(roleFromApi);
       } catch (error) {
@@ -59,22 +60,7 @@ const Login = () => {
     };
 
     fetchUserRole();
-  }, [location]);
-
-  // Subscribe to store changes
-  useEffect(() => {
-    const unsubscribe = store.subscribe(() => {
-      // Update the correct state based on userRole
-      if (userRole === 'student') {
-        setCurrentState(store.getState().student);
-      } else if (userRole === 'teacher') {
-        setCurrentState(store.getState().tutor);
-      } else if (userRole === 'admin') {
-        setCurrentState(store.getState().admin);
-      }
-    });
-    return unsubscribe;
-  }, [userRole]);
+  }, []);
 
   // Configurations for different user roles
   const roleConfigs = {
@@ -122,14 +108,51 @@ const Login = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (userRole === 'student') {
-      store.dispatch(studentLogin(formData));
-    } else if (userRole === 'teacher') {
-      store.dispatch(tutorLogin(formData));
-    } else if (userRole === 'admin') {
-      store.dispatch(adminLogin(formData));
+    
+    try {
+      let response;
+      let credentials;
+      
+      switch (userRole) {
+        case 'student':
+          credentials = {
+            batch: formData.semester,
+            department: formData.department,
+            rollNo: formData.regNumber,
+            password: formData.password
+          };
+          response = await dispatch(loginStudent(credentials)).unwrap();
+          break;
+          
+        case 'teacher':
+          credentials = {
+            email: formData.email,
+            password: formData.password
+          };
+          response = await dispatch(loginTeacher(credentials)).unwrap();
+          break;
+          
+        case 'admin':
+          credentials = {
+            email: formData.email,
+            password: formData.password
+          };
+          response = await dispatch(loginAdmin(credentials)).unwrap();
+          break;
+          
+        default:
+          throw new Error('Invalid user role');
+      }
+      
+      if (response.token) {
+        setIsSuccess(true);
+        // Navigation will be handled by the useEffect watching the token
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+      // Error state is handled by Redux
     }
   };
 
@@ -150,19 +173,20 @@ const Login = () => {
   return (
     <div className={styles.loginContainer} style={{ '--primary-color': colorScheme.primary, '--secondary-color': colorScheme.secondary, '--light-color': colorScheme.light, '--dark-color': colorScheme.dark, '--accent-color': colorScheme.accent }}>
       <div className={styles.loginCard}>
-        {!currentState.success ? (
+        {!isSuccess ? (
           <div className={styles.loginFormContainer}>
             <div className={styles.logoContainer}>
               <div className={styles.logo}></div>
               <h1 className={styles.portalTitle}>{currentConfig?.title || 'Portal Login'}</h1>
             </div>
             
-            {/* Show welcome message based on role */}
+            {error && <div className={styles.errorMessage}>{error}</div>}
+            
             <p className={styles.welcomeText}>{currentConfig?.welcomeMessage || 'Please log in to continue'}</p>
             
             <form onSubmit={handleSubmit} className={styles.loginForm}>
               {/* Render fields based on current role */}
-              {currentConfig?.fields.map((fieldConfig, index) => {
+              {currentConfig?.fields.map((fieldConfig) => {
                 if (fieldConfig.type === 'rollNo') {
                   // For student roll number fields
                   return (
@@ -234,10 +258,13 @@ const Login = () => {
                 }
               })}
               
-              {/* Submit button and forgot password link */}
               <div className={styles.formFooter}>
-                <button type="submit" className={styles.submitButton}>
-                  Sign In
+                <button 
+                  type="submit" 
+                  className={styles.submitButton}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
                 <a href="#" className={styles.forgotPassword}>Forgot Password?</a>
               </div>
@@ -259,7 +286,7 @@ const Login = () => {
 
             {/* Button to return to login screen */}
             <button 
-              onClick={() => setIsSubmitted(false)}
+              onClick={() => setIsSuccess(false)}
               className={styles.backButton}
             >
               Back to Login
