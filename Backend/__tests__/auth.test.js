@@ -59,120 +59,134 @@ describe('Authentication Tests', () => {
   });
 
 
-//   describe('Add Student', () => {
-//     let adminToken;
+  describe('Add Student', () => {
+    let adminToken;
 
-//     beforeEach(async () => {
-//       // Create an admin user and get token
-//       const admin = await User.create({
-//         name: 'Admin',
-//         email: 'admin@example.com',
-//         password: 'admin123',
-//         role: 'admin'
-//       });
+    beforeEach(async () => {
+      // Create an admin user and get token
+      const admin = await User.create({
+        name: 'Admin',
+        email: 'admin@example.com',
+        password: 'admin123',
+        role: 'admin'
+      });
 
-//       const loginResponse = await request(app)
-//         .post('/api/auth/login')
-//         .send({
-//           email: 'admin@example.com',
-//           password: 'admin123'
-//         });
+      const loginResponse = await request(app)
+        .post('/api/admin/login')
+        .send({
+          email: 'admin@example.com',
+          password: 'admin123'
+        });
 
-//       adminToken = loginResponse.body.token;
-//     });
+      adminToken = loginResponse.body.token;
+    });
 
-//     it('should successfully add a new student', async () => {
-//       const studentData = {
-//         name: 'Test Student',
-//         email: 'student@example.com',
-//         rollNumber: 'R123',
-//         department: 'Computer Science'
-//       };
+    it('should successfully add a new student', async () => {
+      const studentData = {
+        name: 'Test Student',
+        email: 'student@example.com',
+        rollNo: 'R123',
+        department: 'Computer Science',
+        password: 'testpass123',
+        semester: 1,
+        batch: '2022'
+      };
 
-//       const response = await request(app)
-//         .post('/api/students')
-//         .set('Authorization', `Bearer ${adminToken}`)
-//         .send(studentData);
+      const response = await request(app)
+        .post('/api/admin/students')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(studentData);
 
-//       expect(response.status).toBe(201);
-//       expect(response.body).toHaveProperty('_id');
-//       expect(response.body.email).toBe(studentData.email);
-//     });
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('_id');
+      expect(response.body.email).toBe(studentData.email);
+    });
 
-//     it('should fail to add student without authentication', async () => {
-//       const studentData = {
-//         name: 'Test Student',
-//         email: 'student@example.com',
-//         rollNumber: 'R123',
-//         department: 'Computer Science'
-//       };
+    it('should fail to add student without authentication', async () => {
+      const studentData = {
+        name: 'Test Student',
+        email: 'student@example.com',
+        rollNumber: 'R123',
+        department: 'Computer Science'
+      };
 
-//       const response = await request(app)
-//         .post('/api/students')
-//         .send(studentData);
+      const response = await request(app)
+        .post('/api/student')
+        .send(studentData);
 
-//       expect(response.status).toBe(401);
-//     });
-//   });
+      expect(response.status).toBe(401);
+    });
+  });
 
-//   describe('Change Password', () => {
-//     let userToken;
-//     let userId;
+  describe('Change Password', () => {
+    let userToken;
+    let userId;
+    const studentData = {
+      name: 'testuser',
+      email: 'user@example.com',
+      password: 'oldpassword123',
+      batch: '2022',
+      department: 'Computer Science',
+      rollNo: 'R001',
+      semester: 1
+    };
 
-//     beforeEach(async () => {
-//       // Create a test user
-//       const user = await User.create({
-//         email: 'user@example.com',
-//         password: 'oldpassword123',
-//         role: 'user'
-//       });
+    beforeEach(async () => {
+      // Create a test student with all required fields
+      const user = await Student.create(studentData);
+      userId = user._id;
 
-//       userId = user._id;
+      // Login as student using correct endpoint and fields
+      const loginResponse = await request(app)
+        .post('/api/student/login')
+        .send({
+          batch: studentData.batch,
+          department: studentData.department,
+          rollNo: studentData.rollNo,
+          password: studentData.password
+        });
 
-//       const loginResponse = await request(app)
-//         .post('/api/auth/login')
-//         .send({
-//           email: 'user@example.com',
-//           password: 'oldpassword123'
-//         });
+      userToken = loginResponse.body.token;
+    });
 
-//       userToken = loginResponse.body.token;
-//     });
+    it('should successfully change password', async () => {
+      const response = await request(app)
+        .put('/api/student/profile/change-password')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          currentPassword: 'oldpassword123',
+          newPassword: 'newpassword123',
+          confirmNewPassword: 'newpassword123'
+        });
 
-//     it('should successfully change password', async () => {
-//       const response = await request(app)
-//         .post('/api/auth/change-password')
-//         .set('Authorization', `Bearer ${userToken}`)
-//         .send({
-//           currentPassword: 'oldpassword123',
-//           newPassword: 'newpassword123'
-//         });
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Password changed successfully');
 
-//       expect(response.status).toBe(200);
-//       expect(response.body).toHaveProperty('message', 'Password updated successfully');
+      // Verify can login with new password
+      const loginResponse = await request(app)
+        .post('/api/student/login')
+        .send({
+          batch: studentData.batch,
+          department: studentData.department,
+          rollNo: studentData.rollNo,
+          password: 'newpassword123'
+        });
 
-//       // Verify can login with new password
-//       const loginResponse = await request(app)
-//         .post('/api/auth/login')
-//         .send({
-//           email: 'user@example.com',
-//           password: 'newpassword123'
-//         });
+      expect(loginResponse.status).toBe(200);
+    });
 
-//       expect(loginResponse.status).toBe(200);
-//     });
+    it('should fail to change password with incorrect current password', async () => {
+      const response = await request(app)
+        .put('/api/student/profile/change-password')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          currentPassword: 'wrongpassword',
+          newPassword: 'newpassword123',
+          confirmNewPassword: 'newpassword123'
+        });
 
-//     it('should fail to change password with incorrect current password', async () => {
-//       const response = await request(app)
-//         .post('/api/auth/change-password')
-//         .set('Authorization', `Bearer ${userToken}`)
-//         .send({
-//           currentPassword: 'wrongpassword',
-//           newPassword: 'newpassword123'
-//         });
-
-//       expect(response.status).toBe(400);
-//       expect(response.body).toHaveProperty('error');
-//     });
-//   });
-// });
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('error');
+    });
+  });
+});
