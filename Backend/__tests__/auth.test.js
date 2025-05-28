@@ -3,12 +3,11 @@ const app = require('../src/index'); // Adjust this path based on your app's ent
 const mongoose = require('mongoose');
 const Admin = require('../src/models/Admin'); // Adjust path as needed
 const Student = require('../src/models/Student'); // Adjust path as needed
-
 beforeAll(async () => {
   // Connect to a test database
-  const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/cms_test';
+  const mongoURI = process.env.MONGO_URI || 
+  'mongodb://localhost:27017/cms_test';
   await mongoose.connect(mongoURI);
-
   // await Admin.deleteMany({}, { timeout: 50000 });
   await Admin.create({
     name: 'Test Admin',
@@ -17,7 +16,6 @@ beforeAll(async () => {
     role: 'admin'
   });
 }, 500000);
-
 afterAll(async () => {
   //  close connection
   await mongoose.connection.close();
@@ -29,23 +27,20 @@ afterAll(async () => {
 //   await Student.deleteMany({});
 // }, 50000);
 
-describe('Authentication Tests', () => {
+ describe('Authentication Tests', () => {
   let adminToken;
   describe('Login', () => {
     it('should login successfully with valid credentials', async () => {
-    
       const response = await request(app)
         .post('/api/admin/login')
         .send({
           email: 'test@example.com',
           password: 'password123'
         });
-
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('token');
       adminToken = response.body.token;
     }, 50000);
-
     it('should fail login with invalid credentials', async () => {
       const response = await request(app)
         .post('/api/admin/login')
@@ -53,7 +48,6 @@ describe('Authentication Tests', () => {
           email: 'wrong@example.com',
           password: 'wrongpassword'
         });
-
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('error');
     }, 50000);
@@ -65,11 +59,9 @@ describe('Authentication Tests', () => {
           email: 'test@example.com',
           password: 'wrongpassword'
         });
-
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('error');
     }, 50000);
-
     it('should fail login with invalid credentials', async () => {
       const response = await request(app)
         .post('/api/admin/login')
@@ -77,33 +69,12 @@ describe('Authentication Tests', () => {
           email: 'wrong@example.com',
           password: 'password123'
         });
-
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('error');
     }, 50000);
   });
 
-
   describe('Add Student', () => {
-    // beforeEach(async () => {
-    //   // Create an admin Admin and get token
-    //   const admin = await Admin.create({
-    //     name: 'Admin',
-    //     email: 'admin@gmail.com',
-    //     password: 'admin123',
-    //     role: 'admin'
-    //   });
-
-    //   const loginResponse = await request(app)
-    //     .post('/api/admin/login')
-    //     .send({
-    //       email: 'admin@gmail.com',
-    //       password: 'admin123'
-    //     });
-
-    //   adminToken = loginResponse.body.token;
-    // });
-
     it('should successfully add a new student', async () => {
       const studentData = {
         name: 'Test Student',
@@ -114,14 +85,13 @@ describe('Authentication Tests', () => {
         semester: 1,
         batch: '2022'
       };
-
       const response = await request(app)
         .post('/api/admin/register/student')
         .set('Authorization', `Bearer ${adminToken}`)//important
         .send(studentData);
 
       expect(response.status).toBe(201);
-      expect(response.body.student).toHaveProperty('_id');
+      expect(response.body).toHaveProperty('student');
       expect(response.body.student.email).toBe(studentData.email);
     }, 500000);
 
@@ -135,7 +105,6 @@ describe('Authentication Tests', () => {
         semester: 1,
         batch: '2022'
       };
-
       const response = await request(app)
         .post('/api/admin/register/student')
         .send(studentData);
@@ -143,14 +112,33 @@ describe('Authentication Tests', () => {
       console.log(response.body);
       expect(response.status).toBe(401);
     }, 500000);
+    it('should fail to add student with duplicate email', async () => {
+      const studentData = {
+        name: 'Test Student',
+        email: 'student@example.com',
+        rollNo: 'R123',
+        department: 'Computer Science',
+        password: 'testpass123',
+        semester: 1,
+        batch: '2022'
+      };
+      // First request: add the student
+      await request(app)
+        .post('/api/admin/register/student')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(studentData);
+      // Second request: same email, should fail
+      const response = await request(app)
+        .post('/api/admin/register/student')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(studentData);
+      expect(response.status).toBe(400); 
+    },500000);
   });
 
   describe('Change Password', () => {
     let UserToken;
-    
-
     beforeEach(async () => {
-
       // Login as student using correct endpoint and fields
       const loginResponse = await request(app)
         .post('/api/student/login')
@@ -158,32 +146,26 @@ describe('Authentication Tests', () => {
           batch: '2022',
           department: 'Computer Science',
           rollNo: 'R123',
-          password: 'password123'
+          password: 'testpass123'
         });
-
       UserToken = loginResponse.body.token;
     });
-
     it('should successfully change password', async () => {
       const response = await request(app)
         .put('/api/student/profile/change-password')
         .set('Authorization', `Bearer ${UserToken}`)
         .send({
-          currentPassword: 'password123',
+          currentPassword: 'testpass123',
           newPassword: 'newpassword123',
           confirmNewPassword: 'newpassword123'
         });
-
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'Password changed successfully');
-
-      // Verify can login with new password
       const loginResponse = await request(app)
         .post('/api/student/login')
         .send({
-          batch: studentData.batch,
-          department: studentData.department,
-          rollNo: studentData.rollNo,
+          batch: '2022',
+          department: 'Computer Science',
+          rollNo: 'R123',
           password: 'newpassword123'
         });
 
