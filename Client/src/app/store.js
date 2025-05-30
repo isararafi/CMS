@@ -10,6 +10,7 @@ import updateStudentReducer from '../features/adminDashboard/updateStudentSlice'
 import addTeacherReducer from '../features/adminDashboard/addTeacherSlice';
 import deleteTeacherReducer from '../features/adminDashboard/deleteTeacherSlice';
 import updateTeacherReducer from '../features/adminDashboard/updateTeacherSlice';
+import teacherDashboardReducer from '../features/teacherDashboard/teacherDashboardSlice';
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     addTeacher: addTeacherReducer,
     deleteTeacher: deleteTeacherReducer,
     updateTeacher: updateTeacherReducer,
+    teacherDashboard: teacherDashboardReducer,
   },
 });
 

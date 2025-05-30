@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/pages/teacherAttendance.module.scss';
 import ApiHandler from '../services/apiHandler';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
 
 const TeacherAttendance = () => {
-  const [courses, setCourses] = useState([
-    { id: 1, code: 'CSE101', name: 'Intro to Programming', students: 35 },
-    { id: 2, code: 'CSE201', name: 'Data Structures', students: 28 },
-    { id: 3, code: 'CSE405', name: 'Adv. Software Eng.', students: 22 }
-  ]);
+  const dispatch = useDispatch();
+  const { courses, isLoading, error } = useSelector(state => state.teacherDashboard);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [lectures, setLectures] = useState([
     { id: 1, title: 'Complexity Analysis', date: '2025-06-03', courseId: 1, description: 'Time and Space complexity deep dive' }
@@ -22,6 +21,10 @@ const TeacherAttendance = () => {
   const [newLecture, setNewLecture] = useState({ title: '', date: '', courseId: '', description: '' });
   const [attendance, setAttendance] = useState({});
   const [selectedLectures, setSelectedLectures] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchTeacherCourses());
+  }, [dispatch]);
 
   const toggleAddSection = (course) => {
     setSelectedCourse(course);
@@ -63,17 +66,23 @@ const TeacherAttendance = () => {
     <div className={styles.attendancePage}>
       <h2>Attendance</h2>
       <div className={styles.classesList}>
-        {courses.map(course => (
-          <div key={course.id} className={styles.classCard}>
-            <div className={styles.classHeader}>
-              <span className={styles.classCode}>{course.code}</span>
-              <span className={styles.className}>{course.name}</span>
-              <span className={styles.classStudents}>{course.students} students</span>
+        {isLoading ? (
+          <p>Loading courses...</p>
+        ) : error ? (
+          <p>Error: {error}</p>
+        ) : (
+          courses.map(course => (
+            <div key={course._id} className={styles.classCard}>
+              <div className={styles.classHeader}>
+                <span className={styles.classCode}>{course.courseCode}</span>
+                <span className={styles.className}>{course.courseName}</span>
+                <span className={styles.classStudents}>{course.students.length} students</span>
+              </div>
+              <button className={styles.actionButton} onClick={() => toggleAddSection(course)}>+</button>
+              <button className={styles.actionButton} onClick={() => toggleDeleteSection(course)}>-</button>
             </div>
-            <button className={styles.actionButton} onClick={() => toggleAddSection(course)}>+</button>
-            <button className={styles.actionButton} onClick={() => toggleDeleteSection(course)}>-</button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       {showAddSection && selectedCourse && (
         <div className={styles.addSection}>

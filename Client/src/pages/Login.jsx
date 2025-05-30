@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginStudent, loginTeacher, loginAdmin } from '../features/auth/authSlice';
 import styles from '../styles/pages/login.module.scss';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, error, token } = useSelector((state) => state.auth);
+  const location = useLocation(); // Add this import and usage
+  const { isLoading, error, token, userType } = useSelector((state) => state.auth);
   
   // State to store user role (e.g., student, teacher, admin)
   const [userRole, setUserRole] = useState(null);
@@ -37,18 +38,30 @@ const Login = () => {
     accent: '#81C784'
   };
 
-  // Redirect if already logged in
-  // useEffect(() => {
-  //   if (token && userRole) {
-  //     if (userRole === 'student') {
-  //       navigate('/student/dashboard');
-  //     } else if (userRole === 'teacher') {
-  //       navigate('/teacher');
-  //     } else if (userRole === 'admin') {
-  //       navigate('/admin');
-  //     }
-  //   }
-  // }, [token, userRole, navigate]);
+  // Check for existing token on component mount
+  useEffect(() => {
+    const existingToken = localStorage.getItem('token');
+    if (existingToken && !token) {
+      // You might want to validate the token here or set it in Redux
+      console.log('Existing token found:', existingToken);
+    }
+  }, [token]);
+
+  // Redirect if already logged in - UNCOMMENTED AND FIXED
+  useEffect(() => {
+    console.log('Token:', token);
+    console.log('User Role:', userRole);
+    if (token && userType) {
+      console.log('Redirecting user with role:', userRole);
+      if (userType === 'student') {
+        navigate('/student/dashboard');
+      } else if (userType === 'teacher') {
+        navigate('/teacher');
+      } else if (userType === 'admin') {
+        navigate('/admin');
+      }
+    }
+  }, [token, userRole, navigate]);
 
   // Get role from URL and simulate fetching from API
   useEffect(() => {
@@ -60,13 +73,14 @@ const Login = () => {
         await new Promise(resolve => setTimeout(resolve, 800));
         const roleFromApi = roleFromUrl || 'student';
         setUserRole(roleFromApi);
+        console.log('User role set to:', roleFromApi);
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
     };
 
     fetchUserRole();
-  }, []);
+  }, [location.search]);
 
   // Configurations for different user roles
   const roleConfigs = {
@@ -75,7 +89,6 @@ const Login = () => {
       fields: [
         { 
           type: 'rollNo', 
-          // label: 'Roll No', 
           components: [
             { name: 'semester', type: 'select', options: semesterOptions, required: true },
             { name: 'department', type: 'select', options: departmentOptions, required: true },
@@ -107,19 +120,35 @@ const Login = () => {
   // Handle changes in form input fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prevState => ({
+      ...prevState,
       [name]: value
-    });
+    }));
   };
 
-  // Handle form submission
+  // Handle form submission - IMPROVED ERROR HANDLING
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
       let response;
       let credentials;
+      
+      // Validate form data before submission
+      if (userRole === 'student') {
+        if (!formData.semester || !formData.department || !formData.regNumber || !formData.password) {
+          console.error('All student fields are required');
+          return;
+        }
+      } else if (userRole === 'teacher' || userRole === 'admin') {
+        if (!formData.email || !formData.password) {
+          console.error('Email and password are required');
+          return;
+        }
+      }
+      
+      console.log('Attempting login for role:', userRole);
+      console.log('Form data:', formData);
       
       switch (userRole) {
         case 'student':
@@ -129,18 +158,17 @@ const Login = () => {
             rollNo: formData.regNumber,
             password: formData.password
           };
+          console.log('Student credentials:', credentials);
           response = await dispatch(loginStudent(credentials)).unwrap();
-          navigate('/student/dashboard');
           break;
 
-          
         case 'teacher':
           credentials = {
             email: formData.email,
             password: formData.password
           };
+          console.log('Teacher credentials:', credentials);
           response = await dispatch(loginTeacher(credentials)).unwrap();
-          navigate('/teacher');
           break;
           
         case 'admin':
@@ -148,21 +176,35 @@ const Login = () => {
             email: formData.email,
             password: formData.password
           };
+          console.log('Admin credentials:', credentials);
           response = await dispatch(loginAdmin(credentials)).unwrap();
-          navigate('/admin');
           break;
           
         default:
           throw new Error('Invalid user role');
       }
       
-      if (response.token) {
+      console.log('Login response:', response);
+      
+      // Check if response contains token
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userRole', userRole); // Also store user role
+        console.log('Token stored successfully:', response.token);
         setIsSuccess(true);
-        // Navigation will be handled by the useEffect watching the token
+        
+        // Small delay to show success message, then navigate
+        setTimeout(() => {
+          navigate(`/${userRole}`);
+        }, 9000);
+      } else {
+        console.error('No token received in response:', response);
+        throw new Error('Authentication failed - no token received');
       }
     } catch (err) {
       console.error('Login failed:', err);
-      // Error state is handled by Redux
+      console.error('Error details:', err.message);
+      // The error will be displayed via Redux state
     }
   };
 
@@ -171,6 +213,7 @@ const Login = () => {
 
   // Show loading spinner while role is being determined
   if (!userRole) {
+    console.log('Loading user role...');
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
@@ -180,8 +223,15 @@ const Login = () => {
   }
 
   // Main JSX structure of the login page
+  console.log('Rendering login form for role:', userRole);
   return (
-    <div className={styles.loginContainer} style={{ '--primary-color': colorScheme.primary, '--secondary-color': colorScheme.secondary, '--light-color': colorScheme.light, '--dark-color': colorScheme.dark, '--accent-color': colorScheme.accent }}>
+    <div className={styles.loginContainer} style={{ 
+      '--primary-color': colorScheme.primary, 
+      '--secondary-color': colorScheme.secondary, 
+      '--light-color': colorScheme.light, 
+      '--dark-color': colorScheme.dark, 
+      '--accent-color': colorScheme.accent 
+    }}>
       <div className={styles.loginCard}>
         {!isSuccess ? (
           <div className={styles.loginFormContainer}>
@@ -190,18 +240,22 @@ const Login = () => {
               <h1 className={styles.portalTitle}>{currentConfig?.title || 'Portal Login'}</h1>
             </div>
             
-            {error && <div className={styles.errorMessage}>{error}</div>}
+            {error && (
+              <div className={styles.errorMessage}>
+                {typeof error === 'string' ? error : 'Login failed. Please try again.'}
+              </div>
+            )}
             
             <p className={styles.welcomeText}>{currentConfig?.welcomeMessage || 'Please log in to continue'}</p>
             
             <form onSubmit={handleSubmit} className={styles.loginForm}>
               {/* Render fields based on current role */}
-              {currentConfig?.fields.map((fieldConfig) => {
+              {currentConfig?.fields.map((fieldConfig, index) => {
                 if (fieldConfig.type === 'rollNo') {
                   // For student roll number fields
                   return (
-                    <div key={`field-rollNo`} className={styles.formGroup}>
-                      <label>{fieldConfig.label}</label>
+                    <div key={`field-rollNo-${index}`} className={styles.formGroup}>
+                      <label>Roll Number</label>
                       <div className={styles.rollNoContainer}>
                         {/* Semester dropdown */}
                         <select
@@ -251,13 +305,13 @@ const Login = () => {
                 } else {
                   // For email and password fields
                   return (
-                    <div key={`field-${fieldConfig.name}`} className={styles.formGroup}>
+                    <div key={`field-${fieldConfig.name}-${index}`} className={styles.formGroup}>
                       <label htmlFor={fieldConfig.name}>{fieldConfig.label}:</label>
                       <input
                         type={fieldConfig.type}
                         id={fieldConfig.name}
                         name={fieldConfig.name}
-                        value={formData[fieldConfig.name]}
+                        value={formData[fieldConfig.name] || ''}
                         onChange={handleInputChange}
                         required={fieldConfig.required}
                         placeholder={fieldConfig.label}
@@ -293,6 +347,7 @@ const Login = () => {
                 <p>Email: <strong>{formData.email}</strong></p>
               )}
             </div>
+            <p>Redirecting to dashboard...</p>
 
             {/* Button to return to login screen */}
             <button 

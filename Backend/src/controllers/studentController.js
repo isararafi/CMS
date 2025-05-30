@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 
 // Student Login
 exports.login = async (req, res) => {
+    console.log('Login request received');
     try {
         const { batch, department, rollNo, password } = req.body;
         
