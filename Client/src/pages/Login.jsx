@@ -23,10 +23,10 @@ const Login = () => {
   });
 
   // Dropdown options for semester
-  const semesterOptions = ['2022', 'Spring 22', 'Fall 23', 'Spring 23', 'Fall 24', 'Spring 24'];
+  const semesterOptions = ['2020', '2021', '2022', '2023', '2024', '2025'];
 
   // Dropdown options for department
-  const departmentOptions = ['Computer Science', 'BSCS', 'BSIT', 'BSAI'];
+  const departmentOptions = ['Computer Science', 'Software Engineering', 'Information Technology', 'Artificial Intelligence'];
 
   // Color theme for styling
   const colorScheme = {
@@ -75,7 +75,7 @@ const Login = () => {
       fields: [
         { 
           type: 'rollNo', 
-          label: 'Roll No', 
+          // label: 'Roll No', 
           components: [
             { name: 'semester', type: 'select', options: semesterOptions, required: true },
             { name: 'department', type: 'select', options: departmentOptions, required: true },
@@ -201,7 +201,7 @@ const Login = () => {
                   // For student roll number fields
                   return (
                     <div key={`field-rollNo`} className={styles.formGroup}>
-                      <label>{fieldConfig.label}:</label>
+                      <label>{fieldConfig.label}</label>
                       <div className={styles.rollNoContainer}>
                         {/* Semester dropdown */}
                         <select

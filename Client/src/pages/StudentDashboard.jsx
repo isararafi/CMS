@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
   Calendar, 
   BookOpen, 
@@ -24,39 +25,32 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { fetchDashboardInfo, fetchGpaProgress } from '../features/studentDashboard/studentDashboardSlice';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentDashboard.module.scss';
 
 const StudentDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const dispatch = useDispatch();
+  const { dashboardInfo, gpaProgress, isLoading, error } = useSelector((state) => state.studentDashboard);
 
-  // Mock data - would be fetched from API in real application
-  const studentData = {
-    name: "John Smith",
-    rollNo: "Fall 23-BSSE-123",
-    department: "Software Engineering",
-    gpa: 3.75,
-    attendance: 92,
-    semester: "Fall 2023",
-    courses: [
-      { id: 1, code: "CSE101", name: "Introduction to Programming", progress: 85, grade: "A", credits: 3 },
-      { id: 2, code: "CSE201", name: "Data Structures and Algorithms", progress: 72, grade: "B+", credits: 4 },
-      { id: 3, code: "MAT202", name: "Discrete Mathematics", progress: 91, grade: "A", credits: 3 },
-      { id: 4, code: "ENG101", name: "Technical Communication", progress: 78, grade: "B", credits: 2 }
-    ],
-    semesterGPAs: [
-      { name: 'Fall 2021', gpa: 3.5 },
-      { name: 'Spring 2022', gpa: 3.7 },
-      { name: 'Fall 2022', gpa: 3.6 },
-      { name: 'Spring 2023', gpa: 3.8 },
-      { name: 'Fall 2023', gpa: 3.75 }
-    ]
-  };
+  useEffect(() => {
+    dispatch(fetchDashboardInfo());
+    dispatch(fetchGpaProgress());
+  }, [dispatch]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className={styles.dashboardLayout}>
@@ -75,17 +69,17 @@ const StudentDashboard = () => {
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
               <div className={styles.welcomeSection}>
-                <h1>Welcome, {studentData.name}</h1>
-                <p className={styles.subtitle}>Student Dashboard • {studentData.department}</p>
+                <h1>Welcome, {dashboardInfo.name}</h1>
+                <p className={styles.subtitle}>Student Dashboard</p>
               </div>
               <div className={styles.studentInfo}>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Roll No:</span>
-                  <span className={styles.value}>{studentData.rollNo}</span>
+                  <span className={styles.value}>{dashboardInfo.rollNo}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Semester:</span>
-                  <span className={styles.value}>{studentData.semester}</span>
+                  <span className={styles.value}>{dashboardInfo.semester}</span>
                 </div>
               </div>
             </div>
@@ -94,28 +88,28 @@ const StudentDashboard = () => {
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><Award size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{studentData.gpa}</h3>
+                  <h3 className={styles.statValue}>{dashboardInfo.cgpa}</h3>
                   <p className={styles.statLabel}>Current GPA</p>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><BookOpen size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{studentData.courses.length}</h3>
+                  <h3 className={styles.statValue}>{dashboardInfo.enrolledCourses.length}</h3>
                   <p className={styles.statLabel}>Courses Enrolled</p>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><Clock size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{studentData.attendance}%</h3>
+                  <h3 className={styles.statValue}>{dashboardInfo.attendanceRate}%</h3>
                   <p className={styles.statLabel}>Attendance Rate</p>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><GraduationCap size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{studentData.courses.reduce((acc, course) => acc + course.credits, 0)}</h3>
+                  <h3 className={styles.statValue}>{dashboardInfo.totalCredits}</h3>
                   <p className={styles.statLabel}>Total Credits</p>
                 </div>
               </div>
@@ -129,7 +123,7 @@ const StudentDashboard = () => {
               <div className={styles.chartWrapper}>
                 <ResponsiveContainer width="100%" height={400}>
                   <LineChart
-                    data={studentData.semesterGPAs}
+                    data={gpaProgress}
                     margin={{
                       top: 20,
                       right: 30,
