@@ -6,6 +6,7 @@
   box-shadow: $card-shadow;
   border: 1px solid $border-color;
   padding: 32px;
+  color: $text-primary;
 }
 
 .marksTable {
@@ -16,10 +17,56 @@
     border-bottom: 1px solid $border-color;
     text-align: left;
     font-size: 14px;
+    color: $text-primary;
   }
   th {
     color: $text-secondary;
     font-weight: 600;
     background: $light-bg;
   }
+}
+
+.subjectsList {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.subjectCard {
+  background: $light-bg;
+  border-radius: 8px;
+  padding: 16px 24px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  min-width: 220px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.subjectCard:hover {
+  background: lighten($light-bg, 10%);
+}
+
+.subjectCard span {
+  display: block;
+  color: $text-primary;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.subjectCard .subjectCode {
+  font-size: 14px;
+  color: $primary-color;
+  font-weight: 600;
+}
+
+.subjectCard .subjectName {
+  font-size: 16px;
+  color: $text-primary;
+  font-weight: 600;
+}
+
+.subjectCard .subjectStudents {
+  font-size: 13px;
+  color: $text-secondary;
 } 

@@ -57,7 +57,7 @@ exports.getCourses = async (req, res) => {
 // Add Lecture Topic
 exports.addLecture = async (req, res) => {
     try {
-        const { title, date, courseId, description } = req.body;
+        const { title, date, courseId } = req.body;
 
         if (!title || !date || !courseId) {
             return res.status(400).json({ error: 'Title, date, and course are required' });
@@ -73,8 +73,8 @@ exports.addLecture = async (req, res) => {
             title,
             date,
             course: courseId,
-            teacher: req.teacher._id,
-            description
+            teacher: req.teacher._id
+            
         });
 
         await lecture.save();
