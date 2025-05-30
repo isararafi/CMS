@@ -4,6 +4,11 @@ import styles from '../styles/pages/dashboard.module.scss'; // Import styles
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllStudents, fetchAllTeachers } from '../features/adminDashboard/adminDashboardSlice';
+import { fetchAdminProfile } from '../features/auth/authSlice';
+import { registerStudent, clearAddStudentState } from '../features/adminDashboard/addStudentSlice';
+import { deleteStudent, clearDeleteStudentState } from '../features/adminDashboard/deleteStudentSlice';
 
 
 
@@ -58,30 +63,45 @@ const AdminDashboard = ({ displayList }) => {
   const [formMessage, setFormMessage] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
 
-  // Use local state for students and teachers so we can update/delete
-  const [students, setStudents] = useState([
-    { id: 1, name: 'Alice Smith', regNo: '2021001', department: 'Computer Science', batch: '2021', year: '1', rollno: '001', password: '', confirmPassword: '' },
-    { id: 2, name: 'Bob Johnson', regNo: '2021002', department: 'Mathematics', batch: '2021', year: '1', rollno: '002', password: '', confirmPassword: '' },
-    { id: 3, name: 'Charlie Brown', regNo: '2021003', department: 'Physics', batch: '2021', year: '1', rollno: '003', password: '', confirmPassword: '' },
-  ]);
-  const [teachers, setTeachers] = useState([
-    { id: 1, name: 'Dr. Emily White', email: 'emily.white@university.edu', department: 'Computer Science', education: '', password: '', confirmPassword: '' },
-    { id: 2, name: 'Dr. John Black', email: 'john.black@university.edu', department: 'Mathematics', education: '', password: '', confirmPassword: '' },
-    { id: 3, name: 'Dr. Sarah Green', email: 'sarah.green@university.edu', department: 'Physics', education: '', password: '', confirmPassword: '' },
-  ]);
+  const dispatch = useDispatch();
+  const { students, teachers, loadingStudents, loadingTeachers, errorStudents, errorTeachers } = useSelector(state => state.adminDashboard);
+  const adminName = useSelector(state => state.auth.adminName);
+  const adminEmail = useSelector(state => state.auth.adminEmail);
+  const addStudentState = useSelector(state => state.addStudent);
+  const deleteStudentState = useSelector(state => state.deleteStudent);
 
-  // Modal state
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updateRole, setUpdateRole] = useState(null);
-  const [updateUser, setUpdateUser] = useState(null);
-  const [updateForm, setUpdateForm] = useState({});
-  const [updateMessage, setUpdateMessage] = useState(null);
-  const [updateLoading, setUpdateLoading] = useState(false);
+  useEffect(() => {
+    dispatch(fetchAllStudents());
+    dispatch(fetchAllTeachers());
+    dispatch(fetchAdminProfile());
+  }, [dispatch]);
 
   useEffect(() => {
     setFormData({});
     setFormMessage(null);
   }, [displayList]);
+
+  useEffect(() => {
+    if (addStudentState.successMessage) {
+      setFormMessage({ type: 'success', text: addStudentState.successMessage });
+      setFormData({});
+      setTimeout(() => dispatch(clearAddStudentState()), 2000);
+    } else if (addStudentState.error) {
+      setFormMessage({ type: 'error', text: addStudentState.error });
+      setTimeout(() => dispatch(clearAddStudentState()), 2000);
+    }
+  }, [addStudentState.successMessage, addStudentState.error, dispatch]);
+
+  useEffect(() => {
+    if (deleteStudentState.message) {
+      setFormMessage({ type: 'success', text: deleteStudentState.message });
+      dispatch(fetchAllStudents());
+      setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
+    } else if (deleteStudentState.error) {
+      setFormMessage({ type: 'error', text: deleteStudentState.error });
+      setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
+    }
+  }, [deleteStudentState.message, deleteStudentState.error, dispatch]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -89,14 +109,29 @@ const AdminDashboard = ({ displayList }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setFormMessage(null);
+    if (displayList === 'createStudent') {
+      // Prepare payload for student registration
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        rollNo: formData.rollNo,
+        semester: formData.semester,
+        department: formData.department,
+        batch: formData.batch,
+        phone: formData.phone,
+        address: formData.address,
+        // Add other fields as needed
+      };
+      dispatch(registerStudent(payload));
+      return;
+    }
     setFormLoading(true);
     setFormMessage(null);
     // Prepare payload based on displayList
     let payload = { ...formData };
-    if (displayList === 'createStudent' && formData.batch && formData.year && formData.rollno) {
-      payload.regNo = `${formData.batch}-${formData.year}-${formData.rollno}`;
-      payload.role = 'student';
-    } else if (displayList === 'createTeacher') {
+    if (displayList === 'createTeacher') {
       payload.role = 'teacher';
     }
     try {
@@ -160,6 +195,10 @@ const AdminDashboard = ({ displayList }) => {
   };
   const handleDeleteClick = async (role, user) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (role === 'student') {
+      dispatch(deleteStudent(user._id || user.id));
+      return;
+    }
     const endpoint = role === 'student' ? `/api/admin/student/${user.id}` : `/api/admin/teacher/${user.id}`;
     try {
       const res = await fetch(endpoint, { method: 'DELETE' });
@@ -239,6 +278,14 @@ const AdminDashboard = ({ displayList }) => {
     boxSizing: 'border-box',
   };
 
+  // Modal state
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateRole, setUpdateRole] = useState(null);
+  const [updateUser, setUpdateUser] = useState(null);
+  const [updateForm, setUpdateForm] = useState({});
+  const [updateMessage, setUpdateMessage] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
+
   return (
     <div className={styles.dashboardLayout}>
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="admin" />
@@ -249,18 +296,17 @@ const AdminDashboard = ({ displayList }) => {
             <div className={styles.dashboardHeader}>
               {/* Header section with admin info */}
               <div className={styles.welcomeSection}>
-                <h1>Welcome, {adminData.name}</h1>
-                <p className={styles.subtitle}>Admin Dashboard • {adminData.department}</p>
+                <h1>Welcome {adminName}</h1>
+                <p className={styles.subtitle}>Admin Dashboard</p>
               </div>
               <div className={styles.adminInfo}>
-                {/* Display admin position and email */}
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Position:</span>
                   <span className={styles.value}>{adminData.position}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Email:</span>
-                  <span className={styles.value}>{adminData.email}</span>
+                  <span className={styles.value}>{adminEmail}</span>
                 </div>
               </div>
             </div>
@@ -270,14 +316,14 @@ const AdminDashboard = ({ displayList }) => {
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><Users size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{adminData.stats.students}</h3>
+                  <h3 className={styles.statValue}>{loadingStudents ? '...' : students.length}</h3>
                   <p className={styles.statLabel}>Total Students</p>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><UserCheck size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{adminData.stats.faculty}</h3>
+                  <h3 className={styles.statValue}>{loadingTeachers ? '...' : teachers.length}</h3>
                   <p className={styles.statLabel}>Faculty Members</p>
                 </div>
               </div>
@@ -294,22 +340,6 @@ const AdminDashboard = ({ displayList }) => {
                     <input id="student-name" name="name" value={formData.name || ''} onChange={handleFormChange} placeholder="Name" required style={inputStyle} />
                   </div>
                   <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-batch">Batch</label>
-                    <input id="student-batch" name="batch" value={formData.batch || ''} onChange={handleFormChange} placeholder="Batch" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-year">Year</label>
-                    <input id="student-year" name="year" value={formData.year || ''} onChange={handleFormChange} placeholder="Year" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-rollno">Roll No</label>
-                    <input id="student-rollno" name="rollno" value={formData.rollno || ''} onChange={handleFormChange} placeholder="Roll No" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-department">Department</label>
-                    <input id="student-department" name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
                     <label style={labelStyle} htmlFor="student-email">Email</label>
                     <input id="student-email" name="email" value={formData.email || ''} onChange={handleFormChange} placeholder="Email" required style={inputStyle} />
                   </div>
@@ -318,8 +348,28 @@ const AdminDashboard = ({ displayList }) => {
                     <input id="student-password" name="password" type="password" value={formData.password || ''} onChange={handleFormChange} placeholder="Password" required style={inputStyle} />
                   </div>
                   <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-confirmPassword">Confirm Password</label>
-                    <input id="student-confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleFormChange} placeholder="Confirm Password" required style={inputStyle} />
+                    <label style={labelStyle} htmlFor="student-rollno">Roll No</label>
+                    <input id="student-rollno" name="rollNo" value={formData.rollNo || ''} onChange={handleFormChange} placeholder="Roll No" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-semester">Semester</label>
+                    <input id="student-semester" name="semester" type="number" value={formData.semester || ''} onChange={handleFormChange} placeholder="Semester" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-department">Department</label>
+                    <input id="student-department" name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-batch">Batch</label>
+                    <input id="student-batch" name="batch" value={formData.batch || ''} onChange={handleFormChange} placeholder="Batch" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-phone">Phone</label>
+                    <input id="student-phone" name="phone" value={formData.phone || ''} onChange={handleFormChange} placeholder="Phone" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-address">Address</label>
+                    <input id="student-address" name="address" value={formData.address || ''} onChange={handleFormChange} placeholder="Address" required style={inputStyle} />
                   </div>
                   <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
                 </form>
@@ -371,7 +421,7 @@ const AdminDashboard = ({ displayList }) => {
                   headers={['Name', 'Reg No', 'Department', 'Actions']}
                   data={students.map(student => ({
                     Name: student.name,
-                    'Reg No': student.regNo,
+                    'Reg No': student.rollNo || student.regNo,
                     Department: student.department,
                     actions: {
                       view: true,

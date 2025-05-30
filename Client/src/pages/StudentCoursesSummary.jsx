@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, PieChart, Layers, X, User, MapPin, Calendar } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/studentCoursesSummary.module.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAttendanceSummary, fetchAttendanceDetailed } from '../features/courses/attendanceSummarySlice';
 
 const StudentCoursesSummary = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -12,6 +14,21 @@ const StudentCoursesSummary = () => {
   const [selectedAttendance, setSelectedAttendance] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
+
+  const dispatch = useDispatch();
+  const {
+    summary,
+    detailed,
+    loadingSummary,
+    loadingDetailed,
+    errorSummary,
+    errorDetailed
+  } = useSelector(state => state.attendanceSummary);
+
+  useEffect(() => {
+    dispatch(fetchAttendanceSummary('683866e97c09d53caade320b'));
+    dispatch(fetchAttendanceDetailed('683866e97c09d53caade320b'));
+  }, [dispatch]);
 
   // Mock data - would be fetched from API
   const studentData = {
@@ -201,6 +218,19 @@ const StudentCoursesSummary = () => {
     }
   ];
 
+  // Use API detailed attendance if available
+  const attendanceDataToUse = detailed && detailed.length > 0 ? [
+    {
+      courseId: 1, // You may need to map this if your API returns courseId
+      attendanceRecords: detailed.map(item => ({
+        date: item.date,
+        time: '', // API does not provide time
+        status: item.status,
+        topic: item.title
+      }))
+    }
+  ] : attendanceData;
+
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
@@ -211,10 +241,7 @@ const StudentCoursesSummary = () => {
 
   // View attendance handler
   const handleViewAttendance = (course) => {
-    console.log("handleViewAttendance called with course:", course);
-    const attendance = attendanceData.find(a => a.courseId === course.id);
-    console.log("Found attendance data:", attendance);
-    
+    const attendance = attendanceDataToUse.find(a => a.courseId === course.id);
     if (attendance) {
       setSelectedAttendance({
         courseName: course.name,
@@ -222,9 +249,6 @@ const StudentCoursesSummary = () => {
         records: attendance.attendanceRecords
       });
       setShowAttendanceModal(true);
-      console.log("Modal should be showing now, showAttendanceModal:", true);
-    } else {
-      console.log("No attendance data found for course ID:", course.id);
     }
   };
 
@@ -324,8 +348,8 @@ const StudentCoursesSummary = () => {
     );
     
     if (details) {
-      setSelectedAttendanceDetail(details);
-      setShowDetailsModal(true);
+      setSelectedAttendanceDetail(null);
+      setShowDetailsModal(false);
     } else {
       // Fallback if no details found
       setSelectedAttendanceDetail({
@@ -348,7 +372,7 @@ const StudentCoursesSummary = () => {
           ]
         }
       });
-      setShowDetailsModal(true);
+      setShowDetailsModal(false);
     }
   };
   
@@ -405,6 +429,10 @@ const StudentCoursesSummary = () => {
     flex: 1,
     color: '#333'
   };
+
+  // Show loading/error for attendance
+  if (loadingDetailed) return <div>Loading attendance...</div>;
+  if (errorDetailed) return <div style={{color: 'red'}}>Error loading attendance: {errorDetailed}</div>;
 
   return (
     <div className={styles.dashboardLayout}>

@@ -1,47 +1,64 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiHandler from '../../services/apiHandler';
+import ApiHandler from '../../services/apiHandler';
 
 // Async thunk for student login
 export const loginStudent = createAsyncThunk(
   'auth/loginStudent',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await apiHandler.post('/student/login', credentials);
-      localStorage.setItem('token', response.data.token);
+      const response = await ApiHandler.request('/student/login', 'POST', credentials);
+      localStorage.setItem('token', response.token);
       localStorage.setItem('userType', 'student');
-      return response.data;
+      return response;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue({ message: error.message || 'Unknown error' });
     }
   }
 );
 
-// Async thunk for teacher login
+// Teacher
 export const loginTeacher = createAsyncThunk(
   'auth/loginTeacher',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await apiHandler.post('/teacher/login', credentials);
-      localStorage.setItem('token', response.data.token);
+      const response = await ApiHandler.request('/teacher/login', 'POST', credentials);
+      localStorage.setItem('token', response.token);
       localStorage.setItem('userType', 'teacher');
-      return response.data;
+      return response;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue({ message: error.message || 'Unknown error' });
     }
   }
 );
 
-// Async thunk for admin login
+// Admin
 export const loginAdmin = createAsyncThunk(
   'auth/loginAdmin',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await apiHandler.post('/admin/login', credentials);
-      localStorage.setItem('token', response.data.token);
+      const response = await ApiHandler.request('/admin/login', 'POST', credentials);
+      localStorage.setItem('token', response.token);
       localStorage.setItem('userType', 'admin');
-      return response.data;
+      // Save admin name if present
+      if (response.name) {
+        localStorage.setItem('adminName', response.name);
+      }
+      return response;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue({ message: error.message || 'Unknown error' });
+    }
+  }
+);
+
+// Thunk to fetch admin profile
+export const fetchAdminProfile = createAsyncThunk(
+  'auth/fetchAdminProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await ApiHandler.request('/admin/profile', 'GET');
+      return response;
+    } catch (error) {
+      return rejectWithValue({ message: error.message || 'Failed to fetch admin profile' });
     }
   }
 );
@@ -50,6 +67,8 @@ const initialState = {
   user: null,
   token: localStorage.getItem('token'),
   userType: localStorage.getItem('userType'),
+  adminName: localStorage.getItem('adminName') || '',
+  adminEmail: '',
   isLoading: false,
   error: null,
 };
@@ -62,9 +81,12 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.userType = null;
+      state.adminName = '';
+      state.adminEmail = '';
       state.error = null;
       localStorage.removeItem('token');
       localStorage.removeItem('userType');
+      localStorage.removeItem('adminName');
     },
     clearError: (state) => {
       state.error = null;
@@ -113,14 +135,31 @@ const authSlice = createSlice({
       })
       .addCase(loginAdmin.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload.admin;
+        state.user = null;
         state.token = action.payload.token;
         state.userType = 'admin';
+        state.adminName = action.payload.name || '';
         state.error = null;
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload?.message || 'Login failed';
+      })
+
+    // Admin profile
+      .addCase(fetchAdminProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAdminProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.adminName = action.payload.name || '';
+        state.adminEmail = action.payload.email || '';
+        state.error = null;
+      })
+      .addCase(fetchAdminProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || 'Failed to fetch admin profile';
       });
   },
 });
