@@ -9,6 +9,11 @@ import { fetchAllStudents, fetchAllTeachers } from '../features/adminDashboard/a
 import { fetchAdminProfile } from '../features/auth/authSlice';
 import { registerStudent, clearAddStudentState } from '../features/adminDashboard/addStudentSlice';
 import { deleteStudent, clearDeleteStudentState } from '../features/adminDashboard/deleteStudentSlice';
+import { updateStudent, clearUpdateStudentState } from '../features/adminDashboard/updateStudentSlice';
+import Toast from '../components/common/Toast';
+import { registerTeacher, clearAddTeacherState } from '../features/adminDashboard/addTeacherSlice';
+import { deleteTeacher, clearDeleteTeacherState } from '../features/adminDashboard/deleteTeacherSlice';
+import { updateTeacher, clearUpdateTeacherState } from '../features/adminDashboard/updateTeacherSlice';
 
 
 
@@ -60,8 +65,9 @@ const AdminDashboard = ({ displayList }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [formData, setFormData] = useState({});
-  const [formMessage, setFormMessage] = useState(null);
+  const [toast, setToast] = useState({ message: '', type: 'info' });
   const [formLoading, setFormLoading] = useState(false);
+  const [formMessage, setFormMessage] = useState(null);
 
   const dispatch = useDispatch();
   const { students, teachers, loadingStudents, loadingTeachers, errorStudents, errorTeachers } = useSelector(state => state.adminDashboard);
@@ -69,6 +75,10 @@ const AdminDashboard = ({ displayList }) => {
   const adminEmail = useSelector(state => state.auth.adminEmail);
   const addStudentState = useSelector(state => state.addStudent);
   const deleteStudentState = useSelector(state => state.deleteStudent);
+  const updateStudentState = useSelector(state => state.updateStudent);
+  const addTeacherState = useSelector(state => state.addTeacher);
+  const deleteTeacherState = useSelector(state => state.deleteTeacher);
+  const updateTeacherState = useSelector(state => state.updateTeacher);
 
   useEffect(() => {
     dispatch(fetchAllStudents());
@@ -78,30 +88,75 @@ const AdminDashboard = ({ displayList }) => {
 
   useEffect(() => {
     setFormData({});
-    setFormMessage(null);
   }, [displayList]);
 
   useEffect(() => {
     if (addStudentState.successMessage) {
-      setFormMessage({ type: 'success', text: addStudentState.successMessage });
+      setToast({ message: addStudentState.successMessage, type: 'success' });
       setFormData({});
       setTimeout(() => dispatch(clearAddStudentState()), 2000);
     } else if (addStudentState.error) {
-      setFormMessage({ type: 'error', text: addStudentState.error });
+      setToast({ message: addStudentState.error, type: 'error' });
       setTimeout(() => dispatch(clearAddStudentState()), 2000);
     }
   }, [addStudentState.successMessage, addStudentState.error, dispatch]);
 
   useEffect(() => {
     if (deleteStudentState.message) {
-      setFormMessage({ type: 'success', text: deleteStudentState.message });
+      setToast({ message: deleteStudentState.message, type: 'success' });
       dispatch(fetchAllStudents());
       setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
     } else if (deleteStudentState.error) {
-      setFormMessage({ type: 'error', text: deleteStudentState.error });
+      setToast({ message: deleteStudentState.error, type: 'error' });
       setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
     }
   }, [deleteStudentState.message, deleteStudentState.error, dispatch]);
+
+  useEffect(() => {
+    if (updateStudentState.successMessage) {
+      setToast({ message: updateStudentState.successMessage, type: 'success' });
+      setShowUpdateModal(false);
+      dispatch(fetchAllStudents());
+      setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
+    } else if (updateStudentState.error) {
+      setToast({ message: updateStudentState.error, type: 'error' });
+      setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
+    }
+  }, [updateStudentState.successMessage, updateStudentState.error, dispatch]);
+
+  useEffect(() => {
+    if (addTeacherState.successMessage) {
+      setToast({ message: addTeacherState.successMessage, type: 'success' });
+      setFormData({});
+      setTimeout(() => dispatch(clearAddTeacherState()), 2000);
+    } else if (addTeacherState.error) {
+      setToast({ message: addTeacherState.error, type: 'error' });
+      setTimeout(() => dispatch(clearAddTeacherState()), 2000);
+    }
+  }, [addTeacherState.successMessage, addTeacherState.error, dispatch]);
+
+  useEffect(() => {
+    if (deleteTeacherState.message) {
+      setToast({ message: deleteTeacherState.message, type: 'success' });
+      dispatch(fetchAllTeachers());
+      setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
+    } else if (deleteTeacherState.error) {
+      setToast({ message: deleteTeacherState.error, type: 'error' });
+      setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
+    }
+  }, [deleteTeacherState.message, deleteTeacherState.error, dispatch]);
+
+  useEffect(() => {
+    if (updateTeacherState.successMessage) {
+      setToast({ message: updateTeacherState.successMessage, type: 'success' });
+      setShowUpdateModal(false);
+      dispatch(fetchAllTeachers());
+      setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
+    } else if (updateTeacherState.error) {
+      setToast({ message: updateTeacherState.error, type: 'error' });
+      setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
+    }
+  }, [updateTeacherState.successMessage, updateTeacherState.error, dispatch]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -109,10 +164,9 @@ const AdminDashboard = ({ displayList }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setFormMessage(null);
+    setFormLoading(true);
     if (displayList === 'createStudent') {
-      // Prepare payload for student registration
-      const payload = {
+      dispatch(registerStudent({
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -122,13 +176,22 @@ const AdminDashboard = ({ displayList }) => {
         batch: formData.batch,
         phone: formData.phone,
         address: formData.address,
-        // Add other fields as needed
-      };
-      dispatch(registerStudent(payload));
+      }));
+      setFormLoading(false);
       return;
     }
-    setFormLoading(true);
-    setFormMessage(null);
+    if (displayList === 'createTeacher') {
+      dispatch(registerTeacher({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        education: formData.education,
+        department: formData.department,
+        confirmPassword: formData.confirmPassword,
+      }));
+      setFormLoading(false);
+      return;
+    }
     // Prepare payload based on displayList
     let payload = { ...formData };
     if (displayList === 'createTeacher') {
@@ -142,13 +205,13 @@ const AdminDashboard = ({ displayList }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        setFormMessage({ type: 'success', text: 'User created successfully!' });
+        setToast({ message: 'User created successfully!', type: 'success' });
         setFormData({});
       } else {
-        setFormMessage({ type: 'error', text: data?.error?.details || data.message || 'Error creating user.' });
+        setToast({ message: data?.error?.details || data.message || 'Error creating user.', type: 'error' });
       }
     } catch (err) {
-      setFormMessage({ type: 'error', text: 'Network error.' });
+      setToast({ message: 'Network error.', type: 'error' });
     }
     setFormLoading(false);
   };
@@ -166,18 +229,51 @@ const AdminDashboard = ({ displayList }) => {
   };
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    setUpdateMessage(null);
+    if (updateRole === 'student') {
+      const studentId = updateUser._id || updateUser.id;
+      // Only send fields that are editable in the modal and match the API
+      const studentData = {
+        name: updateForm.name,
+        rollNo: updateForm.regNo || updateForm.rollNo, // support both keys
+        email: updateForm.email,
+        semester: updateForm.semester,
+        department: updateForm.department,
+        batch: updateForm.batch,
+        phone: updateForm.phone,
+        address: updateForm.address,
+      };
+      if (updateForm.password) studentData.password = updateForm.password;
+      dispatch(updateStudent({ studentId, studentData }));
+      return;
+    }
+    if (updateRole === 'teacher') {
+      const teacherId = updateUser._id || updateUser.id;
+      const teacherData = {
+        name: updateForm.name,
+        email: updateForm.email,
+        education: updateForm.education,
+        department: updateForm.department,
+      };
+      dispatch(updateTeacher({ teacherId, teacherData }));
+      return;
+    }
     setUpdateLoading(true);
     setUpdateMessage(null);
-    const endpoint = updateRole === 'student' ? `/api/admin/student/${updateUser.id}` : `/api/admin/teacher/${updateUser.id}`;
+    // Prepare payload based on displayList
+    let payload = { ...updateForm };
+    if (displayList === 'createTeacher') {
+      payload.role = 'teacher';
+    }
     try {
-      const res = await fetch(endpoint, {
-        method: 'PUT',
+      const res = await fetch('/api/admin/register', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateForm)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (res.ok) {
-        setUpdateMessage({ type: 'success', text: 'User updated successfully!' });
+        setToast({ message: 'User updated successfully!', type: 'success' });
         // Update local table
         if (updateRole === 'student') {
           setStudents(students.map(s => s.id === updateUser.id ? { ...s, ...updateForm } : s));
@@ -186,10 +282,10 @@ const AdminDashboard = ({ displayList }) => {
         }
         setShowUpdateModal(false);
       } else {
-        setUpdateMessage({ type: 'error', text: data?.error?.details || data.message || 'Error updating user.' });
+        setToast({ message: data?.error?.details || data.message || 'Error updating user.', type: 'error' });
       }
     } catch (err) {
-      setUpdateMessage({ type: 'error', text: 'Network error.' });
+      setToast({ message: 'Network error.', type: 'error' });
     }
     setUpdateLoading(false);
   };
@@ -197,6 +293,10 @@ const AdminDashboard = ({ displayList }) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     if (role === 'student') {
       dispatch(deleteStudent(user._id || user.id));
+      return;
+    }
+    if (role === 'teacher') {
+      dispatch(deleteTeacher(user._id || user.id));
       return;
     }
     const endpoint = role === 'student' ? `/api/admin/student/${user.id}` : `/api/admin/teacher/${user.id}`;
@@ -288,6 +388,12 @@ const AdminDashboard = ({ displayList }) => {
 
   return (
     <div className={styles.dashboardLayout}>
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: '', type: 'info' })}
+        duration={3000}
+      />
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="admin" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
@@ -373,9 +479,6 @@ const AdminDashboard = ({ displayList }) => {
                   </div>
                   <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
                 </form>
-                {formMessage && (
-                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{formMessage.text}</div>
-                )}
               </div>
             )}
             {displayList === 'createTeacher' && (
@@ -409,9 +512,6 @@ const AdminDashboard = ({ displayList }) => {
                   </div>
                   <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
                 </form>
-                {formMessage && (
-                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{formMessage.text}</div>
-                )}
               </div>
             )}
             {displayList === 'students' && (
@@ -497,10 +597,7 @@ const AdminDashboard = ({ displayList }) => {
                           <label style={labelStyle} htmlFor="update-student-batch">Batch</label>
                           <input id="update-student-batch" name="batch" value={updateForm.batch || ''} onChange={handleUpdateFormChange} placeholder="Batch" required style={inputStyle} />
                         </div>
-                        <div style={formFieldStyle}>
-                          <label style={labelStyle} htmlFor="update-student-year">Year</label>
-                          <input id="update-student-year" name="year" value={updateForm.year || ''} onChange={handleUpdateFormChange} placeholder="Year" required style={inputStyle} />
-                        </div>
+                       
                         <div style={formFieldStyle}>
                           <label style={labelStyle} htmlFor="update-student-department">Department</label>
                           <input id="update-student-department" name="department" value={updateForm.department || ''} onChange={handleUpdateFormChange} placeholder="Department" required style={inputStyle} />
@@ -538,11 +635,8 @@ const AdminDashboard = ({ displayList }) => {
                         </div>
                       </>
                     )}
-                    <button type="submit" disabled={updateLoading} style={buttonStyle}>Update</button>
+                    <button type="submit" disabled={updateLoading || updateStudentState.loading} style={buttonStyle}>Update</button>
                   </form>
-                  {updateMessage && (
-                    <div style={{ marginTop: '1rem', color: updateMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{updateMessage.text}</div>
-                  )}
                 </div>
               </div>
             )}

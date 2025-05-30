@@ -6,6 +6,10 @@ import attendanceSummaryReducer from '../features/courses/attendanceSummarySlice
 import adminDashboardReducer from '../features/adminDashboard/adminDashboardSlice';
 import addStudentReducer from '../features/adminDashboard/addStudentSlice';
 import deleteStudentReducer from '../features/adminDashboard/deleteStudentSlice';
+import updateStudentReducer from '../features/adminDashboard/updateStudentSlice';
+import addTeacherReducer from '../features/adminDashboard/addTeacherSlice';
+import deleteTeacherReducer from '../features/adminDashboard/deleteTeacherSlice';
+import updateTeacherReducer from '../features/adminDashboard/updateTeacherSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +20,10 @@ export const store = configureStore({
     adminDashboard: adminDashboardReducer,
     addStudent: addStudentReducer,
     deleteStudent: deleteStudentReducer,
+    updateStudent: updateStudentReducer,
+    addTeacher: addTeacherReducer,
+    deleteTeacher: deleteTeacherReducer,
+    updateTeacher: updateTeacherReducer,
   },
 });
 
