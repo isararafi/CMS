@@ -256,20 +256,41 @@ exports.registerCourses = async (req, res) => {
             return res.status(400).json({ error: 'One or more courses not found' });
         }
 
-        // Add new courses to enrolledCourses
-        const newEnrollments = courses.map(course => ({
-            course: course._id,
-            semester: student.semester
-        }));
+        // Track newly added course references
+        const newEnrollments = [];
 
-        student.enrolledCourses.push(...newEnrollments);
-        await student.save();
+        for (const course of courses) {
+            // Prevent duplicate enrollment
+            const alreadyEnrolled = student.enrolledCourses.some(enrollment =>
+                enrollment.course.toString() === course._id.toString()
+            );
+
+            if (!alreadyEnrolled) {
+                // Add to student's enrolledCourses
+                newEnrollments.push({
+                    course: course._id,
+                    semester: student.semester
+                });
+
+                // Add student to course.students if not already added
+                if (!course.students.includes(student._id)) {
+                    course.students.push(student._id);
+                    await course.save(); // Save updated course
+                }
+            }
+        }
+
+        if (newEnrollments.length > 0) {
+            student.enrolledCourses.push(...newEnrollments);
+            await student.save(); // Save updated student
+        }
 
         res.json({ message: 'Courses registered successfully' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
+
 
 // Get Semester Result
 exports.getSemesterResult = async (req, res) => {

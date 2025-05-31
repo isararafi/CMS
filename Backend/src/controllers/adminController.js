@@ -335,10 +335,10 @@ exports.registerTeacher = async (req, res) => {
 // Course Management
 exports.createCourse = async (req, res) => {
     try {
-        const { courseName, courseCode, creditHours, semester, department, teacherId } = req.body;
+        const { courseName, courseCode, creditHours, department, teacherId } = req.body;
 
         // Validate required fields
-        if (!courseName || !courseCode || !creditHours || !semester || !department || !teacherId) {
+        if (!courseName || !courseCode || !creditHours || !department || !teacherId) {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
@@ -359,7 +359,6 @@ exports.createCourse = async (req, res) => {
             courseName,
             courseCode,
             creditHours,
-            semester,
             department,
             teacher: teacherId
         });

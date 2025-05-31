@@ -16,11 +16,6 @@ const courseSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    semester: {
-        type: String,
-        required: true,
-        trim: true
-    },
     department: {
         type: String,
         required: true,
@@ -38,6 +33,8 @@ const courseSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+
 
 const Course = mongoose.model('Course', courseSchema);
 module.exports = Course; 
