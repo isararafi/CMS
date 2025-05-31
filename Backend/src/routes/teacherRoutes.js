@@ -36,4 +36,7 @@ router.post('/assignments/upload', upload.single('file'), teacherController.uplo
 router.get('/courses/:courseId/assignments', teacherController.getAssignments);
 router.get('/assignments/download/:filename', teacherController.downloadAssignment);
 
+// Student Management
+router.get('/students', teacherController.getStudentsForTeacherCourses);
+
 module.exports = router; 

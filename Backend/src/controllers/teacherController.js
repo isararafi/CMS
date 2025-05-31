@@ -165,10 +165,10 @@ exports.getAttendance = async (req, res) => {
 // Add Marks
 exports.addMarks = async (req, res) => {
     try {
-        const { studentId, courseId, type, marks, totalMarks, examDate } = req.body;
+        const { studentId, courseId, type, marks, totalMarks } = req.body;
 
         // Validate required fields
-        if (!studentId || !courseId || !type || marks === undefined || !totalMarks || !examDate) {
+        if (!studentId || !courseId || !type || marks === undefined || !totalMarks ) {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
@@ -198,8 +198,7 @@ exports.addMarks = async (req, res) => {
             teacher: req.teacher._id,
             type,
             marks,
-            totalMarks,
-            examDate
+            totalMarks
         });
 
         await markRecord.save();
@@ -297,10 +296,10 @@ exports.uploadAssignment = async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        const { title, description, courseId, dueDate } = req.body;
+        const {courseId} = req.body;
 
-        if (!title || !description || !courseId || !dueDate) {
-            return res.status(400).json({ error: 'Title, description, course, and due date are required' });
+        if (!courseId) {
+            return res.status(400).json({ error: 'course is required' });
         }
 
         // Verify the course belongs to the teacher
@@ -313,8 +312,6 @@ exports.uploadAssignment = async (req, res) => {
         const fileUrl = `/api/assignments/download/${req.file.filename}`;
 
         const assignment = new Assignment({
-            title,
-            description,
             course: courseId,
             teacher: req.teacher._id,
             filePath: req.file.path,
@@ -322,7 +319,6 @@ exports.uploadAssignment = async (req, res) => {
             fileUrl: fileUrl,
             fileSize: req.file.size,
             mimeType: req.file.mimetype,
-            dueDate
         });
 
         await assignment.save();
@@ -436,6 +432,30 @@ exports.getProfile = async (req, res) => {
     try {
         const teacher = await Teacher.findById(req.teacher._id).select('-password');
         res.json(teacher);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+// Get All Students for Teacher's Courses
+exports.getStudentsForTeacherCourses = async (req, res) => {
+    try {
+        // Find all courses taught by the teacher
+        const courses = await Course.find({ teacher: req.teacher._id });
+
+        // Extract student IDs from these courses
+        const studentIds = courses.reduce((acc, course) => {
+            return acc.concat(course.students);
+        }, []);
+
+        // Remove duplicate student IDs
+        const uniqueStudentIds = [...new Set(studentIds.map(id => id.toString()))];
+
+        // Fetch student details
+        const students = await Student.find({ _id: { $in: uniqueStudentIds } })
+            .select('name rollNo email department');
+
+        res.json(students);
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }

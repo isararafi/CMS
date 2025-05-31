@@ -30,11 +30,8 @@ const marksSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 1
-    },
-    examDate: {
-        type: Date,
-        required: true
     }
+   
 }, {
     timestamps: true
 });

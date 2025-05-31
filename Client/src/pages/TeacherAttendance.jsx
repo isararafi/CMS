@@ -2,20 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styles from '../styles/pages/teacherAttendance.module.scss';
 import ApiHandler from '../services/apiHandler';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
+import { fetchTeacherCourses, addLecture, fetchStudents, markAttendance, fetchLectures } from '../features/teacherDashboard/teacherDashboardSlice';
 
 const TeacherAttendance = () => {
   const dispatch = useDispatch();
-  const { courses, isLoading, error } = useSelector(state => state.teacherDashboard);
+  const { courses, isLoading, error, students = [], lectures = [] } = useSelector(state => state.teacherDashboard);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [lectures, setLectures] = useState([
-    { id: 1, title: 'Complexity Analysis', date: '2025-06-03', courseId: 1, description: 'Time and Space complexity deep dive' }
-  ]);
-  const [students, setStudents] = useState([
-    { id: 1, name: 'John Doe', regNo: 'STU001' },
-    { id: 2, name: 'Jane Smith', regNo: 'STU002' },
-    { id: 3, name: 'Alice Johnson', regNo: 'STU003' }
-  ]);
   const [showAddSection, setShowAddSection] = useState(false);
   const [showDeleteSection, setShowDeleteSection] = useState(false);
   const [newLecture, setNewLecture] = useState({ title: '', date: '', courseId: '', description: '' });
@@ -30,18 +22,23 @@ const TeacherAttendance = () => {
     setSelectedCourse(course);
     setShowAddSection(!showAddSection);
     setShowDeleteSection(false);
+    if (!showAddSection) {
+      dispatch(fetchStudents());
+    }
   };
 
   const toggleDeleteSection = (course) => {
     setSelectedCourse(course);
     setShowDeleteSection(!showDeleteSection);
     setShowAddSection(false);
+    if (!showDeleteSection) {
+      dispatch(fetchLectures(course._id));
+    }
   };
 
   const handleAddLecture = () => {
-    const newId = lectures.length + 1;
-    const newLectureData = { ...newLecture, id: newId, courseId: selectedCourse.id };
-    setLectures([...lectures, newLectureData]);
+    const newLectureData = { ...newLecture, courseId: selectedCourse._id };
+    dispatch(addLecture(newLectureData));
     setNewLecture({ title: '', date: '', courseId: '', description: '' });
   };
 
@@ -49,8 +46,19 @@ const TeacherAttendance = () => {
     setAttendance({ ...attendance, [studentId]: !attendance[studentId] });
   };
 
-  const handleSaveAttendance = (lectureId) => {
-    alert('Attendance saved successfully');
+  const handleSave = () => {
+    const newLectureData = { ...newLecture, courseId: selectedCourse._id };
+    dispatch(addLecture(newLectureData)).then((action) => {
+      if (action.type === 'teacherDashboard/addLecture/fulfilled') {
+        const lectureId = action.payload._id;
+        const attendanceData = students.map(student => ({
+          studentId: student._id,
+          status: attendance[student._id] ? 'present' : 'absent'
+        }));
+        dispatch(markAttendance({ lectureId, attendanceData }));
+        alert('Lecture and attendance saved successfully');
+      }
+    });
   };
 
   const handleLectureSelect = (lectureId) => {
@@ -92,29 +100,27 @@ const TeacherAttendance = () => {
           <div className={styles.customTable}>
             <h5>Mark Attendance</h5>
             {students.map(student => (
-              <div key={student.id} className={styles.tableRow}>
-                <span>{student.regNo}</span>
+              <div key={student._id} className={styles.tableRow}>
+                <span>{student.rollNo}</span>
                 <span>{student.name}</span>
-                <input type="checkbox" checked={!!attendance[student.id]} onChange={() => handleAttendanceChange(student.id)} />
+                <input type="checkbox" checked={!!attendance[student._id]} onChange={() => handleAttendanceChange(student._id)} />
               </div>
             ))}
           </div>
-          <button onClick={handleAddLecture}>Save</button>
+          <button onClick={handleSave}>Add</button>
         </div>
       )}
       {showDeleteSection && selectedCourse && (
         <div className={styles.deleteSection}>
-          <h4>Delete Lectures</h4>
+          <h4>Lectures</h4>
           <div className={styles.customTable}>
             {lectures.map(lecture => (
-              <div key={lecture.id} className={styles.tableRow}>
+              <div key={lecture._id} className={styles.tableRow}>
                 <span>{lecture.title}</span>
                 <span>{lecture.date}</span>
-                <input type="checkbox" checked={selectedLectures.includes(lecture.id)} onChange={() => handleLectureSelect(lecture.id)} />
               </div>
             ))}
           </div>
-          <button onClick={handleDeleteLectures}>Delete Selected Lectures</button>
         </div>
       )}
     </div>

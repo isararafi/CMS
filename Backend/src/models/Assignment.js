@@ -1,16 +1,7 @@
 const mongoose = require('mongoose');
 
 const assignmentSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        required: true,
-        trim: true
-    },
+   
     course: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
@@ -39,10 +30,6 @@ const assignmentSchema = new mongoose.Schema({
     },
     mimeType: {
         type: String,
-        required: true
-    },
-    dueDate: {
-        type: Date,
         required: true
     },
     uploadDate: {
