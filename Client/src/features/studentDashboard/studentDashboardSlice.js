@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiHandler from '../../services/apiHandler';
+import ApiHandler from '../../services/apiHandler';
 
 // Async thunk for fetching dashboard info
 export const fetchDashboardInfo = createAsyncThunk(
   'studentDashboard/fetchDashboardInfo',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiHandler.get('/student/dashboard');
-      return response.data;
+      const data = await ApiHandler.request('/student/dashboard', 'GET');
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue({ message: error.message || 'Failed to fetch dashboard info' });
     }
   }
 );
@@ -19,10 +19,10 @@ export const fetchGpaProgress = createAsyncThunk(
   'studentDashboard/fetchGpaProgress',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiHandler.get('/student/gpa-progress');
-      return response.data;
+      const data = await ApiHandler.request('/student/gpa-progress', 'GET');
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue({ message: error.message || 'Failed to fetch GPA progress' });
     }
   }
 );

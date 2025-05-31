@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/teacherDashboard.module.scss';
+import { fetchTeacherProfile, fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
 
 const TeacherDashboard = () => {
+  const dispatch = useDispatch();
+  const { profile, courses, isLoading, error } = useSelector(state => state.teacherDashboard);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+
+  useEffect(() => {
+    dispatch(fetchTeacherProfile());
+    dispatch(fetchTeacherCourses());
+  }, [dispatch]);
 
   return (
     <div className={styles.dashboardLayout}>
@@ -16,11 +25,27 @@ const TeacherDashboard = () => {
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
               <div className={styles.welcomeSection}>
-                <h1>Teacher Dashboard</h1>
-                <p className={styles.subtitle}>Faculty Portal</p>
+                <h1>Welcome, {profile.name}</h1>
+                <p className={styles.subtitle}>Email: {profile.email}</p>
               </div>
             </div>
             <div className={styles.tabContent}>
+              {isLoading ? (
+                <p>Loading...</p>
+              ) : error ? (
+                <p>Error: {error}</p>
+              ) : (
+                <div>
+                  {/* <h2>Your Courses</h2> */}
+                  {/* <ul>
+                    {courses.map(course => (
+                      <li key={course._id}>
+                        {course.courseCode} - {course.courseName} (Students: {course.students.length})
+                      </li>
+                    ))}
+                  </ul> */}
+                </div>
+              )}
               <Outlet />
             </div>
           </div>

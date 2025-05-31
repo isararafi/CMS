@@ -5,10 +5,10 @@ const Admin = require('../src/models/Admin'); // Adjust path as needed
 const Student = require('../src/models/Student'); // Adjust path as needed
 beforeAll(async () => {
   // Connect to a test database
-  const mongoURI = process.env.MONGO_URI || 
-  'mongodb://localhost:27017/cms_test';
+  const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/cms_test';
   await mongoose.connect(mongoURI);
-  // await Admin.deleteMany({}, { timeout: 50000 });
+  await Admin.deleteMany({}, { timeout: 50000 });
+  await Student.deleteMany({}, { timeout: 50000 });
   await Admin.create({
     name: 'Test Admin',
     email: 'test@example.com',
@@ -94,6 +94,29 @@ afterAll(async () => {
       expect(response.body).toHaveProperty('student');
       expect(response.body.student.email).toBe(studentData.email);
     }, 500000);
+
+
+
+
+
+    it('should fail to add student with empty data', async () => {
+      const studentData = {
+        name: '',
+        email: '',
+        rollNo: '',
+        department: '',
+        password: '',
+        semester: '',
+        batch: ''
+      };
+      const response = await request(app)
+        .post('/api/admin/register/student')
+        .send(studentData);
+
+      console.log(response.body);
+      expect(response.status).toBe(401);
+    }, 500000);
+
 
     it('should fail to add student without authentication', async () => {
       const studentData = {

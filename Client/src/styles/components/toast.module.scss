@@ -1,0 +1,104 @@
+.toast {
+  display: flex;
+  align-items: flex-start;
+  min-width: 280px;
+  max-width: 400px;
+  height: 100px;
+  padding: 1.25rem 1.75rem 1.5rem 1.25rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(40,40,40,0.18), 0 1.5px 6px rgba(0,0,0,0.08);
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 1.5rem auto 0 auto;
+  background: #fff;
+  color: #232323;
+  position: relative;
+  animation: toast-in 0.45s cubic-bezier(0.4,0,0.2,1);
+  z-index: 9999;
+  border: none;
+  gap: 1rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(40px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast.info {
+  border-left: 6px solid #1976d2;
+  background: linear-gradient(90deg, #e3f0ff 0%, #fafdff 100%);
+}
+.toast.success {
+  border-left: 6px solid #2e7d32;
+  background: linear-gradient(90deg, #e6f7ec 0%, #fafdff 100%);
+}
+.toast.error {
+  border-left: 6px solid #d32f2f;
+  background: linear-gradient(90deg, #ffeaea 0%, #fff9f9 100%);
+}
+
+.toast .icon {
+  margin-right: 0.75rem;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.toast.info .icon {
+  color: #1976d2;
+}
+.toast.success .icon {
+  color: #2e7d32;
+}
+.toast.error .icon {
+  color: #d32f2f;
+}
+
+.message {
+  flex: 1;
+  margin-right: 0.5rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  margin-left: 0.5rem;
+  margin-top: 2px;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.closeBtn:hover {
+  color: #232323;
+}
+
+.progressBar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+.progress {
+  height: 200px;
+  background: linear-gradient(90deg, #1976d2 0%, #2e7d32 100%);
+  animation: progressBarAnim 3s linear forwards;
+}
+.toast.success .progress {
+  background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+}
+.toast.error .progress {
+  background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+}
+@keyframes progressBarAnim {
+  from { width: 100%; }
+  to { width: 0%; }
+} 

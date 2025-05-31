@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, Layers, GraduationCap } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentCoursesMids.module.scss';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCourseMarks } from '../features/courses/coursesSlice';
 
 const StudentCoursesMids = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -153,6 +155,27 @@ const StudentCoursesMids = () => {
       }
     ]
   };
+
+  const dispatch = useDispatch();
+  const { marks: midsMarks, loading: midsLoading, error: midsError } = useSelector(state => state.courses);
+
+  useEffect(() => {
+    dispatch(fetchCourseMarks('683866e97c09d53caade320b'));
+  }, [dispatch]);
+
+  // Replace only the mids data with API data if available
+  const midsData = midsMarks && midsMarks.length > 0 ? midsMarks.map((item, idx) => ({
+    id: idx + 1,
+    courseCode: item.courseCode,
+    courseName: item.courseName,
+    date: '', // API does not provide date
+    time: '', // API does not provide time
+    venue: '', // API does not provide venue
+    totalMarks: item.totalMarks,
+    obtainedMarks: item.marks,
+    status: 'completed', // Assume completed if marks present
+    syllabus: [] // Not provided
+  })) : evaluationData.mids;
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -412,9 +435,11 @@ const StudentCoursesMids = () => {
         );
       
       case 'mids':
+        if (midsLoading) return <div>Loading...</div>;
+        if (midsError) return <div style={{color: 'red'}}>Error: {midsError}</div>;
         return (
           <div className={styles.evaluationGrid} style={evaluationGridStyle}>
-            {evaluationData.mids.map(exam => (
+            {midsData.map(exam => (
               <div key={exam.id} className={styles.midtermCard} style={{
                 backgroundColor: '#fff',
                 borderRadius: '12px',

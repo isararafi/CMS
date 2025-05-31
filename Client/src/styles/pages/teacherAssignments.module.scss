@@ -22,4 +22,77 @@
     font-weight: 600;
     background: $light-bg;
   }
+}
+
+.classesList {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.classCard {
+  background: $light-bg;
+  border-radius: 8px;
+  padding: 16px 24px;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  min-width: 220px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.classCard:hover {
+  background: lighten($light-bg, 10%);
+}
+
+.classHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.classCode {
+  font-size: 14px;
+  color: $primary-color;
+  font-weight: 600;
+}
+
+.className {
+  font-size: 16px;
+  color: $text-primary;
+  font-weight: 600;
+}
+
+.classStudents {
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.uploadSection {
+  background: $light-bg;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  box-shadow: $card-shadow;
+}
+
+.uploadSection h4 {
+  color: $text-primary;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+button {
+  background: $primary-color;
+  color: $white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 12px;
+}
+
+button:hover {
+  background: darken($primary-color, 10%);
 } 

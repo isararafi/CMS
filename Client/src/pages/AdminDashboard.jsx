@@ -4,6 +4,16 @@ import styles from '../styles/pages/dashboard.module.scss'; // Import styles
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllStudents, fetchAllTeachers } from '../features/adminDashboard/adminDashboardSlice';
+import { fetchAdminProfile } from '../features/auth/authSlice';
+import { registerStudent, clearAddStudentState } from '../features/adminDashboard/addStudentSlice';
+import { deleteStudent, clearDeleteStudentState } from '../features/adminDashboard/deleteStudentSlice';
+import { updateStudent, clearUpdateStudentState } from '../features/adminDashboard/updateStudentSlice';
+import Toast from '../components/common/Toast';
+import { registerTeacher, clearAddTeacherState } from '../features/adminDashboard/addTeacherSlice';
+import { deleteTeacher, clearDeleteTeacherState } from '../features/adminDashboard/deleteTeacherSlice';
+import { updateTeacher, clearUpdateTeacherState } from '../features/adminDashboard/updateTeacherSlice';
 
 
 
@@ -55,33 +65,98 @@ const AdminDashboard = ({ displayList }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [formData, setFormData] = useState({});
-  const [formMessage, setFormMessage] = useState(null);
+  const [toast, setToast] = useState({ message: '', type: 'info' });
   const [formLoading, setFormLoading] = useState(false);
+  const [formMessage, setFormMessage] = useState(null);
 
-  // Use local state for students and teachers so we can update/delete
-  const [students, setStudents] = useState([
-    { id: 1, name: 'Alice Smith', regNo: '2021001', department: 'Computer Science', batch: '2021', year: '1', rollno: '001', password: '', confirmPassword: '' },
-    { id: 2, name: 'Bob Johnson', regNo: '2021002', department: 'Mathematics', batch: '2021', year: '1', rollno: '002', password: '', confirmPassword: '' },
-    { id: 3, name: 'Charlie Brown', regNo: '2021003', department: 'Physics', batch: '2021', year: '1', rollno: '003', password: '', confirmPassword: '' },
-  ]);
-  const [teachers, setTeachers] = useState([
-    { id: 1, name: 'Dr. Emily White', email: 'emily.white@university.edu', department: 'Computer Science', education: '', password: '', confirmPassword: '' },
-    { id: 2, name: 'Dr. John Black', email: 'john.black@university.edu', department: 'Mathematics', education: '', password: '', confirmPassword: '' },
-    { id: 3, name: 'Dr. Sarah Green', email: 'sarah.green@university.edu', department: 'Physics', education: '', password: '', confirmPassword: '' },
-  ]);
+  const dispatch = useDispatch();
+  const { students, teachers, loadingStudents, loadingTeachers, errorStudents, errorTeachers } = useSelector(state => state.adminDashboard);
+  const adminName = useSelector(state => state.auth.adminName);
+  const adminEmail = useSelector(state => state.auth.adminEmail);
+  const addStudentState = useSelector(state => state.addStudent);
+  const deleteStudentState = useSelector(state => state.deleteStudent);
+  const updateStudentState = useSelector(state => state.updateStudent);
+  const addTeacherState = useSelector(state => state.addTeacher);
+  const deleteTeacherState = useSelector(state => state.deleteTeacher);
+  const updateTeacherState = useSelector(state => state.updateTeacher);
 
-  // Modal state
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updateRole, setUpdateRole] = useState(null);
-  const [updateUser, setUpdateUser] = useState(null);
-  const [updateForm, setUpdateForm] = useState({});
-  const [updateMessage, setUpdateMessage] = useState(null);
-  const [updateLoading, setUpdateLoading] = useState(false);
+  useEffect(() => {
+    dispatch(fetchAllStudents());
+    dispatch(fetchAllTeachers());
+    dispatch(fetchAdminProfile());
+  }, [dispatch]);
 
   useEffect(() => {
     setFormData({});
-    setFormMessage(null);
   }, [displayList]);
+
+  useEffect(() => {
+    if (addStudentState.successMessage) {
+      setToast({ message: addStudentState.successMessage, type: 'success' });
+      setFormData({});
+      setTimeout(() => dispatch(clearAddStudentState()), 2000);
+    } else if (addStudentState.error) {
+      setToast({ message: addStudentState.error, type: 'error' });
+      setTimeout(() => dispatch(clearAddStudentState()), 2000);
+    }
+  }, [addStudentState.successMessage, addStudentState.error, dispatch]);
+
+  useEffect(() => {
+    if (deleteStudentState.message) {
+      setToast({ message: deleteStudentState.message, type: 'success' });
+      dispatch(fetchAllStudents());
+      setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
+    } else if (deleteStudentState.error) {
+      setToast({ message: deleteStudentState.error, type: 'error' });
+      setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
+    }
+  }, [deleteStudentState.message, deleteStudentState.error, dispatch]);
+
+  useEffect(() => {
+    if (updateStudentState.successMessage) {
+      setToast({ message: updateStudentState.successMessage, type: 'success' });
+      setShowUpdateModal(false);
+      dispatch(fetchAllStudents());
+      setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
+    } else if (updateStudentState.error) {
+      setToast({ message: updateStudentState.error, type: 'error' });
+      setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
+    }
+  }, [updateStudentState.successMessage, updateStudentState.error, dispatch]);
+
+  useEffect(() => {
+    if (addTeacherState.successMessage) {
+      setToast({ message: addTeacherState.successMessage, type: 'success' });
+      setFormData({});
+      setTimeout(() => dispatch(clearAddTeacherState()), 2000);
+    } else if (addTeacherState.error) {
+      setToast({ message: addTeacherState.error, type: 'error' });
+      setTimeout(() => dispatch(clearAddTeacherState()), 2000);
+    }
+  }, [addTeacherState.successMessage, addTeacherState.error, dispatch]);
+
+  useEffect(() => {
+    if (deleteTeacherState.message) {
+      setToast({ message: deleteTeacherState.message, type: 'success' });
+      dispatch(fetchAllTeachers());
+      setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
+    } else if (deleteTeacherState.error) {
+      setToast({ message: deleteTeacherState.error, type: 'error' });
+      setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
+    }
+  }, [deleteTeacherState.message, deleteTeacherState.error, dispatch]);
+
+  useEffect(() => {
+    if (updateTeacherState.successMessage) {
+      setToast({ message: updateTeacherState.successMessage, type: 'success' });
+      setShowUpdateModal(false);
+      dispatch(fetchAllTeachers());
+      setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
+    } else if (updateTeacherState.error) {
+      setToast({ message: updateTeacherState.error, type: 'error' });
+      setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
+    }
+  }, [updateTeacherState.successMessage, updateTeacherState.error, dispatch]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -90,13 +165,36 @@ const AdminDashboard = ({ displayList }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setFormLoading(true);
-    setFormMessage(null);
+    if (displayList === 'createStudent') {
+      dispatch(registerStudent({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        rollNo: formData.rollNo,
+        semester: formData.semester,
+        department: formData.department,
+        batch: formData.batch,
+        phone: formData.phone,
+        address: formData.address,
+      }));
+      setFormLoading(false);
+      return;
+    }
+    if (displayList === 'createTeacher') {
+      dispatch(registerTeacher({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        education: formData.education,
+        department: formData.department,
+        confirmPassword: formData.confirmPassword,
+      }));
+      setFormLoading(false);
+      return;
+    }
     // Prepare payload based on displayList
     let payload = { ...formData };
-    if (displayList === 'createStudent' && formData.batch && formData.year && formData.rollno) {
-      payload.regNo = `${formData.batch}-${formData.year}-${formData.rollno}`;
-      payload.role = 'student';
-    } else if (displayList === 'createTeacher') {
+    if (displayList === 'createTeacher') {
       payload.role = 'teacher';
     }
     try {
@@ -107,13 +205,13 @@ const AdminDashboard = ({ displayList }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        setFormMessage({ type: 'success', text: 'User created successfully!' });
+        setToast({ message: 'User created successfully!', type: 'success' });
         setFormData({});
       } else {
-        setFormMessage({ type: 'error', text: data?.error?.details || data.message || 'Error creating user.' });
+        setToast({ message: data?.error?.details || data.message || 'Error creating user.', type: 'error' });
       }
     } catch (err) {
-      setFormMessage({ type: 'error', text: 'Network error.' });
+      setToast({ message: 'Network error.', type: 'error' });
     }
     setFormLoading(false);
   };
@@ -131,18 +229,51 @@ const AdminDashboard = ({ displayList }) => {
   };
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    setUpdateMessage(null);
+    if (updateRole === 'student') {
+      const studentId = updateUser._id || updateUser.id;
+      // Only send fields that are editable in the modal and match the API
+      const studentData = {
+        name: updateForm.name,
+        rollNo: updateForm.regNo || updateForm.rollNo, // support both keys
+        email: updateForm.email,
+        semester: updateForm.semester,
+        department: updateForm.department,
+        batch: updateForm.batch,
+        phone: updateForm.phone,
+        address: updateForm.address,
+      };
+      if (updateForm.password) studentData.password = updateForm.password;
+      dispatch(updateStudent({ studentId, studentData }));
+      return;
+    }
+    if (updateRole === 'teacher') {
+      const teacherId = updateUser._id || updateUser.id;
+      const teacherData = {
+        name: updateForm.name,
+        email: updateForm.email,
+        education: updateForm.education,
+        department: updateForm.department,
+      };
+      dispatch(updateTeacher({ teacherId, teacherData }));
+      return;
+    }
     setUpdateLoading(true);
     setUpdateMessage(null);
-    const endpoint = updateRole === 'student' ? `/api/admin/student/${updateUser.id}` : `/api/admin/teacher/${updateUser.id}`;
+    // Prepare payload based on displayList
+    let payload = { ...updateForm };
+    if (displayList === 'createTeacher') {
+      payload.role = 'teacher';
+    }
     try {
-      const res = await fetch(endpoint, {
-        method: 'PUT',
+      const res = await fetch('/api/admin/register', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateForm)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (res.ok) {
-        setUpdateMessage({ type: 'success', text: 'User updated successfully!' });
+        setToast({ message: 'User updated successfully!', type: 'success' });
         // Update local table
         if (updateRole === 'student') {
           setStudents(students.map(s => s.id === updateUser.id ? { ...s, ...updateForm } : s));
@@ -151,15 +282,23 @@ const AdminDashboard = ({ displayList }) => {
         }
         setShowUpdateModal(false);
       } else {
-        setUpdateMessage({ type: 'error', text: data?.error?.details || data.message || 'Error updating user.' });
+        setToast({ message: data?.error?.details || data.message || 'Error updating user.', type: 'error' });
       }
     } catch (err) {
-      setUpdateMessage({ type: 'error', text: 'Network error.' });
+      setToast({ message: 'Network error.', type: 'error' });
     }
     setUpdateLoading(false);
   };
   const handleDeleteClick = async (role, user) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (role === 'student') {
+      dispatch(deleteStudent(user._id || user.id));
+      return;
+    }
+    if (role === 'teacher') {
+      dispatch(deleteTeacher(user._id || user.id));
+      return;
+    }
     const endpoint = role === 'student' ? `/api/admin/student/${user.id}` : `/api/admin/teacher/${user.id}`;
     try {
       const res = await fetch(endpoint, { method: 'DELETE' });
@@ -239,8 +378,22 @@ const AdminDashboard = ({ displayList }) => {
     boxSizing: 'border-box',
   };
 
+  // Modal state
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateRole, setUpdateRole] = useState(null);
+  const [updateUser, setUpdateUser] = useState(null);
+  const [updateForm, setUpdateForm] = useState({});
+  const [updateMessage, setUpdateMessage] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
+
   return (
     <div className={styles.dashboardLayout}>
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: '', type: 'info' })}
+        duration={3000}
+      />
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="admin" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
@@ -249,18 +402,17 @@ const AdminDashboard = ({ displayList }) => {
             <div className={styles.dashboardHeader}>
               {/* Header section with admin info */}
               <div className={styles.welcomeSection}>
-                <h1>Welcome, {adminData.name}</h1>
-                <p className={styles.subtitle}>Admin Dashboard • {adminData.department}</p>
+                <h1>Welcome {adminName}</h1>
+                <p className={styles.subtitle}>Admin Dashboard</p>
               </div>
               <div className={styles.adminInfo}>
-                {/* Display admin position and email */}
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Position:</span>
                   <span className={styles.value}>{adminData.position}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Email:</span>
-                  <span className={styles.value}>{adminData.email}</span>
+                  <span className={styles.value}>{adminEmail}</span>
                 </div>
               </div>
             </div>
@@ -270,14 +422,14 @@ const AdminDashboard = ({ displayList }) => {
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><Users size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{adminData.stats.students}</h3>
+                  <h3 className={styles.statValue}>{loadingStudents ? '...' : students.length}</h3>
                   <p className={styles.statLabel}>Total Students</p>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><UserCheck size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{adminData.stats.faculty}</h3>
+                  <h3 className={styles.statValue}>{loadingTeachers ? '...' : teachers.length}</h3>
                   <p className={styles.statLabel}>Faculty Members</p>
                 </div>
               </div>
@@ -294,22 +446,6 @@ const AdminDashboard = ({ displayList }) => {
                     <input id="student-name" name="name" value={formData.name || ''} onChange={handleFormChange} placeholder="Name" required style={inputStyle} />
                   </div>
                   <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-batch">Batch</label>
-                    <input id="student-batch" name="batch" value={formData.batch || ''} onChange={handleFormChange} placeholder="Batch" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-year">Year</label>
-                    <input id="student-year" name="year" value={formData.year || ''} onChange={handleFormChange} placeholder="Year" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-rollno">Roll No</label>
-                    <input id="student-rollno" name="rollno" value={formData.rollno || ''} onChange={handleFormChange} placeholder="Roll No" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-department">Department</label>
-                    <input id="student-department" name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={inputStyle} />
-                  </div>
-                  <div style={formFieldStyle}>
                     <label style={labelStyle} htmlFor="student-email">Email</label>
                     <input id="student-email" name="email" value={formData.email || ''} onChange={handleFormChange} placeholder="Email" required style={inputStyle} />
                   </div>
@@ -318,14 +454,31 @@ const AdminDashboard = ({ displayList }) => {
                     <input id="student-password" name="password" type="password" value={formData.password || ''} onChange={handleFormChange} placeholder="Password" required style={inputStyle} />
                   </div>
                   <div style={formFieldStyle}>
-                    <label style={labelStyle} htmlFor="student-confirmPassword">Confirm Password</label>
-                    <input id="student-confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleFormChange} placeholder="Confirm Password" required style={inputStyle} />
+                    <label style={labelStyle} htmlFor="student-rollno">Roll No</label>
+                    <input id="student-rollno" name="rollNo" value={formData.rollNo || ''} onChange={handleFormChange} placeholder="Roll No" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-semester">Semester</label>
+                    <input id="student-semester" name="semester" type="number" value={formData.semester || ''} onChange={handleFormChange} placeholder="Semester" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-department">Department</label>
+                    <input id="student-department" name="department" value={formData.department || ''} onChange={handleFormChange} placeholder="Department" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-batch">Batch</label>
+                    <input id="student-batch" name="batch" value={formData.batch || ''} onChange={handleFormChange} placeholder="Batch" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-phone">Phone</label>
+                    <input id="student-phone" name="phone" value={formData.phone || ''} onChange={handleFormChange} placeholder="Phone" required style={inputStyle} />
+                  </div>
+                  <div style={formFieldStyle}>
+                    <label style={labelStyle} htmlFor="student-address">Address</label>
+                    <input id="student-address" name="address" value={formData.address || ''} onChange={handleFormChange} placeholder="Address" required style={inputStyle} />
                   </div>
                   <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
                 </form>
-                {formMessage && (
-                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{formMessage.text}</div>
-                )}
               </div>
             )}
             {displayList === 'createTeacher' && (
@@ -359,9 +512,6 @@ const AdminDashboard = ({ displayList }) => {
                   </div>
                   <button type="submit" disabled={formLoading} style={buttonStyle}>ADD</button>
                 </form>
-                {formMessage && (
-                  <div style={{ marginTop: '1rem', color: formMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{formMessage.text}</div>
-                )}
               </div>
             )}
             {displayList === 'students' && (
@@ -371,7 +521,7 @@ const AdminDashboard = ({ displayList }) => {
                   headers={['Name', 'Reg No', 'Department', 'Actions']}
                   data={students.map(student => ({
                     Name: student.name,
-                    'Reg No': student.regNo,
+                    'Reg No': student.rollNo || student.regNo,
                     Department: student.department,
                     actions: {
                       view: true,
@@ -447,10 +597,7 @@ const AdminDashboard = ({ displayList }) => {
                           <label style={labelStyle} htmlFor="update-student-batch">Batch</label>
                           <input id="update-student-batch" name="batch" value={updateForm.batch || ''} onChange={handleUpdateFormChange} placeholder="Batch" required style={inputStyle} />
                         </div>
-                        <div style={formFieldStyle}>
-                          <label style={labelStyle} htmlFor="update-student-year">Year</label>
-                          <input id="update-student-year" name="year" value={updateForm.year || ''} onChange={handleUpdateFormChange} placeholder="Year" required style={inputStyle} />
-                        </div>
+                       
                         <div style={formFieldStyle}>
                           <label style={labelStyle} htmlFor="update-student-department">Department</label>
                           <input id="update-student-department" name="department" value={updateForm.department || ''} onChange={handleUpdateFormChange} placeholder="Department" required style={inputStyle} />
@@ -488,11 +635,8 @@ const AdminDashboard = ({ displayList }) => {
                         </div>
                       </>
                     )}
-                    <button type="submit" disabled={updateLoading} style={buttonStyle}>Update</button>
+                    <button type="submit" disabled={updateLoading || updateStudentState.loading} style={buttonStyle}>Update</button>
                   </form>
-                  {updateMessage && (
-                    <div style={{ marginTop: '1rem', color: updateMessage.type === 'success' ? 'green' : 'red', textAlign: 'center', fontWeight: 500 }}>{updateMessage.text}</div>
-                  )}
                 </div>
               </div>
             )}
