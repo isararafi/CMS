@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import styles from '../styles/pages/teacherMarks.module.scss';
+import styless from '../styles/pages/teacherAttendance.module.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
+import CustomTable from '../components/common/CustomTable';
+import { addMarks } from '../features/teacherDashboard/addMarksSlice';
+import { getMarks } from '../features/teacherDashboard/getMarksSlice';
 
 const TeacherMarks = () => {
-  const [subjects, setSubjects] = useState([
-    { id: 1, code: 'CSE101', name: 'Intro to Programming' },
-    { id: 2, code: 'CSE201', name: 'Data Structures' }
-  ]);
+  const dispatch = useDispatch();
+  const { courses, isLoading, error } = useSelector(state => state.teacherDashboard);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [students, setStudents] = useState([
     { id: 1, rollNo: 'STU001', name: 'Alice', midMarks: 0, sessionalMarks: 0, finalMarks: 0 },
@@ -13,8 +17,11 @@ const TeacherMarks = () => {
     { id: 3, rollNo: 'STU003', name: 'Charlie', midMarks: 0, sessionalMarks: 0, finalMarks: 0 }
   ]);
 
-  const handleSubjectClick = (subject) => {
-    setSelectedSubject(subject);
+  const { marks } = useSelector(state => state.getMarks);
+
+  const handleSubjectClick = (course) => {
+    setSelectedSubject(course);
+    dispatch(getMarks(course._id));
   };
 
   const handleMarksChange = (studentId, field, value) => {
@@ -28,50 +35,61 @@ const TeacherMarks = () => {
   };
 
   const handleSaveMarks = () => {
+    students.forEach(student => {
+      const marksData = {
+        studentId: student.id,
+        courseId: selectedSubject._id,
+        type: 'midterm', // Assuming type is midterm, adjust as needed
+        marks: student.midMarks,
+        totalMarks: 25 // Assuming total marks for midterm is 25, adjust as needed
+      };
+      dispatch(addMarks(marksData));
+    });
     alert('Marks saved successfully');
+  };
+
+  const toggleAddSection = (course) => {
+    // Define logic for handling the "+" button
+  };
+
+  const toggleDeleteSection = (course) => {
+    // Define logic for handling the "-" button
   };
 
   return (
     <div className={styles.marksPage}>
       <h2>Marks Entry</h2>
-      <div className={styles.subjectsList}>
-        {subjects.map(subject => (
-          <div key={subject.id} className={styles.subjectCard} onClick={() => handleSubjectClick(subject)}>
-            <span>{subject.code}</span>
-            <span>{subject.name}</span>
-            <span className={styles.subjectStudents}>{students.length} students</span>
-          </div>
-        ))}
+      <div className={styless.classesList}>
+        {isLoading ? (
+          <p>Loading courses...</p>
+        ) : error ? (
+          <p>Error: {error}</p>
+        ) : (
+          courses.map(course => (
+            <div key={course._id} className={styless.classCard}>
+              <div className={styless.classHeader}>
+                <span className={styless.classCode}>{course.courseCode}</span>
+                <span className={styless.className}>{course.courseName}</span>
+                <span className={styless.classStudents}>{course.students.length} students</span>
+              </div>
+              <button className={styless.actionButton} onClick={() => handleSubjectClick(course)}>View Marks</button>
+            </div>
+          ))
+        )}
       </div>
       {selectedSubject && (
-        <div className={styles.marksTableContainer}>
-          <h3>Marks for {selectedSubject.name}</h3>
-          <table className={styles.marksTable}>
-            <thead>
-              <tr>
-                <th>Roll No</th>
-                <th>Student Name</th>
-                <th>Mid Marks</th>
-                <th>Sessional Marks</th>
-                <th>Final Marks</th>
-                <th>Total Marks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map(student => (
-                <tr key={student.id}>
-                  <td>{student.rollNo}</td>
-                  <td>{student.name}</td>
-                  <td><input type="number" value={student.midMarks} onChange={(e) => handleMarksChange(student.id, 'midMarks', parseInt(e.target.value) || 0)} /></td>
-                  <td><input type="number" value={student.sessionalMarks} onChange={(e) => handleMarksChange(student.id, 'sessionalMarks', parseInt(e.target.value) || 0)} /></td>
-                  <td><input type="number" value={student.finalMarks} onChange={(e) => handleMarksChange(student.id, 'finalMarks', parseInt(e.target.value) || 0)} /></td>
-                  <td>{calculateTotal(student)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button onClick={handleSaveMarks}>Add</button>
-        </div>
+        <CustomTable
+          headers={["Roll No", "Student Name", "Mid Marks", "Sessional Marks", "Final Marks", "Total Marks"]}
+          data={marks.map(mark => ({
+            "Roll No": mark.student.rollNo,
+            "Student Name": mark.student.name,
+            "Mid Marks": mark.type === 'midterm' ? mark.marks : 0,
+            "Sessional Marks": mark.type === 'sessional' ? mark.marks : 0,
+            "Final Marks": mark.type === 'final' ? mark.marks : 0,
+            "Total Marks": mark.totalMarks
+          }))}
+          onView={handleSaveMarks}
+        />
       )}
     </div>
   );
