@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import styles from '../styles/pages/teacherMarks.module.scss';
 import styless from '../styles/pages/teacherAttendance.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTeacherCourses, fetchStudents } from '../features/teacherDashboard/teacherDashboardSlice';
+import { fetchTeacherCourses, fetchStudents, getMarks } from '../features/teacherDashboard/teacherDashboardSlice';
 import CustomTable from '../components/common/CustomTable';
 import { addMarks } from '../features/teacherDashboard/addMarksSlice';
 
 const TeacherMarks = () => {
   const dispatch = useDispatch();
-  const { courses, students, isLoading, error } = useSelector(state => state.teacherDashboard);
+  const { courses, students, marks, isLoading, error } = useSelector(state => state.teacherDashboard);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [studentsMarks, setStudentsMarks] = useState([]);
@@ -17,26 +17,54 @@ const TeacherMarks = () => {
     dispatch(fetchTeacherCourses());
   }, [dispatch]);
 
+  // Update marks when students, marks, or selectedType changes
   useEffect(() => {
-    if (students?.students) {
+    if (students?.students && selectedType) {
+      const existingMarks = marks.filter(mark => mark.type === selectedType);
+      
       setStudentsMarks(
-        students.students.map(student => ({
-          studentId: student._id,
-          rollNo: student.rollNo,
-          name: student.name,
-          marks: 0
-        }))
+        students.students.map(student => {
+          const studentMark = existingMarks.find(mark => 
+            mark.student && mark.student._id === student._id
+          );
+          
+          return {
+            studentId: student._id,
+            rollNo: student.rollNo,
+            name: student.name,
+            marks: studentMark ? studentMark.marks : 0
+          };
+        })
       );
     }
-  }, [students]);
+  }, [students, marks, selectedType]);
 
   const handleSubjectClick = (course) => {
     setSelectedSubject(course);
     dispatch(fetchStudents(course._id));
+    dispatch(getMarks(course._id));
   };
 
   const handleTypeSelect = (type) => {
     setSelectedType(type);
+    if (students?.students) {
+      const existingMarks = marks.filter(mark => mark.type === type);
+      
+      setStudentsMarks(
+        students.students.map(student => {
+          const studentMark = existingMarks.find(mark => 
+            mark.student && mark.student._id === student._id
+          );
+          
+          return {
+            studentId: student._id,
+            rollNo: student.rollNo,
+            name: student.name,
+            marks: studentMark ? studentMark.marks : 0
+          };
+        })
+      );
+    }
   };
 
   const handleMarksChange = (studentId, newMarks) => {

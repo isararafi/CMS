@@ -6,51 +6,274 @@
   box-shadow: $card-shadow;
   border: 1px solid $border-color;
   padding: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  h2 {
+    color: $text-primary;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid $border-color;
+  }
+}
+
+.error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #fecaca;
+  font-size: 14px;
+}
+
+.success {
+  background-color: #dcfce7;
+  color: #16a34a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #bbf7d0;
+  font-size: 14px;
 }
 
 .profileSection {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 400px;
+  background: $white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid $border-color;
 }
 
 .profileField {
+  margin-bottom: 20px;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  label {
-    font-size: 14px;
-    color: $text-secondary;
-    font-weight: 500;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid $border-color;
+
+  &:last-of-type {
+    border-bottom: none;
   }
-  input {
+
+  label {
+    min-width: 120px;
+    font-weight: 600;
+    color: $text-secondary;
+    font-size: 14px;
+  }
+
+  span {
+    color: $text-primary;
+    font-size: 15px;
+  }
+
+  .input {
+    flex: 1;
     padding: 8px 12px;
     border: 1px solid $border-color;
     border-radius: 6px;
-    font-size: 14px;
-    color: $text-primary;
-    margin-top: 2px;
-  }
-  span {
     font-size: 15px;
-    color: $text-primary;
-    font-weight: 500;
+    transition: all 0.3s ease;
+    background: $light-bg;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
   }
 }
 
 .editButton {
-  margin-top: 16px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  background: $primary-color;
+  background: linear-gradient(135deg, $primary-color, darken($primary-color, 15%));
   color: $white;
   border: none;
-  font-size: 15px;
+  padding: 12px 24px;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 100%;
+  max-width: 200px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    transition: transform 0.3s ease;
+    transform: translateY(-100%);
+  }
+
   &:hover {
-    background: darken($primary-color, 5%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+
+    &::before {
+      transform: translateY(0);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: linear-gradient(135deg, lighten($primary-color, 20%), lighten($primary-color, 10%));
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+  }
+
+  &.loading {
+    position: relative;
+    padding-left: 48px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 16px;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: $white;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .settingsPage {
+    padding: 20px;
+  }
+
+  .profileField {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    label {
+      min-width: auto;
+    }
+
+    .input {
+      width: 100%;
+    }
+  }
+
+  .editButton {
+    max-width: 100%;
+  }
+}
+
+.requestsSection {
+  margin-top: 32px;
+
+  h3 {
+    color: $text-primary;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border-color;
+  }
+}
+
+.updateRequest {
+  background: $light-bg;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid $border-color;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.requestDetails {
+  display: grid;
+  gap: 8px;
+}
+
+.fieldUpdate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.fieldName {
+  font-weight: 600;
+  color: $text-secondary;
+  font-size: 14px;
+  min-width: 100px;
+  text-transform: capitalize;
+}
+
+.fieldValue {
+  color: $text-primary;
+  font-size: 14px;
+}
+
+.requestStatus {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $border-color;
+  font-size: 14px;
+  color: $text-secondary;
+
+  span {
+    color: $primary-color;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+
+  button {
+    flex: 1;
+  }
+}
+
+.logoutButton {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+  }
+
+  &::before {
+    background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)) !important;
   }
 } 

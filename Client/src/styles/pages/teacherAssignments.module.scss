@@ -6,93 +6,262 @@
   box-shadow: $card-shadow;
   border: 1px solid $border-color;
   padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h2 {
+    color: $text-primary;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid $border-color;
+  }
 }
 
-.assignmentsTable {
-  width: 100%;
-  border-collapse: collapse;
-  th, td {
-    padding: 12px 16px;
-    border-bottom: 1px solid $border-color;
-    text-align: left;
-    font-size: 14px;
-  }
-  th {
-    color: $text-secondary;
-    font-weight: 600;
-    background: $light-bg;
-  }
+.error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #fecaca;
+  font-size: 14px;
+}
+
+.success {
+  background-color: #dcfce7;
+  color: #16a34a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #bbf7d0;
+  font-size: 14px;
 }
 
 .classesList {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
   margin-bottom: 32px;
 }
 
 .classCard {
-  background: $light-bg;
-  border-radius: 8px;
-  padding: 16px 24px;
-  box-shadow: $card-shadow;
+  background: $white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid $border-color;
-  min-width: 220px;
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: background 0.3s ease;
-}
+  position: relative;
+  overflow: hidden;
 
-.classCard:hover {
-  background: lighten($light-bg, 10%);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  &.selected {
+    border: 2px solid $primary-color;
+    background: rgba($primary-color, 0.05);
+  }
 }
 
 .classHeader {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .classCode {
   font-size: 14px;
   color: $primary-color;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .className {
-  font-size: 16px;
+  font-size: 18px;
   color: $text-primary;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .classStudents {
-  font-size: 13px;
+  font-size: 14px;
   color: $text-secondary;
+  // background: rgba($primary-color, 0.1);
+  padding: 4px 12px;
+  // border-radius: 20px;/
+  display: inline-block;
+  margin-top: 8px;
 }
 
 .uploadSection {
-  background: $light-bg;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-  box-shadow: $card-shadow;
+  background: $white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid $border-color;
+
+  h4 {
+    color: $text-primary;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border-color;
+  }
+
+  form {
+    display: grid;
+    gap: 20px;
+    max-width: 600px;
+  }
 }
 
-.uploadSection h4 {
-  color: $text-primary;
-  font-weight: 600;
-  margin-bottom: 12px;
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-secondary;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  textarea {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid $border-color;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: $light-bg;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  input[type="file"] {
+    padding: 12px;
+    border: 2px dashed $border-color;
+    border-radius: 8px;
+    background: $light-bg;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: $primary-color;
+      background: rgba($primary-color, 0.05);
+    }
+  }
 }
 
-button {
-  background: $primary-color;
+.customButton {
+  background: linear-gradient(135deg, $primary-color, darken($primary-color, 15%));
   color: $white;
   border: none;
-  padding: 8px 16px;
+  padding: 12px 24px;
   border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
-  transition: background 0.3s ease;
-  margin-top: 12px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    transition: transform 0.3s ease;
+    transform: translateY(-100%);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+    
+    &::before {
+      transform: translateY(0);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: linear-gradient(135deg, lighten($primary-color, 20%), lighten($primary-color, 10%));
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+  }
+
+  &.loading {
+    position: relative;
+    padding-left: 48px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 16px;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: $white;
+      animation: spin 1s linear infinite;
+    }
+  }
 }
 
-button:hover {
-  background: darken($primary-color, 10%);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .assignmentsPage {
+    padding: 20px;
+  }
+
+  .classesList {
+    grid-template-columns: 1fr;
+  }
+
+  .uploadSection {
+    padding: 20px;
+    
+    form {
+      max-width: 100%;
+    }
+  }
 } 
