@@ -665,6 +665,7 @@ const StudentCoursesMids = () => {
   };
 
   return (
+    
     <div className={styles.dashboardLayout}>
       {/* Decorative elements */}
       <div className={styles.decorativeWave}></div>
