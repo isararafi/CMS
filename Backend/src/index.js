@@ -35,7 +35,7 @@ app.use('/api/teacher', teacherRoutes);
 // Student routes
 app.use('/api/student', studentRoutes);
 
-// app.listen(port, () => {
-//   console.log("server started...");
-// });
-module.exports = app;
+app.listen(port, () => {
+  console.log("server started...");
+});
+// module.exports = app;
