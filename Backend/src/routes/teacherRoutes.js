@@ -37,6 +37,6 @@ router.get('/courses/:courseId/assignments', teacherController.getAssignments);
 router.get('/assignments/download/:filename', teacherController.downloadAssignment);
 
 // Student Management
-router.get('/students', teacherController.getStudentsForTeacherCourses);
+router.get('/students/:courseId', teacherController.getStudentsForCourse);
 
 module.exports = router; 

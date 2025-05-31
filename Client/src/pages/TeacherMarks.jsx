@@ -2,41 +2,66 @@ import React, { useState, useEffect } from 'react';
 import styles from '../styles/pages/teacherMarks.module.scss';
 import styless from '../styles/pages/teacherAttendance.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
+import { fetchTeacherCourses, fetchStudents } from '../features/teacherDashboard/teacherDashboardSlice';
 import CustomTable from '../components/common/CustomTable';
 import { addMarks } from '../features/teacherDashboard/addMarksSlice';
-import { getMarks } from '../features/teacherDashboard/getMarksSlice';
 
 const TeacherMarks = () => {
   const dispatch = useDispatch();
-  const { courses, isLoading, error } = useSelector(state => state.teacherDashboard);
+  const { courses, students, isLoading, error } = useSelector(state => state.teacherDashboard);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-  const { marks } = useSelector(state => state.getMarks|| []);
+  const [studentsMarks, setStudentsMarks] = useState([]);
 
   useEffect(() => {
     dispatch(fetchTeacherCourses());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (students?.students) {
+      setStudentsMarks(
+        students.students.map(student => ({
+          studentId: student._id,
+          rollNo: student.rollNo,
+          name: student.name,
+          marks: 0
+        }))
+      );
+    }
+  }, [students]);
+
   const handleSubjectClick = (course) => {
     setSelectedSubject(course);
-    if (selectedType) {
-      dispatch(getMarks({ courseId: course._id, type: selectedType }));
-    }
+    dispatch(fetchStudents(course._id));
   };
 
   const handleTypeSelect = (type) => {
     setSelectedType(type);
-    if (selectedSubject) {
-      dispatch(getMarks({ courseId: selectedSubject._id, type }));
-    }
   };
 
-  const handleSaveMarks = (updatedMarks) => {
+  const handleMarksChange = (studentId, newMarks) => {
+    const maxMarks = getMaxMarks(selectedType);
+    // Ensure marks don't exceed maximum and are not negative
+    const validMarks = Math.min(Math.max(0, Number(newMarks || 0)), maxMarks);
+    
+    setStudentsMarks(prevMarks =>
+      prevMarks.map(student =>
+        student.studentId === studentId
+          ? { ...student, marks: validMarks }
+          : student
+      )
+    );
+  };
+
+  const handleSaveAllMarks = () => {
     const marksData = {
       courseId: selectedSubject._id,
       type: selectedType,
-      marks: updatedMarks
+      marks: studentsMarks.map(student => ({
+        studentId: student.studentId,
+        marks: student.marks,
+        totalMarks: getMaxMarks(selectedType)
+      }))
     };
     dispatch(addMarks(marksData));
   };
@@ -102,20 +127,35 @@ const TeacherMarks = () => {
         )}
       </div>
 
-      {selectedSubject && selectedType && (
+      {selectedSubject && selectedType && students && (
         <div className={styles.marksTable}>
           <h3>{`${selectedSubject.courseName} - ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Marks`}</h3>
           <CustomTable
-            headers={["Roll No", "Student Name", "Marks", "Total Marks", "Actions"]}
-            data={marks.map(mark => ({
-              "Roll No": mark.student.rollNo,
-              "Student Name": mark.student.name,
-              "Marks": mark.marks,
-              "Total Marks": getMaxMarks(selectedType),
-              "Actions": "Edit"
+            headers={["Roll No", "Student Name", "Marks", "Total Marks"]}
+            data={studentsMarks.map(student => ({
+              "Roll No": student.rollNo,
+              "Student Name": student.name,
+              "Marks": (
+                <input
+                  type="number"
+                  min="0"
+                  max={getMaxMarks(selectedType)}
+                  value={student.marks}
+                  onChange={(e) => handleMarksChange(student.studentId, e.target.value)}
+                  className={styles.marksInput}
+                  placeholder="Enter marks"
+                />
+              ),
+              "Total Marks": getMaxMarks(selectedType)
             }))}
-            onSave={handleSaveMarks}
           />
+          <button 
+            className={styles.saveAllButton}
+            onClick={handleSaveAllMarks}
+            disabled={!studentsMarks.length}
+          >
+            Add Marks
+          </button>
         </div>
       )}
     </div>

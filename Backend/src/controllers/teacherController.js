@@ -165,11 +165,11 @@ exports.getAttendance = async (req, res) => {
 // Add Marks
 exports.addMarks = async (req, res) => {
     try {
-        const { studentId, courseId, type, marks, totalMarks } = req.body;
+        const { courseId, type, marks } = req.body;
 
         // Validate required fields
-        if (!studentId || !courseId || !type || marks === undefined || !totalMarks ) {
-            return res.status(400).json({ error: 'All fields are required' });
+        if (!courseId || !type || !Array.isArray(marks)) {
+            return res.status(400).json({ error: 'Invalid request format. Required: courseId, type, and marks array' });
         }
 
         // Verify the course belongs to the teacher
@@ -178,38 +178,54 @@ exports.addMarks = async (req, res) => {
             return res.status(404).json({ error: 'Course not found or unauthorized' });
         }
 
-        // Check if marks already exist
-        const existingMarks = await Marks.findOne({ 
-            student: studentId, 
-            course: courseId, 
-            type 
-        });
+        // Process marks for all students
+        const marksPromises = marks.map(async (markData) => {
+            const { studentId, marks: studentMarks, totalMarks } = markData;
 
-        if (existingMarks) {
-            return res.status(400).json({ 
-                error: 'Marks already exist for this student in this course and exam type. Use update marks API instead.' 
+            // Validate individual mark entry
+            if (!studentId || studentMarks === undefined || !totalMarks) {
+                throw new Error(`Invalid marks data for student: ${studentId}`);
+            }
+
+            // Check if marks already exist for this student
+            const existingMarks = await Marks.findOne({ 
+                student: studentId, 
+                course: courseId, 
+                type 
             });
-        }
 
-        // Create new marks record
-        const markRecord = new Marks({
-            student: studentId,
-            course: courseId,
-            teacher: req.teacher._id,
-            type,
-            marks,
-            totalMarks
+            if (existingMarks) {
+                // Update existing marks
+                existingMarks.marks = studentMarks;
+                existingMarks.totalMarks = totalMarks;
+                return await existingMarks.save();
+            } else {
+                // Create new marks record
+                const markRecord = new Marks({
+                    student: studentId,
+                    course: courseId,
+                    teacher: req.teacher._id,
+                    type,
+                    marks: studentMarks,
+                    totalMarks
+                });
+                return await markRecord.save();
+            }
         });
 
-        await markRecord.save();
+        // Wait for all marks to be processed
+        const savedMarks = await Promise.all(marksPromises);
 
-        const populatedRecord = await Marks.findById(markRecord._id)
-            .populate('student', 'name rollNo')
-            .populate('course', 'courseName courseCode');
+        // Populate the saved marks with student and course details
+        const populatedMarks = await Marks.find({
+            _id: { $in: savedMarks.map(mark => mark._id) }
+        })
+        .populate('student', 'name rollNo')
+        .populate('course', 'courseName courseCode');
 
-        res.status(201).json({
-            message: 'Marks added successfully',
-            markRecord: populatedRecord
+        res.status(200).json({
+            message: 'Marks added/updated successfully',
+            markRecords: populatedMarks
         });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -438,25 +454,28 @@ exports.getProfile = async (req, res) => {
 };
 
 // Get All Students for Teacher's Courses
-exports.getStudentsForTeacherCourses = async (req, res) => {
+exports.getStudentsForCourse = async (req, res) => {
     try {
-        // Find all courses taught by the teacher
-        const courses = await Course.find({ teacher: req.teacher._id });
+        const { courseId } = req.params;
 
-        // Extract student IDs from these courses
-        const studentIds = courses.reduce((acc, course) => {
-            return acc.concat(course.students);
-        }, []);
+        // Find the course and make sure the requesting teacher is the one who teaches it
+        const course = await Course.findOne({ _id: courseId, teacher: req.teacher._id });
 
-        // Remove duplicate student IDs
-        const uniqueStudentIds = [...new Set(studentIds.map(id => id.toString()))];
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found or not authorized' });
+        }
 
-        // Fetch student details
-        const students = await Student.find({ _id: { $in: uniqueStudentIds } })
+        // Fetch students enrolled in this course
+        const students = await Student.find({ _id: { $in: course.students } })
             .select('name rollNo email department');
 
-        res.json(students);
+        res.json({
+            courseId: course._id,
+            courseName: course.name, // Adjust if course schema differs
+            students,
+        });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Server error' });
     }
-}; 
+};

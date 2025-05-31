@@ -6,7 +6,7 @@ import { fetchTeacherCourses, addLecture, fetchStudents, markAttendance, fetchLe
 
 const TeacherAttendance = () => {
   const dispatch = useDispatch();
-  const { courses, isLoading, error, students = [], lectures = [] } = useSelector(state => state.teacherDashboard);
+  const { courses, isLoading, error, students, lectures = [] } = useSelector(state => state.teacherDashboard);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showAddSection, setShowAddSection] = useState(false);
   const [showDeleteSection, setShowDeleteSection] = useState(false);
@@ -23,7 +23,7 @@ const TeacherAttendance = () => {
     setShowAddSection(!showAddSection);
     setShowDeleteSection(false);
     if (!showAddSection) {
-      dispatch(fetchStudents());
+      dispatch(fetchStudents(course._id));
     }
   };
 
@@ -51,12 +51,14 @@ const TeacherAttendance = () => {
     dispatch(addLecture(newLectureData)).then((action) => {
       if (action.type === 'teacherDashboard/addLecture/fulfilled') {
         const lectureId = action.payload._id;
-        const attendanceData = students.map(student => ({
+        const attendanceData = students?.students?.map(student => ({
           studentId: student._id,
           status: attendance[student._id] ? 'present' : 'absent'
         }));
-        dispatch(markAttendance({ lectureId, attendanceData }));
-        alert('Lecture and attendance saved successfully');
+        if (attendanceData) {
+          dispatch(markAttendance({ lectureId, attendanceData }));
+          alert('Lecture and attendance saved successfully');
+        }
       }
     });
   };
@@ -79,12 +81,12 @@ const TeacherAttendance = () => {
         ) : error ? (
           <p>Error: {error}</p>
         ) : (
-          courses.map(course => (
+          courses && courses.map(course => (
             <div key={course._id} className={styles.classCard}>
               <div className={styles.classHeader}>
                 <span className={styles.classCode}>{course.courseCode}</span>
                 <span className={styles.className}>{course.courseName}</span>
-                <span className={styles.classStudents}>{course.students.length} students</span>
+                <span className={styles.classStudents}>{course.students?.length || 0} students</span>
               </div>
               <button className={styles.actionButton} onClick={() => toggleAddSection(course)}>+</button>
               <button className={styles.actionButton} onClick={() => toggleDeleteSection(course)}>-</button>
@@ -99,7 +101,7 @@ const TeacherAttendance = () => {
           <input type="date" value={newLecture.date} onChange={(e) => setNewLecture({ ...newLecture, date: e.target.value })} />
           <div className={styles.customTable}>
             <h5>Mark Attendance</h5>
-            {students.map(student => (
+            {students?.students && students.students.map(student => (
               <div key={student._id} className={styles.tableRow}>
                 <span>{student.rollNo}</span>
                 <span>{student.name}</span>

@@ -49,9 +49,9 @@ export const addLecture = createAsyncThunk(
 // Async thunk to fetch students
 export const fetchStudents = createAsyncThunk(
   'teacherDashboard/fetchStudents',
-  async (_, { rejectWithValue }) => {
+  async (courseId, { rejectWithValue }) => {
     try {
-      const response = await ApiHandler.request('/teacher/students', 'GET');
+      const response = await ApiHandler.request(`/teacher/students/${courseId}`, 'GET');
       console.log('fetchStudents - API response:', response);
       return response;
     } catch (error) {
@@ -91,19 +91,18 @@ export const fetchLectures = createAsyncThunk(
   }
 );
 
-const initialState = {
-  profile: {
-    name: '',
-    email: '',
-  },
-  courses: [],
-  isLoading: false,
-  error: null,
-};
-
 const teacherDashboardSlice = createSlice({
   name: 'teacherDashboard',
-  initialState,
+  initialState: {
+    profile: {
+      name: '',
+      email: '',
+    },
+    courses: [],
+    students: null,
+    isLoading: false,
+    error: null,
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
