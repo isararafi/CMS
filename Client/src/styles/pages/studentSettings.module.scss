@@ -4,7 +4,7 @@
   flex: 1;
   margin-left: 280px;
   transition: margin-left 0.3s ease;
-  
+  background-color: #e8f5e9;
   &.expanded {
     margin-left: 80px;
   }
@@ -14,6 +14,7 @@
   padding: 24px;
   max-width: 1600px;
   margin: 0 auto;
+  // background-color: #e8f5e9;
 }
 
 .pageContent {
@@ -136,6 +137,7 @@
     border-radius: 8px;
     font-size: 14px;
     color: $text-primary;
+    
     transition: border-color 0.2s;
     
     &:focus {
@@ -174,6 +176,7 @@
     color: $text-primary;
     resize: vertical;
     min-height: 100px;
+
     
     &:focus {
       outline: none;
@@ -341,6 +344,7 @@
   padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
+  background-color: #e8f5e9;
 
   h2 {
     font-size: 1.8rem;

@@ -13,7 +13,7 @@ $shadow-color: rgba(0, 0, 0, 0.1);
 
 .marksPage {
   padding: 2rem;
-  background: white;
+  background: #e8f5e9;
   border-radius: 12px;
   box-shadow: 0 2px 12px $shadow-color;
   min-height: calc(100vh - 4rem);
@@ -120,7 +120,7 @@ $shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 .saveAllButton:active {
-
+  background-color: darken($primary-color, 15%);
   transform: translateY(0);
 }
 

@@ -307,4 +307,13 @@
       }
     }
   }
+}
+
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #e8f5e9; // Light green background
+  color: $text-primary;
+  position: relative;
+  overflow: hidden;
 } 

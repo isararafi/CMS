@@ -17,9 +17,10 @@ $background-light: #f8f9fa;
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-family: 'Poppins', sans-serif;
+  align-items: center;
+  background-color: #e8f5e9; // Light green background
+  padding: 20px;
   overflow: hidden;
 }
 
