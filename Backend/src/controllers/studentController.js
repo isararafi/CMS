@@ -126,38 +126,55 @@ exports.getGpaProgress = async (req, res) => {
 };
 
 // Get Course Marks
-exports.getCourseMarks = async (req, res) => {
+exports.getAllCourseMarks = async (req, res) => {
   try {
-    const { courseId } = req.params;
+    const studentId = req.student._id;
 
-    // Verify student is enrolled in the course
-    const student = await Student.findById(req.student._id);
-    const isEnrolled = student.enrolledCourses.some(
-      (enrollment) => enrollment.course.toString() === courseId
-    );
+    // Fetch student with enrolled courses
+    const student = await Student.findById(studentId).populate({
+      path: "enrolledCourses.course",
+      select: "courseName courseCode"
+    });
 
-    if (!isEnrolled) {
-      return res.status(403).json({ error: "Not enrolled in this course" });
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
     }
 
+    const allCourseIds = student.enrolledCourses.map((enrollment) => enrollment.course._id);
+
+    // Fetch all marks of the student in those courses
     const marks = await Marks.find({
-      student: req.student._id,
-      course: courseId,
+      student: studentId,
+      course: { $in: allCourseIds }
     }).populate("course", "courseName courseCode");
 
-    const formattedMarks = marks.map((mark) => ({
-      type: mark.type,
-      marks: mark.marks,
-      totalMarks: mark.totalMarks,
-      courseCode: mark.course.courseCode,
-      courseName: mark.course.courseName,
-    }));
+    // Group marks by course
+    const marksByCourse = {};
 
-    res.json(formattedMarks);
+    marks.forEach((mark) => {
+      const courseId = mark.course._id.toString();
+      if (!marksByCourse[courseId]) {
+        marksByCourse[courseId] = {
+          courseCode: mark.course.courseCode,
+          courseName: mark.course.courseName,
+          marks: []
+        };
+      }
+
+      marksByCourse[courseId].marks.push({
+        type: mark.type,
+        marks: mark.marks,
+        totalMarks: mark.totalMarks
+      });
+    });
+
+    res.json(Object.values(marksByCourse));
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 // Get Course Attendance Summary
 exports.getCourseAttendanceSummary = async (req, res) => {
@@ -243,12 +260,8 @@ exports.getDetailedCourseAttendance = async (req, res) => {
 exports.getAvailableCourses = async (req, res) => {
   try {
     const student = await Student.findById(req.student._id);
-    const enrolledCourseIds = student.enrolledCourses.map((enrollment) =>
-      enrollment.course.toString()
-    );
 
     const availableCourses = await Course.find({
-      _id: { $nin: enrolledCourseIds },
       department: student.department,
     });
 
@@ -257,6 +270,7 @@ exports.getAvailableCourses = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 // Register for Courses
 exports.registerCourses = async (req, res) => {

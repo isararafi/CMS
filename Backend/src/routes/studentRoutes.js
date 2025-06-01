@@ -18,7 +18,7 @@ router.get('/courses/available', studentController.getAvailableCourses);
 router.post('/courses/register', studentController.registerCourses);
 
 // Marks
-router.get('/courses/:courseId/marks', studentController.getCourseMarks);
+router.get('/courses/marks', studentController.getAllCourseMarks);
 
 // Attendance
 router.get('/courses/:courseId/attendance/summary', studentController.getCourseAttendanceSummary);

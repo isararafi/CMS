@@ -64,6 +64,11 @@ const TeacherSettings = () => {
 
   const handleLogout = () => {
     // Clear all storage
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('user');
+    // localStorage.removeItem('userType');
+    // localStorage.removeItem('userRole');
+    localStorage.removeItem('loglevel');
     localStorage.clear();
     sessionStorage.clear();
     
