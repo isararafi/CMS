@@ -33,7 +33,16 @@ import styles from '../styles/pages/studentDashboard.module.scss';
 const StudentDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dispatch = useDispatch();
-  const { dashboardInfo, gpaProgress, isLoading, error } = useSelector((state) => state.studentDashboard);
+  const dummyGpaProgress = [
+    { name: 'Sem 1', gpa: 3.2 },
+    { name: 'Sem 2', gpa: 3.4 },
+    { name: 'Sem 3', gpa: 2.8 },
+    { name: 'Sem 4', gpa: 3.0 },
+    { name: 'Sem 5', gpa: 3.3 },
+    { name: 'Sem 6', gpa: 3.75 }
+  ];
+  const { dashboardInfo, isLoading, error } = useSelector((state) => state.studentDashboard);
+  const gpaProgress = dummyGpaProgress;
 
   useEffect(() => {
     dispatch(fetchDashboardInfo());
@@ -63,7 +72,7 @@ const StudentDashboard = () => {
       
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="student" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Navbar toggleSidebar={toggleSidebar} />
+        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
         
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
@@ -88,7 +97,7 @@ const StudentDashboard = () => {
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><Award size={24} /></div>
                 <div className={styles.statContent}>
-                  <h3 className={styles.statValue}>{dashboardInfo.cgpa}</h3>
+                  <h3 className={styles.statValue}>3.5</h3>
                   <p className={styles.statLabel}>Current GPA</p>
                 </div>
               </div>

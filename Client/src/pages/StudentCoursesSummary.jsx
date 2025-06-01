@@ -124,7 +124,7 @@ const StudentCoursesSummary = () => {
       
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Navbar toggleSidebar={toggleSidebar} />
+        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
         
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
@@ -149,11 +149,10 @@ const StudentCoursesSummary = () => {
             <div className={styles.tableSection}>
               <h2>Courses Overview</h2>
               <CustomTable 
-                headers={['Code', 'Course Name', 'Instructor', 'Attendance', 'Total Lectures', 'Present', 'Absent', 'Actions']}
+                headers={['Code', 'Course Name',  'Attendance', 'Total Lectures', 'Present', 'Absent', 'Actions']}
                 data={coursesData.map(course => ({
                   code: course.code,
                   'Course Name': course.name,
-                  instructor: course.instructor,
                   attendance: `${Math.round(course.attendance)}%`,
                   'Total Lectures': course.totalLectures,
                   Present: course.presentLectures,

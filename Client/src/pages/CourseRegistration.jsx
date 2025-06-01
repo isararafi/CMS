@@ -48,7 +48,8 @@ const CourseRegistration = () => {
   const coursesData = availableCourses.map(course => ({
     id: course._id,
     code: course.courseCode,
-    name: course.courseName,
+    courseName: course.courseName,
+    // name: course.courseName,
     creditHours: course.creditHours,
     department: course.department,
     instructor: course.instructor?.name || 'TBA',
@@ -85,7 +86,7 @@ const CourseRegistration = () => {
       
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Navbar toggleSidebar={toggleSidebar} />
+        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
         
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
@@ -122,7 +123,7 @@ const CourseRegistration = () => {
               )}
 
               <CustomTable 
-                headers={['Code', 'Course Name', 'Credit Hours', 'Department', 'Instructor', 'Availability', 'Action']}
+                headers={['Code', 'Course Name', 'Credit Hours', 'Department' , 'Action']}
                 data={coursesData}
                 onView={handleCourseSelect}
               />

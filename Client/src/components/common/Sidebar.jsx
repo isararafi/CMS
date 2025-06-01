@@ -149,18 +149,18 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
                   {!collapsed && <span className={styles.menuText}>Registration</span>}
                 </Link>
               </li>
-              <li className={isActive('/result') ? styles.active : ''}>
+              {/* <li className={isActive('/result') ? styles.active : ''}>
                 <Link to="/student/result">
                   <span className={styles.icon}><GraduationCap size={20} strokeWidth={1.5} /></span>
                   {!collapsed && <span className={styles.menuText}>Result</span>}
                 </Link>
-              </li>
-              <li className={isActive('/fees') ? styles.active : ''}>
+              </li> */}
+              {/* <li className={isActive('/fees') ? styles.active : ''}>
                 <Link to="/student/fees">
                   <span className={styles.icon}><CreditCard size={20} strokeWidth={1.5} /></span>
                   {!collapsed && <span className={styles.menuText}>Fees</span>}
                 </Link>
-              </li>
+              </li> */}
               <li className={isActive('/assignments') ? styles.active : ''}>
                 <Link to="/student/assignments">
                   <span className={styles.icon}><ClipboardList size={20} strokeWidth={1.5} /></span>

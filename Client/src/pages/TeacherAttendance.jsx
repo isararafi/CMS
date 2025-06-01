@@ -88,8 +88,8 @@ const TeacherAttendance = () => {
                 <span className={styles.className}>{course.courseName}</span>
                 <span className={styles.classStudents}>{course.students?.length || 0} students</span>
               </div>
-              <button className={styles.actionButton} onClick={() => toggleAddSection(course)}>+</button>
-              <button className={styles.actionButton} onClick={() => toggleDeleteSection(course)}>-</button>
+              <button className={styles.actionButton} onClick={() => toggleAddSection(course)}>Add</button>
+              <button className={styles.actionButton} onClick={() => toggleDeleteSection(course)}>View</button>
             </div>
           ))
         )}
@@ -109,7 +109,7 @@ const TeacherAttendance = () => {
               </div>
             ))}
           </div>
-          <button onClick={handleSave}>Add</button>
+          <button className={styles.addButton} onClick={handleSave}>Add</button>
         </div>
       )}
       {showDeleteSection && selectedCourse && (

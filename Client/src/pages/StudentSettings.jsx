@@ -131,7 +131,7 @@ const StudentSettings = () => {
       
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Navbar toggleSidebar={toggleSidebar} />
+        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
         
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
@@ -159,37 +159,37 @@ const StudentSettings = () => {
                   className={`${settingStyles.tab} ${activeTab === 'profile' ? settingStyles.active : ''}`}
                   onClick={() => handleTabChange('profile')}
                 >
-                  <User size={18} />
+                  <User size={18} />  
                   <span>Profile Information</span>
                 </div>
-                <div 
+                {/* <div 
                   className={`${settingStyles.tab} ${activeTab === 'notifications' ? settingStyles.active : ''}`}
                   onClick={() => handleTabChange('notifications')}
                 >
                   <Mail size={18} />
                   <span>Notification Settings</span>
-                </div>
-                <div 
+                </div> */}
+                {/* <div 
                   className={`${settingStyles.tab} ${activeTab === 'privacy' ? settingStyles.active : ''}`}
                   onClick={() => handleTabChange('privacy')}
                 >
                   <Key size={18} />
                   <span>Privacy & Security</span>
-                </div>
-                <div 
+                </div> */}
+                {/* <div 
                   className={`${settingStyles.tab} ${activeTab === 'password' ? settingStyles.active : ''}`}
                   onClick={() => handleTabChange('password')}
                 >
                   <Key size={18} />
                   <span>Change Password</span>
-                </div>
-                <div 
+                </div> */}
+                {/* <div 
                   className={`${settingStyles.tab} ${activeTab === 'activity' ? settingStyles.active : ''}`}
                   onClick={() => handleTabChange('activity')}
                 >
                   <Calendar size={18} />
                   <span>Login Activity</span>
-                </div>
+                </div> */}
               </div>
               
               <div className={settingStyles.settingsContent}>
@@ -216,7 +216,7 @@ const StudentSettings = () => {
                     </div>
                     
                     <div className={settingStyles.profileContent}>
-                      <div className={settingStyles.profilePicture}>
+                      {/* <div className={settingStyles.profilePicture}>
                         <img 
                           src={profile?.profilePicture || "https://randomuser.me/api/portraits/men/75.jpg"} 
                           alt={profile?.name || "John Smith"} 
@@ -226,7 +226,7 @@ const StudentSettings = () => {
                             <Camera size={20} />
                           </div>
                         )}
-                      </div>
+                      </div> */}
                       
                       <div className={settingStyles.profileDetails}>
                         <div className={settingStyles.formGroup}>
@@ -608,7 +608,7 @@ const StudentSettings = () => {
                   </div>
                 )}
                 
-                {activeTab === 'password' && (
+                {/* {activeTab === 'password' && (
                   <div className={settingStyles.passwordSection}>
                     <div className={settingStyles.sectionHeader}>
                       <h2>Change Password</h2>
@@ -678,7 +678,7 @@ const StudentSettings = () => {
                       </div>
                     </form>
                   </div>
-                )}
+                )} */}
                 
                 {activeTab === 'activity' && (
                   <div className={settingStyles.activitySection}>

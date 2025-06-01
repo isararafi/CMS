@@ -100,31 +100,28 @@ $shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 .saveAllButton {
-  background: $success-color;
-  color: white;
-  padding: 0.8rem 2rem;
+  background-color: green;
+  color: $white;
   border: none;
+  padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
   display: block;
-  margin: 2rem auto 0;
-  min-width: 200px;
-  font-size: 1rem;
+  margin-top: 21px;
+}
 
-  &:hover {
-    background: darken($success-color, 5%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba($success-color, 0.2);
-  }
+.saveAllButton:hover {
+  
+  transform: translateY(-2px);
+}
 
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
+.saveAllButton:active {
+
+  transform: translateY(0);
 }
 
 .selected {

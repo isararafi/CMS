@@ -139,7 +139,7 @@ const StudentAssignments = () => {
       
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Navbar toggleSidebar={toggleSidebar} />
+        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
         
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
@@ -330,7 +330,7 @@ const StudentAssignments = () => {
                                   {getFileIcon(attachment.type)}
                                   <span className={assignmentStyles.attachmentName}>{attachment.name}</span>
                                   <span className={assignmentStyles.attachmentSize}>{attachment.size}</span>
-                                  <a href="#" className={assignmentStyles.downloadLink}>
+                                  <a href={attachment.url} className={assignmentStyles.downloadLink} download>
                                     <Download size={16} />
                                     <span>Download</span>
                                   </a>

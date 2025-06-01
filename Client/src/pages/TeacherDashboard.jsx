@@ -20,7 +20,7 @@ const TeacherDashboard = () => {
     <div className={styles.dashboardLayout}>
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="tutor" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        {/* <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} /> */}
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
