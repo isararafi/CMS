@@ -298,4 +298,58 @@
     color: $text-primary;
     font-size: 0.95rem;
   }
+}
+
+.errorMessage {
+  background-color: #FFEBEE;
+  color: #D32F2F;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.successMessage {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $background-color;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid $primary-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 } 

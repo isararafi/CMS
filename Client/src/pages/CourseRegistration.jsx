@@ -1,129 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, FileText, BookOpen, AlertCircle, Award, CheckCircle } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/courseRegistration.module.scss';
+import { fetchAvailableCourses, registerCourses, toggleCourseSelection, clearRegistrationStatus } from '../features/courses/courseRegistrationSlice';
+import { fetchStudentProfile } from '../features/student/studentProfileSlice';
 
 const CourseRegistration = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedCourses, setSelectedCourses] = useState([]);
-  const [registrationSubmitted, setRegistrationSubmitted] = useState(false);
+  const dispatch = useDispatch();
+  
+  const { 
+    availableCourses, 
+    selectedCourses, 
+    loading, 
+    registrationLoading, 
+    error, 
+    registrationError,
+    registrationSuccess,
+    successMessage 
+  } = useSelector(state => state.courseRegistration);
+  
+  const { profile } = useSelector(state => state.studentProfile);
 
-  // Mock student data
-  const studentData = {
-    name: "John Smith",
-    rollNo: "Fall 23-BSSE-123",
-    department: "Software Engineering",
-    semester: "Fall 2023"
-  };
-
-  // Mock courses data with availability
-  const coursesData = [
-    {
-      id: 1,
-      code: 'CS301',
-      name: 'Database Systems',
-      creditHours: 3,
-      instructor: 'Dr. Smith',
-      availability: {
-        type: 'availability',
-        status: 'open',
-        seats: 40,
-        enrolled: 35
-      },
-      action: {
-        type: 'action',
-        selected: false,
-        disabled: false
-      },
-      status: registrationSubmitted ? 'Approved' : '-'
-    },
-    {
-      id: 2,
-      code: 'CS302',
-      name: 'Operating Systems',
-      creditHours: 3,
-      instructor: 'Dr. Johnson',
-      availability: {
-        type: 'availability',
-        status: 'open',
-        seats: 45,
-        enrolled: 40
-      },
-      action: {
-        type: 'action',
-        selected: false,
-        disabled: false
-      },
-      status: registrationSubmitted ? 'Rejected' : '-'
-    },
-    {
-      id: 3,
-      code: 'CS303',
-      name: 'Software Engineering',
-      creditHours: 3,
-      instructor: 'Dr. Williams',
-      availability: {
-        type: 'availability',
-        status: 'closed',
-        seats: 35,
-        enrolled: 35
-      },
-      action: {
-        type: 'action',
-        selected: false,
-        disabled: true
-      },
-      status: '-'
-    },
-    {
-      id: 4,
-      code: 'CS304',
-      name: 'Computer Networks',
-      creditHours: 3,
-      instructor: 'Dr. Brown',
-      availability: {
-        type: 'availability',
-        status: 'open',
-        seats: 50,
-        enrolled: 42
-      },
-      action: {
-        type: 'action',
-        selected: false,
-        disabled: false
-      },
-      status: registrationSubmitted ? 'Approved' : '-'
-    }
-  ];
+  useEffect(() => {
+    dispatch(fetchAvailableCourses());
+    dispatch(fetchStudentProfile());
+  }, [dispatch]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const handleCourseSelect = (course) => {
-    const updatedCourses = coursesData.map(c => {
-      if (c.id === course.id) {
-        return {
-          ...c,
-          action: {
-            ...c.action,
-            selected: !c.action.selected
-          }
-        };
-      }
-      return c;
-    });
-
-    setSelectedCourses(updatedCourses.filter(c => c.action.selected));
+    dispatch(toggleCourseSelection(course.id));
   };
 
   const handleSubmitRegistration = () => {
-    setRegistrationSubmitted(true);
-    // Here you would typically make an API call to submit the registration
-    console.log("Selected courses:", selectedCourses);
+    if (selectedCourses.length > 0) {
+      dispatch(registerCourses(selectedCourses));
+    }
   };
+
+  // Transform available courses data for the table
+  const coursesData = availableCourses.map(course => ({
+    id: course._id,
+    code: course.courseCode,
+    name: course.courseName,
+    creditHours: course.creditHours,
+    department: course.department,
+    instructor: course.instructor?.name || 'TBA',
+    availability: {
+      type: 'availability',
+      status: course.seats > course.enrolled ? 'open' : 'closed',
+      seats: course.seats,
+      enrolled: course.enrolled
+    },
+    action: {
+      type: 'action',
+      selected: selectedCourses.includes(course._id),
+      disabled: course.seats <= course.enrolled
+    }
+  }));
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.dashboardLayout}>
@@ -148,11 +97,11 @@ const CourseRegistration = () => {
               <div className={styles.studentInfo}>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Roll No:</span>
-                  <span className={styles.value}>{studentData.rollNo}</span>
+                  <span className={styles.value}>{profile?.rollNo || 'N/A'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Semester:</span>
-                  <span className={styles.value}>{studentData.semester}</span>
+                  <span className={styles.value}>{profile?.semester || 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -165,24 +114,42 @@ const CourseRegistration = () => {
                 </div>
               </div>
 
+              {error && (
+                <div className={styles.errorMessage}>
+                  <AlertCircle size={16} />
+                  {error}
+                </div>
+              )}
+
               <CustomTable 
-                headers={['Code', 'Course Name', 'Credit Hours', 'Instructor', 'Availability', 'Action', 'Status']}
+                headers={['Code', 'Course Name', 'Credit Hours', 'Department', 'Instructor', 'Availability', 'Action']}
                 data={coursesData}
                 onView={handleCourseSelect}
-                statusColors={{
-                  'Approved': '#C3F4D0',
-                  'Rejected': '#FFCECE',
-                  '-': '#f0f0f0'
-                }}
               />
 
               <div className={styles.registrationActions}>
+                {registrationError && (
+                  <div className={styles.errorMessage}>
+                    <AlertCircle size={16} />
+                    {registrationError}
+                  </div>
+                )}
+
+                {registrationSuccess && (
+                  <div className={styles.successMessage}>
+                    <CheckCircle size={16} />
+                    {successMessage}
+                  </div>
+                )}
+
                 <button 
                   className={styles.submitButton}
                   onClick={handleSubmitRegistration}
-                  disabled={selectedCourses.length === 0 || registrationSubmitted}
+                  disabled={selectedCourses.length === 0 || registrationLoading}
                 >
-                  {registrationSubmitted ? (
+                  {registrationLoading ? (
+                    'Registering...'
+                  ) : registrationSuccess ? (
                     <>
                       <CheckCircle size={16} />
                       Registration Submitted
@@ -192,13 +159,6 @@ const CourseRegistration = () => {
                   )}
                 </button>
               </div>
-
-              {registrationSubmitted && (
-                <div className={styles.registrationStatus}>
-                  <h3>Registration Status</h3>
-                  <p>Your course registration has been submitted. Check the status column for results.</p>
-                </div>
-              )}
             </div>
           </div>
         </div>

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bookmark, Calendar, CheckCircle, Clock, Download, ExternalLink, FileText, Filter, Search, Upload, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentAssignments.module.scss';
 import assignmentStyles from '../styles/pages/assignments.module.scss';
+import { fetchStudentAssignments } from '../features/student/studentAssignmentsSlice';
+import { fetchStudentProfile } from '../features/student/studentProfileSlice';
 
 const StudentAssignments = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -12,102 +15,14 @@ const StudentAssignments = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [visibleDetails, setVisibleDetails] = useState(null);
 
-  // Mock data for assignments - would be fetched from API
-  const studentData = {
-    name: "John Smith",
-    rollNo: "Fall 23-BSSE-123",
-    department: "Software Engineering",
-    semester: "Fall 2023"
-  };
+  const dispatch = useDispatch();
+  const { assignments, loading, error } = useSelector(state => state.studentAssignments);
+  const { profile } = useSelector(state => state.studentProfile);
 
-  const assignments = [
-    {
-      id: 1,
-      courseCode: 'CS301',
-      courseName: 'Database Systems',
-      title: 'Assignment 1: ER Diagrams',
-      description: 'Design an ER diagram for a university database system that includes students, courses, instructors, and departments. Include appropriate relationships and constraints.',
-      dueDate: '2023-11-20T23:59:59',
-      posted: '2023-11-10T10:30:00',
-      status: 'pending',
-      totalMarks: 20,
-      weightage: 10,
-      attachments: [
-        { id: 1, name: 'Assignment1_Instructions.pdf', size: '256 KB', type: 'pdf' }
-      ]
-    },
-    {
-      id: 2,
-      courseCode: 'CS302',
-      courseName: 'Operating Systems',
-      title: 'Assignment 2: Process Scheduling',
-      description: 'Implement a process scheduling simulator for FCFS, SJF, Priority, and Round Robin algorithms. Compare the performance of these algorithms using average waiting time and turnaround time metrics.',
-      dueDate: '2023-11-18T23:59:59',
-      posted: '2023-11-05T14:15:00',
-      status: 'submitted',
-      submittedOn: '2023-11-15T16:45:00',
-      totalMarks: 25,
-      obtainedMarks: 22,
-      feedback: 'Well done! Good implementation of scheduling algorithms. The comparative analysis could have been more detailed.',
-      weightage: 15,
-      attachments: [
-        { id: 2, name: 'ProcessScheduling_Instructions.pdf', size: '320 KB', type: 'pdf' },
-        { id: 3, name: 'TestCases.txt', size: '12 KB', type: 'txt' }
-      ],
-      submission: { id: 1, name: 'A2_Solution.zip', size: '1.2 MB', type: 'zip' }
-    },
-    {
-      id: 3,
-      courseCode: 'CS303',
-      courseName: 'Software Engineering',
-      title: 'Assignment 3: Requirements Engineering',
-      description: 'Develop a Software Requirements Specification (SRS) document for a library management system. Include functional and non-functional requirements, use cases, and user stories.',
-      dueDate: '2023-11-25T23:59:59',
-      posted: '2023-11-12T09:00:00',
-      status: 'overdue',
-      totalMarks: 30,
-      weightage: 15,
-      attachments: [
-        { id: 4, name: 'SRS_Template.docx', size: '150 KB', type: 'docx' },
-        { id: 5, name: 'Requirements_Guidelines.pdf', size: '280 KB', type: 'pdf' }
-      ]
-    },
-    {
-      id: 4,
-      courseCode: 'CS304',
-      courseName: 'Computer Networks',
-      title: 'Assignment 1: Network Protocols',
-      description: 'Analyze and compare TCP and UDP protocols in terms of reliability, speed, and use cases. Implement a simple client-server application using both protocols.',
-      dueDate: '2023-11-15T23:59:59',
-      posted: '2023-11-01T11:20:00',
-      status: 'graded',
-      submittedOn: '2023-11-13T20:10:00',
-      totalMarks: 20,
-      obtainedMarks: 18,
-      feedback: 'Excellent comparison of protocols. The implementation works well but lacks proper error handling.',
-      weightage: 10,
-      attachments: [
-        { id: 6, name: 'NetworkProtocols_Assignment.pdf', size: '310 KB', type: 'pdf' }
-      ],
-      submission: { id: 2, name: 'Network_Assignment.zip', size: '950 KB', type: 'zip' }
-    },
-    {
-      id: 5,
-      courseCode: 'CS301',
-      courseName: 'Database Systems',
-      title: 'Assignment 2: SQL Queries',
-      description: 'Write SQL queries for various database operations including joins, aggregations, nested queries, and views. Use the provided sample database for testing.',
-      dueDate: '2023-12-05T23:59:59',
-      posted: '2023-11-20T13:45:00',
-      status: 'pending',
-      totalMarks: 15,
-      weightage: 7.5,
-      attachments: [
-        { id: 7, name: 'SQL_Assignment.pdf', size: '220 KB', type: 'pdf' },
-        { id: 8, name: 'SampleDB.sql', size: '45 KB', type: 'sql' }
-      ]
-    }
-  ];
+  useEffect(() => {
+    dispatch(fetchStudentAssignments());
+    dispatch(fetchStudentProfile());
+  }, [dispatch]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -236,11 +151,11 @@ const StudentAssignments = () => {
               <div className={styles.studentInfo}>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Roll No:</span>
-                  <span className={styles.value}>{studentData.rollNo}</span>
+                  <span className={styles.value}>{profile?.rollNo || 'N/A'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Semester:</span>
-                  <span className={styles.value}>{studentData.semester}</span>
+                  <span className={styles.value}>{profile?.semester || 'N/A'}</span>
                 </div>
               </div>
             </div>

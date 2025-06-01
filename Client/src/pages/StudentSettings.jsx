@@ -1,60 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Key, MapPin, Calendar, Edit2, Camera, Save, AlertCircle } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentSettings.module.scss';
 import settingStyles from '../styles/pages/settings.module.scss';
+import { fetchStudentProfile, updateStudentProfile } from '../features/student/studentSettingsSlice';
 
 const StudentSettings = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { profile, isLoading, error, successMessage } = useSelector(state => state.studentSettings);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [notification, setNotification] = useState(null);
 
-  // Mock data - would be fetched from API
-  const [studentData, setStudentData] = useState({
-    name: "John Smith",
-    rollNo: "Fall 23-BSSE-123",
-    email: "john.smith@university.edu",
-    phone: "+1 (555) 123-4567",
-    department: "Software Engineering",
-    semester: "Fall 2023",
-    dateOfBirth: "1998-05-15",
-    address: "123 University Avenue, College Town, State - 10001",
-    profilePicture: "https://randomuser.me/api/portraits/men/75.jpg",
-    notifications: {
-      emailAlerts: true,
-      smsAlerts: false,
-      resultsPublished: true,
-      assignmentDeadlines: true,
-      feeDueReminders: true,
-      courseUpdates: true
-    },
-    privacySettings: {
-      showEmail: false,
-      showPhone: false,
-      allowProfileView: true,
-      showAcademicInfo: true
-    },
-    currentPassword: "password123", // This is just for demo purposes
-    loginActivity: [
-      { id: 1, device: "Windows 10 - Chrome", location: "New York, USA", time: "2023-11-15 14:30:45", status: "success" },
-      { id: 2, device: "macOS - Safari", location: "New York, USA", time: "2023-11-12 09:15:22", status: "success" },
-      { id: 3, device: "iOS - Mobile App", location: "Boston, USA", time: "2023-11-10 18:45:30", status: "success" },
-      { id: 4, device: "Android - Mobile App", location: "Chicago, USA", time: "2023-11-05 07:20:15", status: "failed" }
-    ]
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
   });
 
-  const [formData, setFormData] = useState({
-    name: studentData.name,
-    email: studentData.email,
-    phone: studentData.phone,
-    address: studentData.address,
-    dateOfBirth: studentData.dateOfBirth,
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  });
+  useEffect(() => {
+    // Fetch initial data
+    dispatch(fetchStudentProfile());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Update form when profile changes
+    if (profile) {
+      setForm({
+        name: profile.name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        address: profile.address || ''
+      });
+    }
+  }, [profile]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -65,72 +50,37 @@ const StudentSettings = () => {
     setIsEditing(false);
   };
 
-  const handleEditToggle = () => {
+  const handleEdit = async () => {
     if (isEditing) {
-      // Save changes
-      setStudentData({
-        ...studentData,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        dateOfBirth: formData.dateOfBirth
-      });
-      showNotification('success', 'Profile updated successfully');
-    }
-    setIsEditing(!isEditing);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleCheckboxChange = (e, section) => {
-    const { name, checked } = e.target;
-    setStudentData({
-      ...studentData,
-      [section]: {
-        ...studentData[section],
-        [name]: checked
+      try {
+        await dispatch(updateStudentProfile(form)).unwrap();
+        setIsEditing(false);
+      } catch (err) {
+        console.error('Failed to submit profile update request:', err);
       }
-    });
+    } else {
+      setIsEditing(true);
+    }
   };
 
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    if (formData.currentPassword !== studentData.currentPassword) {
-      showNotification('error', 'Current password is incorrect');
-      return;
-    }
+  const handleChange = e => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleLogout = () => {
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
     
-    if (formData.newPassword !== formData.confirmPassword) {
-      showNotification('error', 'New passwords do not match');
-      return;
-    }
-    
-    if (formData.newPassword.length < 8) {
-      showNotification('error', 'Password must be at least 8 characters');
-      return;
-    }
-    
-    // Update password
-    setStudentData({
-      ...studentData,
-      currentPassword: formData.newPassword
+    // Clear cookies
+    document.cookie.split(";").forEach(cookie => {
+      document.cookie = cookie
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
     });
     
-    setFormData({
-      ...formData,
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: ""
-    });
-    
-    showNotification('success', 'Password updated successfully');
+    // Navigate to home page
+    navigate('/');
   };
 
   const showNotification = (type, message) => {
@@ -149,6 +99,26 @@ const StudentSettings = () => {
   const formatDateTime = (dateTimeString) => {
     return new Date(dateTimeString).toLocaleString();
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className={styles.settingsPage}>
+        <div className={styles.loading}>Loading...</div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className={styles.settingsPage}>
+        <div className={styles.error}>
+          Error loading profile: {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.dashboardLayout}>
@@ -229,12 +199,12 @@ const StudentSettings = () => {
                       <h2>Profile Information</h2>
                       <button 
                         className={`${settingStyles.editButton} ${isEditing ? settingStyles.saveButton : ''}`}
-                        onClick={handleEditToggle}
+                        onClick={handleEdit}
                       >
                         {isEditing ? (
                           <>
                             <Save size={16} />
-                            <span>Save</span>
+                            <span>Submit Request</span>
                           </>
                         ) : (
                           <>
@@ -248,8 +218,8 @@ const StudentSettings = () => {
                     <div className={settingStyles.profileContent}>
                       <div className={settingStyles.profilePicture}>
                         <img 
-                          src={studentData.profilePicture} 
-                          alt={studentData.name} 
+                          src={profile?.profilePicture || "https://randomuser.me/api/portraits/men/75.jpg"} 
+                          alt={profile?.name || "John Smith"} 
                         />
                         {isEditing && (
                           <div className={settingStyles.changePhoto}>
@@ -265,27 +235,28 @@ const StudentSettings = () => {
                             <input 
                               type="text" 
                               name="name" 
-                              value={formData.name} 
-                              onChange={handleInputChange}
+                              value={form.name} 
+                              onChange={handleChange}
+                              className={styles.input}
                             />
                           ) : (
-                            <p>{studentData.name}</p>
+                            <p>{profile?.name || "John Smith"}</p>
                           )}
                         </div>
                         
                         <div className={settingStyles.formGroup}>
                           <label>Roll Number</label>
-                          <p>{studentData.rollNo}</p>
+                          <p>{profile?.rollNo || "Fall 23-BSSE-123"}</p>
                         </div>
                         
                         <div className={settingStyles.formGroup}>
                           <label>Department</label>
-                          <p>{studentData.department}</p>
+                          <p>{profile?.department || "Software Engineering"}</p>
                         </div>
                         
                         <div className={settingStyles.formGroup}>
                           <label>Semester</label>
-                          <p>{studentData.semester}</p>
+                          <p>{profile?.semester || "Fall 2023"}</p>
                         </div>
                         
                         <div className={settingStyles.formGroup}>
@@ -294,11 +265,12 @@ const StudentSettings = () => {
                             <input 
                               type="email" 
                               name="email" 
-                              value={formData.email} 
-                              onChange={handleInputChange}
+                              value={form.email} 
+                              onChange={handleChange}
+                              className={styles.input}
                             />
                           ) : (
-                            <p>{studentData.email}</p>
+                            <p>{profile?.email || "john.smith@university.edu"}</p>
                           )}
                         </div>
                         
@@ -308,11 +280,12 @@ const StudentSettings = () => {
                             <input 
                               type="tel" 
                               name="phone" 
-                              value={formData.phone} 
-                              onChange={handleInputChange}
+                              value={form.phone} 
+                              onChange={handleChange}
+                              className={styles.input}
                             />
                           ) : (
-                            <p>{studentData.phone}</p>
+                            <p>{profile?.phone || "+1 (555) 123-4567"}</p>
                           )}
                         </div>
                         
@@ -322,25 +295,26 @@ const StudentSettings = () => {
                             <input 
                               type="date" 
                               name="dateOfBirth" 
-                              value={formData.dateOfBirth} 
-                              onChange={handleInputChange}
+                              value={profile?.dateOfBirth || "1998-05-15"} 
+                              onChange={handleChange}
+                              className={styles.input}
                             />
                           ) : (
-                            <p>{formatDate(studentData.dateOfBirth)}</p>
+                            <p>{formatDate(profile?.dateOfBirth || "1998-05-15")}</p>
                           )}
                         </div>
                         
                         <div className={settingStyles.formGroup}>
                           <label>Address</label>
                           {isEditing ? (
-                            <textarea 
+                            <input 
                               name="address" 
-                              value={formData.address} 
-                              onChange={handleInputChange}
-                              rows={3}
+                              value={form.address} 
+                              onChange={handleChange}
+                              className={styles.input}
                             />
                           ) : (
-                            <p>{studentData.address}</p>
+                            <p>{profile?.address || "123 University Avenue, College Town, State - 10001"}</p>
                           )}
                         </div>
                       </div>
@@ -365,8 +339,16 @@ const StudentSettings = () => {
                             <input 
                               type="checkbox" 
                               name="emailAlerts" 
-                              checked={studentData.notifications.emailAlerts} 
-                              onChange={(e) => handleCheckboxChange(e, 'notifications')} 
+                              checked={profile?.notifications.emailAlerts || false} 
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  notifications: {
+                                    ...profile?.notifications,
+                                    emailAlerts: e.target.checked
+                                  }
+                                });
+                              }} 
                             />
                             <span className={settingStyles.checkbox}></span>
                             <div>
@@ -381,8 +363,16 @@ const StudentSettings = () => {
                             <input 
                               type="checkbox" 
                               name="smsAlerts" 
-                              checked={studentData.notifications.smsAlerts} 
-                              onChange={(e) => handleCheckboxChange(e, 'notifications')} 
+                              checked={profile?.notifications.smsAlerts || false} 
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  notifications: {
+                                    ...profile?.notifications,
+                                    smsAlerts: e.target.checked
+                                  }
+                                });
+                              }} 
                             />
                             <span className={settingStyles.checkbox}></span>
                             <div>
@@ -400,8 +390,16 @@ const StudentSettings = () => {
                             <input 
                               type="checkbox" 
                               name="resultsPublished" 
-                              checked={studentData.notifications.resultsPublished} 
-                              onChange={(e) => handleCheckboxChange(e, 'notifications')} 
+                              checked={profile?.notifications.resultsPublished || false} 
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  notifications: {
+                                    ...profile?.notifications,
+                                    resultsPublished: e.target.checked
+                                  }
+                                });
+                              }} 
                             />
                             <span className={settingStyles.checkbox}></span>
                             <div>
@@ -416,8 +414,16 @@ const StudentSettings = () => {
                             <input 
                               type="checkbox" 
                               name="assignmentDeadlines" 
-                              checked={studentData.notifications.assignmentDeadlines} 
-                              onChange={(e) => handleCheckboxChange(e, 'notifications')} 
+                              checked={profile?.notifications.assignmentDeadlines || false} 
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  notifications: {
+                                    ...profile?.notifications,
+                                    assignmentDeadlines: e.target.checked
+                                  }
+                                });
+                              }} 
                             />
                             <span className={settingStyles.checkbox}></span>
                             <div>
@@ -432,8 +438,16 @@ const StudentSettings = () => {
                             <input 
                               type="checkbox" 
                               name="feeDueReminders" 
-                              checked={studentData.notifications.feeDueReminders} 
-                              onChange={(e) => handleCheckboxChange(e, 'notifications')} 
+                              checked={profile?.notifications.feeDueReminders || false} 
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  notifications: {
+                                    ...profile?.notifications,
+                                    feeDueReminders: e.target.checked
+                                  }
+                                });
+                              }} 
                             />
                             <span className={settingStyles.checkbox}></span>
                             <div>
@@ -448,8 +462,16 @@ const StudentSettings = () => {
                             <input 
                               type="checkbox" 
                               name="courseUpdates" 
-                              checked={studentData.notifications.courseUpdates} 
-                              onChange={(e) => handleCheckboxChange(e, 'notifications')} 
+                              checked={profile?.notifications.courseUpdates || false} 
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  notifications: {
+                                    ...profile?.notifications,
+                                    courseUpdates: e.target.checked
+                                  }
+                                });
+                              }} 
                             />
                             <span className={settingStyles.checkbox}></span>
                             <div>
@@ -485,8 +507,16 @@ const StudentSettings = () => {
                           <input 
                             type="checkbox" 
                             name="showEmail" 
-                            checked={studentData.privacySettings.showEmail} 
-                            onChange={(e) => handleCheckboxChange(e, 'privacySettings')} 
+                            checked={profile?.privacySettings.showEmail || false} 
+                            onChange={(e) => {
+                              setForm({
+                                ...form,
+                                privacySettings: {
+                                  ...profile?.privacySettings,
+                                  showEmail: e.target.checked
+                                }
+                              });
+                            }} 
                           />
                           <span className={settingStyles.checkbox}></span>
                           <div>
@@ -501,8 +531,16 @@ const StudentSettings = () => {
                           <input 
                             type="checkbox" 
                             name="showPhone" 
-                            checked={studentData.privacySettings.showPhone} 
-                            onChange={(e) => handleCheckboxChange(e, 'privacySettings')} 
+                            checked={profile?.privacySettings.showPhone || false} 
+                            onChange={(e) => {
+                              setForm({
+                                ...form,
+                                privacySettings: {
+                                  ...profile?.privacySettings,
+                                  showPhone: e.target.checked
+                                }
+                              });
+                            }} 
                           />
                           <span className={settingStyles.checkbox}></span>
                           <div>
@@ -517,8 +555,16 @@ const StudentSettings = () => {
                           <input 
                             type="checkbox" 
                             name="allowProfileView" 
-                            checked={studentData.privacySettings.allowProfileView} 
-                            onChange={(e) => handleCheckboxChange(e, 'privacySettings')} 
+                            checked={profile?.privacySettings.allowProfileView || false} 
+                            onChange={(e) => {
+                              setForm({
+                                ...form,
+                                privacySettings: {
+                                  ...profile?.privacySettings,
+                                  allowProfileView: e.target.checked
+                                }
+                              });
+                            }} 
                           />
                           <span className={settingStyles.checkbox}></span>
                           <div>
@@ -533,8 +579,16 @@ const StudentSettings = () => {
                           <input 
                             type="checkbox" 
                             name="showAcademicInfo" 
-                            checked={studentData.privacySettings.showAcademicInfo} 
-                            onChange={(e) => handleCheckboxChange(e, 'privacySettings')} 
+                            checked={profile?.privacySettings.showAcademicInfo || false} 
+                            onChange={(e) => {
+                              setForm({
+                                ...form,
+                                privacySettings: {
+                                  ...profile?.privacySettings,
+                                  showAcademicInfo: e.target.checked
+                                }
+                              });
+                            }} 
                           />
                           <span className={settingStyles.checkbox}></span>
                           <div>
@@ -563,14 +617,22 @@ const StudentSettings = () => {
                       </div>
                     </div>
                     
-                    <form className={settingStyles.passwordForm} onSubmit={handlePasswordChange}>
+                    <form className={settingStyles.passwordForm} onSubmit={(e) => {
+                      e.preventDefault();
+                      showNotification('error', 'Password change functionality not implemented');
+                    }}>
                       <div className={settingStyles.formGroup}>
                         <label>Current Password</label>
                         <input 
                           type="password" 
                           name="currentPassword" 
-                          value={formData.currentPassword} 
-                          onChange={handleInputChange}
+                          value={profile?.currentPassword || ''} 
+                          onChange={(e) => {
+                            setForm({
+                              ...form,
+                              currentPassword: e.target.value
+                            });
+                          }}
                           required
                         />
                       </div>
@@ -580,8 +642,13 @@ const StudentSettings = () => {
                         <input 
                           type="password" 
                           name="newPassword" 
-                          value={formData.newPassword} 
-                          onChange={handleInputChange}
+                          value={profile?.newPassword || ''} 
+                          onChange={(e) => {
+                            setForm({
+                              ...form,
+                              newPassword: e.target.value
+                            });
+                          }}
                           required
                         />
                         <small>Password must be at least 8 characters long</small>
@@ -592,8 +659,13 @@ const StudentSettings = () => {
                         <input 
                           type="password" 
                           name="confirmPassword" 
-                          value={formData.confirmPassword} 
-                          onChange={handleInputChange}
+                          value={profile?.confirmPassword || ''} 
+                          onChange={(e) => {
+                            setForm({
+                              ...form,
+                              confirmPassword: e.target.value
+                            });
+                          }}
                           required
                         />
                       </div>
@@ -618,7 +690,7 @@ const StudentSettings = () => {
                     </div>
                     
                     <div className={settingStyles.activityList}>
-                      {studentData.loginActivity.map(activity => (
+                      {profile?.loginActivity.map(activity => (
                         <div 
                           key={activity.id} 
                           className={`${settingStyles.activityItem} ${activity.status === 'failed' ? settingStyles.failedLogin : ''}`}

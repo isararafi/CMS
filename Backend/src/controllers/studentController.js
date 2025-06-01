@@ -180,7 +180,7 @@ exports.getAllCourseMarks = async (req, res) => {
 exports.getCourseAttendanceSummary = async (req, res) => {
   try {
     const { courseId } = req.params;
-
+    const course = await Course.findById(courseId);
     // Verify student is enrolled in the course
     const student = await Student.findById(req.student._id);
     const isEnrolled = student.enrolledCourses.some(
@@ -204,6 +204,8 @@ exports.getCourseAttendanceSummary = async (req, res) => {
       presentLectures,
       absentLectures: totalLectures - presentLectures,
       attendanceRate,
+      courseName: course.courseName,
+      courseCode: course.courseCode,
     });
   } catch (error) {
     res.status(500).json({ error: "Server error" });

@@ -4,9 +4,9 @@ import ApiHandler from '../../services/apiHandler';
 // Async thunk to fetch course marks
 export const fetchCourseMarks = createAsyncThunk(
   'courses/fetchCourseMarks',
-  async (studentId, { rejectWithValue }) => {
+  async (courseId, { rejectWithValue }) => {
     try {
-      const data = await ApiHandler.request(`/student/courses/${studentId}/marks`, 'GET');
+      const data = await ApiHandler.request(`/student/courses/${courseId}/marks`, 'GET');
       return data;
     } catch (error) {
       return rejectWithValue({ message: error.message || 'Failed to fetch course marks' });
@@ -17,7 +17,11 @@ export const fetchCourseMarks = createAsyncThunk(
 const coursesSlice = createSlice({
   name: 'courses',
   initialState: {
-    marks: [],
+    marks: {
+      sessional: [],
+      midterm: [],
+      final: []
+    },
     loading: false,
     error: null,
   },
@@ -30,7 +34,19 @@ const coursesSlice = createSlice({
       })
       .addCase(fetchCourseMarks.fulfilled, (state, action) => {
         state.loading = false;
-        state.marks = action.payload;
+        // Group marks by type
+        const groupedMarks = action.payload.reduce((acc, mark) => {
+          if (!acc[mark.type]) {
+            acc[mark.type] = [];
+          }
+          acc[mark.type].push(mark);
+          return acc;
+        }, {
+          sessional: [],
+          midterm: [],
+          final: []
+        });
+        state.marks = groupedMarks;
       })
       .addCase(fetchCourseMarks.rejected, (state, action) => {
         state.loading = false;
