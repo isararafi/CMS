@@ -479,3 +479,29 @@ exports.getStudentsForCourse = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+//update profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, email, education, department } = req.body;    
+
+        const teacher = await Teacher.findById(req.teacher._id);
+
+        if (!teacher) {
+            return res.status(404).json({ error: 'Teacher not found' });
+        }   
+
+        if (name) teacher.name = name;
+        if (email) teacher.email = email;
+        if (education) teacher.education = education;
+        if (department) teacher.department = department;
+
+        await teacher.save();   
+
+        res.status(200).json({ message: "Profile updated successfully" });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};  
+
+

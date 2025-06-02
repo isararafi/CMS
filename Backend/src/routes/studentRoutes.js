@@ -38,5 +38,6 @@ router.get('/assignments', studentController.getAssignments);
 router.get('/profile', studentController.getProfile);
 router.post('/profile/update-request', studentController.requestProfileUpdate);
 router.put('/profile/change-password', studentController.changePassword);
+router.put('/profile/update', studentController.updateProfile);
 
 module.exports = router; 

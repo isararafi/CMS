@@ -39,4 +39,7 @@ router.get('/assignments/download/:filename', teacherController.downloadAssignme
 // Student Management
 router.get('/students/:courseId', teacherController.getStudentsForCourse);
 
+//update profile
+router.put('/profile/update', teacherController.updateProfile);
+
 module.exports = router; 

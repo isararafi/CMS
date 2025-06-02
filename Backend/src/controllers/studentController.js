@@ -490,3 +490,29 @@ exports.changePassword = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+//update profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone, address } = req.body;
+
+    const student = await Student.findById(req.student._id);
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    } 
+
+    if (name) student.name = name;
+    if (email) student.email = email;
+    if (phone) student.phone = phone;
+    if (address) student.address = address;
+
+    await student.save(); 
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};  
+
+
