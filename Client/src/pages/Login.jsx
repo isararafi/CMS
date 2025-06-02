@@ -47,21 +47,31 @@ const Login = () => {
     }
   }, [token]);
 
-  // Redirect if already logged in - UNCOMMENTED AND FIXED
+  // Check for existing token and redirect if already logged in
   useEffect(() => {
-    console.log('Token:', token);
-    console.log('User Role:', userRole);
+    // Only redirect if there's both a token and userType
     if (token && userType) {
-      console.log('Redirecting user with role:', userRole);
-      if (userType === 'student') {
-        navigate('/student/dashboard');
-      } else if (userType === 'teacher') {
-        navigate('/teacher');
-      } else if (userType === 'admin') {
-        navigate('/admin');
+      const storedToken = localStorage.getItem('token');
+      const storedUserRole = localStorage.getItem('userRole');
+      
+      // Only redirect if both token and role match what's in localStorage
+      if (storedToken === token && storedUserRole === userType) {
+        switch (userType) {
+          case 'student':
+            navigate('/student/dashboard');
+            break;
+          case 'teacher':
+            navigate('/teacher');
+            break;
+          case 'admin':
+            navigate('/admin');
+            break;
+          default:
+            break;
+        }
       }
     }
-  }, [token, userRole, navigate]);
+  }, [token, userType, navigate]);
 
   // Get role from URL and simulate fetching from API
   useEffect(() => {
@@ -193,10 +203,22 @@ const Login = () => {
         console.log('Token stored successfully:', response.token);
         setIsSuccess(true);
         
-        // Small delay to show success message, then navigate
+        // Reduced delay for better UX
         setTimeout(() => {
-          navigate(`/${userRole}`);
-        }, 9000);
+          switch (userRole) {
+            case 'student':
+              navigate('/student/dashboard');
+              break;
+            case 'teacher':
+              navigate('/teacher');
+              break;
+            case 'admin':
+              navigate('/admin');
+              break;
+            default:
+              break;
+          }
+        }, 1000); // Reduced from 30000 to 1000ms
       } else {
         console.error('No token received in response:', response);
         throw new Error('Authentication failed - no token received');

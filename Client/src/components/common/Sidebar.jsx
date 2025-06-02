@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.avif';
 import { 
   Home,
@@ -17,12 +17,14 @@ import {
   User,
   Users,
   UserPlus,
-  UserCheck
+  UserCheck,
+  LogOut
 } from 'lucide-react';
 import styles from '../../styles/components/sidebar.module.scss';
 
-const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
+const Sidebar = ({ collapsed, setCollapsed, role }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [coursesSubmenuOpen, setCoursesSubmenuOpen] = useState(false);
   const [studentSubmenuOpen, setStudentSubmenuOpen] = useState(false);
   const [teacherSubmenuOpen, setTeacherSubmenuOpen] = useState(false);
@@ -64,6 +66,13 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.clear(); // Clear all localStorage data
+    navigate('/'); // Redirect to home page
   };
 
   return (
@@ -261,6 +270,13 @@ const Sidebar = ({ collapsed, setCollapsed, role, onCreateClick }) => {
               </li>
             </>
           )}
+          {/* Logout button at the bottom */}
+          <li className={styles.logoutItem}>
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              <span className={styles.icon}><LogOut size={20} strokeWidth={1.5} /></span>
+              {!collapsed && <span className={styles.menuText}>Logout</span>}
+            </button>
+          </li>
         </ul>
       </div>
     </div>

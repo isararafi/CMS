@@ -10,7 +10,6 @@ import { fetchAdminProfile } from '../features/auth/authSlice';
 import { registerStudent, clearAddStudentState } from '../features/adminDashboard/addStudentSlice';
 import { deleteStudent, clearDeleteStudentState } from '../features/adminDashboard/deleteStudentSlice';
 import { updateStudent, clearUpdateStudentState } from '../features/adminDashboard/updateStudentSlice';
-import Toast from '../components/common/Toast';
 import { registerTeacher, clearAddTeacherState } from '../features/adminDashboard/addTeacherSlice';
 import { deleteTeacher, clearDeleteTeacherState } from '../features/adminDashboard/deleteTeacherSlice';
 import { updateTeacher, clearUpdateTeacherState } from '../features/adminDashboard/updateTeacherSlice';
@@ -65,7 +64,6 @@ const AdminDashboard = ({ displayList }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [formData, setFormData] = useState({});
-  const [toast, setToast] = useState({ message: '', type: 'info' });
   const [formLoading, setFormLoading] = useState(false);
   const [formMessage, setFormMessage] = useState(null);
 
@@ -92,68 +90,56 @@ const AdminDashboard = ({ displayList }) => {
 
   useEffect(() => {
     if (addStudentState.successMessage) {
-      setToast({ message: addStudentState.successMessage, type: 'success' });
       setFormData({});
       setTimeout(() => dispatch(clearAddStudentState()), 2000);
     } else if (addStudentState.error) {
-      setToast({ message: addStudentState.error, type: 'error' });
       setTimeout(() => dispatch(clearAddStudentState()), 2000);
     }
   }, [addStudentState.successMessage, addStudentState.error, dispatch]);
 
   useEffect(() => {
     if (deleteStudentState.message) {
-      setToast({ message: deleteStudentState.message, type: 'success' });
       dispatch(fetchAllStudents());
       setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
     } else if (deleteStudentState.error) {
-      setToast({ message: deleteStudentState.error, type: 'error' });
       setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
     }
   }, [deleteStudentState.message, deleteStudentState.error, dispatch]);
 
   useEffect(() => {
     if (updateStudentState.successMessage) {
-      setToast({ message: updateStudentState.successMessage, type: 'success' });
       setShowUpdateModal(false);
       dispatch(fetchAllStudents());
       setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
     } else if (updateStudentState.error) {
-      setToast({ message: updateStudentState.error, type: 'error' });
       setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
     }
   }, [updateStudentState.successMessage, updateStudentState.error, dispatch]);
 
   useEffect(() => {
     if (addTeacherState.successMessage) {
-      setToast({ message: addTeacherState.successMessage, type: 'success' });
       setFormData({});
       setTimeout(() => dispatch(clearAddTeacherState()), 2000);
     } else if (addTeacherState.error) {
-      setToast({ message: addTeacherState.error, type: 'error' });
       setTimeout(() => dispatch(clearAddTeacherState()), 2000);
     }
   }, [addTeacherState.successMessage, addTeacherState.error, dispatch]);
 
   useEffect(() => {
     if (deleteTeacherState.message) {
-      setToast({ message: deleteTeacherState.message, type: 'success' });
       dispatch(fetchAllTeachers());
       setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
     } else if (deleteTeacherState.error) {
-      setToast({ message: deleteTeacherState.error, type: 'error' });
       setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
     }
   }, [deleteTeacherState.message, deleteTeacherState.error, dispatch]);
 
   useEffect(() => {
     if (updateTeacherState.successMessage) {
-      setToast({ message: updateTeacherState.successMessage, type: 'success' });
       setShowUpdateModal(false);
       dispatch(fetchAllTeachers());
       setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
     } else if (updateTeacherState.error) {
-      setToast({ message: updateTeacherState.error, type: 'error' });
       setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
     }
   }, [updateTeacherState.successMessage, updateTeacherState.error, dispatch]);
@@ -192,26 +178,15 @@ const AdminDashboard = ({ displayList }) => {
       setFormLoading(false);
       return;
     }
-    // Prepare payload based on displayList
-    let payload = { ...formData };
-    if (displayList === 'createTeacher') {
-      payload.role = 'teacher';
-    }
     try {
-      const res = await fetch('/api/admin/register', {
+      await fetch('/api/admin/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ ...formData, role: displayList === 'createTeacher' ? 'teacher' : 'student' })
       });
-      const data = await res.json();
-      if (res.ok) {
-        setToast({ message: 'User created successfully!', type: 'success' });
-        setFormData({});
-      } else {
-        setToast({ message: data?.error?.details || data.message || 'Error creating user.', type: 'error' });
-      }
-    } catch (err) {
-      setToast({ message: 'Network error.', type: 'error' });
+      setFormData({});
+    } catch (error) {
+      console.error('Network error:', error);
     }
     setFormLoading(false);
   };
@@ -222,14 +197,12 @@ const AdminDashboard = ({ displayList }) => {
     setUpdateUser(user);
     setUpdateForm({ ...user });
     setShowUpdateModal(true);
-    setUpdateMessage(null);
   };
   const handleUpdateFormChange = (e) => {
     setUpdateForm({ ...updateForm, [e.target.name]: e.target.value });
   };
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
-    setUpdateMessage(null);
     if (updateRole === 'student') {
       const studentId = updateUser._id || updateUser.id;
       // Only send fields that are editable in the modal and match the API
@@ -245,9 +218,7 @@ const AdminDashboard = ({ displayList }) => {
       };
       if (updateForm.password) studentData.password = updateForm.password;
       dispatch(updateStudent({ studentId, studentData }));
-      return;
-    }
-    if (updateRole === 'teacher') {
+    } else if (updateRole === 'teacher') {
       const teacherId = updateUser._id || updateUser.id;
       const teacherData = {
         name: updateForm.name,
@@ -256,63 +227,15 @@ const AdminDashboard = ({ displayList }) => {
         department: updateForm.department,
       };
       dispatch(updateTeacher({ teacherId, teacherData }));
-      return;
     }
-    setUpdateLoading(true);
-    setUpdateMessage(null);
-    // Prepare payload based on displayList
-    let payload = { ...updateForm };
-    if (displayList === 'createTeacher') {
-      payload.role = 'teacher';
-    }
-    try {
-      const res = await fetch('/api/admin/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setToast({ message: 'User updated successfully!', type: 'success' });
-        // Update local table
-        if (updateRole === 'student') {
-          setStudents(students.map(s => s.id === updateUser.id ? { ...s, ...updateForm } : s));
-        } else {
-          setTeachers(teachers.map(t => t.id === updateUser.id ? { ...t, ...updateForm } : t));
-        }
-        setShowUpdateModal(false);
-      } else {
-        setToast({ message: data?.error?.details || data.message || 'Error updating user.', type: 'error' });
-      }
-    } catch (err) {
-      setToast({ message: 'Network error.', type: 'error' });
-    }
-    setUpdateLoading(false);
+    setShowUpdateModal(false);
   };
   const handleDeleteClick = async (role, user) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     if (role === 'student') {
       dispatch(deleteStudent(user._id || user.id));
-      return;
-    }
-    if (role === 'teacher') {
+    } else if (role === 'teacher') {
       dispatch(deleteTeacher(user._id || user.id));
-      return;
-    }
-    const endpoint = role === 'student' ? `/api/admin/student/${user.id}` : `/api/admin/teacher/${user.id}`;
-    try {
-      const res = await fetch(endpoint, { method: 'DELETE' });
-      if (res.ok) {
-        if (role === 'student') {
-          setStudents(students.filter(s => s.id !== user.id));
-        } else {
-          setTeachers(teachers.filter(t => t.id !== user.id));
-        }
-      } else {
-        alert('Error deleting user.');
-      }
-    } catch {
-      alert('Network error.');
     }
   };
 
@@ -383,17 +306,9 @@ const AdminDashboard = ({ displayList }) => {
   const [updateRole, setUpdateRole] = useState(null);
   const [updateUser, setUpdateUser] = useState(null);
   const [updateForm, setUpdateForm] = useState({});
-  const [updateMessage, setUpdateMessage] = useState(null);
-  const [updateLoading, setUpdateLoading] = useState(false);
 
   return (
     <div className={styles.dashboardLayout}>
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ message: '', type: 'info' })}
-        duration={3000}
-      />
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} role="admin" />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
         <Navbar toggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
@@ -635,7 +550,7 @@ const AdminDashboard = ({ displayList }) => {
                         </div>
                       </>
                     )}
-                    <button type="submit" disabled={updateLoading || updateStudentState.loading} style={buttonStyle}>Update</button>
+                    <button type="submit" disabled={updateStudentState.loading} style={buttonStyle}>Update</button>
                   </form>
                 </div>
               </div>

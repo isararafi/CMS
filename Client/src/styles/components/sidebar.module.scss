@@ -577,6 +577,41 @@ $active-item-bg: rgba(255, 255, 255, 0.22);
       }
     }
   }
+
+  .logoutItem {
+    margin-top: auto;
+    padding: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .logoutButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ff4d4d;
+    }
+
+    .icon {
+      margin-right: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .menuText {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+  }
 }
 
 @keyframes fadeIn {

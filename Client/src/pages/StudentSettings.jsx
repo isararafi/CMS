@@ -317,6 +317,10 @@ const StudentSettings = () => {
                             <p>{profile?.address || "123 University Avenue, College Town, State - 10001"}</p>
                           )}
                         </div>
+                        <button className={settingStyles.saveButton} onClick={handleLogout}>
+                          <Save size={16} />
+                          <span>Logout</span>
+                        </button>
                       </div>
                     </div>
                   </div>
