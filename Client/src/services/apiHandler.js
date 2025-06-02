@@ -47,7 +47,7 @@ class ApiHandler {
         throw {
           message: data.message,
           errors: data.errors
-        };
+        };  
       } else {
         throw new Error(data.message || 'Failed API request');
       }
