@@ -7,6 +7,7 @@ import styles from '../styles/pages/studentCoursesSummary.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAttendanceSummary, fetchAttendanceDetailed } from '../features/courses/attendanceSlice';
 import { fetchStudentProfile } from '../features/student/studentProfileSlice';
+import { useToast } from '../context/ToastContext';
 
 const StudentCoursesSummary = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -17,21 +18,40 @@ const StudentCoursesSummary = () => {
   const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
 
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const { profile } = useSelector(state => state.studentProfile || {});
   const { summaries, details, loading, error } = useSelector(state => state.attendance || {});
 
   useEffect(() => {
-    dispatch(fetchStudentProfile());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchStudentProfile()).unwrap();
+        showToast('Profile data loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load profile data', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   useEffect(() => {
-    if (profile?.enrolledCourses) {
-      profile.enrolledCourses.forEach(course => {
-        dispatch(fetchAttendanceSummary(course.course));
-        dispatch(fetchAttendanceDetailed(course.course));
-      });
-    }
-  }, [dispatch, profile]);
+    const fetchAttendanceData = async () => {
+      if (profile?.enrolledCourses) {
+        try {
+          await Promise.all(profile.enrolledCourses.map(async course => {
+            await dispatch(fetchAttendanceSummary(course.course)).unwrap();
+            await dispatch(fetchAttendanceDetailed(course.course)).unwrap();
+          }));
+          showToast('Attendance data loaded successfully', 'success');
+        } catch (error) {
+          showToast('Failed to load attendance data for some courses', 'error');
+        }
+      }
+    };
+
+    fetchAttendanceData();
+  }, [dispatch]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -56,6 +76,9 @@ const StudentCoursesSummary = () => {
         }))
       });
       setShowAttendanceModal(true);
+      showToast(`Viewing attendance for ${course.code}`, 'info');
+    } else {
+      showToast(`No attendance records found for ${course.code}`, 'error');
     }
   };
 

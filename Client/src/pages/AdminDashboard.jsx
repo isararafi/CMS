@@ -5,14 +5,14 @@ import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllStudents, fetchAllTeachers } from '../features/adminDashboard/adminDashboardSlice';
-import { fetchAdminProfile } from '../features/auth/authSlice';
+import { fetchAllStudents, fetchAllTeachers, fetchAdminProfile } from '../features/adminDashboard/adminDashboardSlice';
 import { registerStudent, clearAddStudentState } from '../features/adminDashboard/addStudentSlice';
 import { deleteStudent, clearDeleteStudentState } from '../features/adminDashboard/deleteStudentSlice';
 import { updateStudent, clearUpdateStudentState } from '../features/adminDashboard/updateStudentSlice';
 import { registerTeacher, clearAddTeacherState } from '../features/adminDashboard/addTeacherSlice';
 import { deleteTeacher, clearDeleteTeacherState } from '../features/adminDashboard/deleteTeacherSlice';
 import { updateTeacher, clearUpdateTeacherState } from '../features/adminDashboard/updateTeacherSlice';
+import { useToast } from '../context/ToastContext';
 
 
 
@@ -77,11 +77,23 @@ const AdminDashboard = ({ displayList }) => {
   const addTeacherState = useSelector(state => state.addTeacher);
   const deleteTeacherState = useSelector(state => state.deleteTeacher);
   const updateTeacherState = useSelector(state => state.updateTeacher);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    dispatch(fetchAllStudents());
-    dispatch(fetchAllTeachers());
-    dispatch(fetchAdminProfile());
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(fetchAllStudents()).unwrap(),
+          dispatch(fetchAllTeachers()).unwrap(),
+          dispatch(fetchAdminProfile()).unwrap()
+        ]);
+        showToast('Dashboard data loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load dashboard data', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   useEffect(() => {
@@ -90,56 +102,68 @@ const AdminDashboard = ({ displayList }) => {
 
   useEffect(() => {
     if (addStudentState.successMessage) {
+      showToast('Student added successfully', 'success');
       setFormData({});
       setTimeout(() => dispatch(clearAddStudentState()), 2000);
     } else if (addStudentState.error) {
+      showToast(addStudentState.error, 'error');
       setTimeout(() => dispatch(clearAddStudentState()), 2000);
     }
   }, [addStudentState.successMessage, addStudentState.error, dispatch]);
 
   useEffect(() => {
     if (deleteStudentState.message) {
+      showToast('Student deleted successfully', 'success');
       dispatch(fetchAllStudents());
       setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
     } else if (deleteStudentState.error) {
+      showToast(deleteStudentState.error, 'error');
       setTimeout(() => dispatch(clearDeleteStudentState()), 2000);
     }
   }, [deleteStudentState.message, deleteStudentState.error, dispatch]);
 
   useEffect(() => {
     if (updateStudentState.successMessage) {
+      showToast('Student updated successfully', 'success');
       setShowUpdateModal(false);
       dispatch(fetchAllStudents());
       setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
     } else if (updateStudentState.error) {
+      showToast(updateStudentState.error, 'error');
       setTimeout(() => dispatch(clearUpdateStudentState()), 2000);
     }
   }, [updateStudentState.successMessage, updateStudentState.error, dispatch]);
 
   useEffect(() => {
     if (addTeacherState.successMessage) {
+      showToast('Teacher added successfully', 'success');
       setFormData({});
       setTimeout(() => dispatch(clearAddTeacherState()), 2000);
     } else if (addTeacherState.error) {
+      showToast(addTeacherState.error, 'error');
       setTimeout(() => dispatch(clearAddTeacherState()), 2000);
     }
   }, [addTeacherState.successMessage, addTeacherState.error, dispatch]);
 
   useEffect(() => {
     if (deleteTeacherState.message) {
+      showToast('Teacher deleted successfully', 'success');
       dispatch(fetchAllTeachers());
       setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
     } else if (deleteTeacherState.error) {
+      showToast(deleteTeacherState.error, 'error');
       setTimeout(() => dispatch(clearDeleteTeacherState()), 2000);
     }
   }, [deleteTeacherState.message, deleteTeacherState.error, dispatch]);
 
   useEffect(() => {
     if (updateTeacherState.successMessage) {
+      showToast('Teacher updated successfully', 'success');
       setShowUpdateModal(false);
       dispatch(fetchAllTeachers());
       setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
     } else if (updateTeacherState.error) {
+      showToast(updateTeacherState.error, 'error');
       setTimeout(() => dispatch(clearUpdateTeacherState()), 2000);
     }
   }, [updateTeacherState.successMessage, updateTeacherState.error, dispatch]);

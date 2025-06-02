@@ -7,14 +7,16 @@ import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/courseRegistration.module.scss';
 import { fetchAvailableCourses, registerCourses, toggleCourseSelection, clearRegistrationStatus } from '../features/courses/courseRegistrationSlice';
 import { fetchStudentProfile } from '../features/student/studentProfileSlice';
+import { useToast } from '../context/ToastContext';
 
 const CourseRegistration = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedCourses, setSelectedCourses] = useState([]);
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   
   const { 
     availableCourses, 
-    selectedCourses, 
     loading, 
     registrationLoading, 
     error, 
@@ -26,21 +28,47 @@ const CourseRegistration = () => {
   const { profile } = useSelector(state => state.studentProfile);
 
   useEffect(() => {
-    dispatch(fetchAvailableCourses());
-    dispatch(fetchStudentProfile());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchAvailableCourses()).unwrap();
+        await dispatch(fetchStudentProfile()).unwrap();
+        showToast('Available courses loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load available courses', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  const handleCourseSelect = (course) => {
-    dispatch(toggleCourseSelection(course.id));
+  const handleCourseSelect = (courseId) => {
+    setSelectedCourses(prev => {
+      if (prev.includes(courseId)) {
+        showToast('Course removed from selection', 'info');
+        return prev.filter(id => id !== courseId);
+      } else {
+        if (prev.length >= 6) {
+          showToast('Cannot select more than 6 courses', 'error');
+          return prev;
+        }
+        showToast('Course added to selection', 'success');
+        return [...prev, courseId];
+      }
+    });
   };
 
-  const handleSubmitRegistration = () => {
-    if (selectedCourses.length > 0) {
-      dispatch(registerCourses(selectedCourses));
+  const handleSubmitRegistration = async () => {
+    try {
+      if (selectedCourses.length > 0) {
+        await dispatch(registerCourses(selectedCourses));
+        showToast('Course registration submitted successfully', 'success');
+      }
+    } catch (error) {
+      showToast('Failed to submit course registration', 'error');
     }
   };
 

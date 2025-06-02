@@ -29,10 +29,13 @@ import { fetchDashboardInfo, fetchGpaProgress } from '../features/studentDashboa
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentDashboard.module.scss';
+import { useToast } from '../context/ToastContext';
 
 const StudentDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dispatch = useDispatch();
+  const { showToast } = useToast();
+  
   const dummyGpaProgress = [
     { name: 'Sem 1', gpa: 3.2 },
     { name: 'Sem 2', gpa: 3.4 },
@@ -41,12 +44,24 @@ const StudentDashboard = () => {
     { name: 'Sem 5', gpa: 3.3 },
     { name: 'Sem 6', gpa: 3.75 }
   ];
+  
   const { dashboardInfo, isLoading, error } = useSelector((state) => state.studentDashboard);
   const gpaProgress = dummyGpaProgress;
 
   useEffect(() => {
-    dispatch(fetchDashboardInfo());
-    dispatch(fetchGpaProgress());
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(fetchDashboardInfo()).unwrap(),
+          dispatch(fetchGpaProgress()).unwrap()
+        ]);
+        showToast('Dashboard data loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load dashboard data', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   const toggleSidebar = () => {

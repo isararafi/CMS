@@ -19,7 +19,7 @@ export const updateStudentProfile = createAsyncThunk(
   'studentSettings/updateProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const data = await ApiHandler.request('/student/profile/update-request', 'POST', profileData);
+      const data = await ApiHandler.request('/student/profile/update', 'PUT', profileData);
       return data;
     } catch (error) {
       return rejectWithValue({ message: error.message || 'Failed to update profile' });
@@ -66,7 +66,9 @@ const studentSettingsSlice = createSlice({
       })
       .addCase(updateStudentProfile.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.successMessage = 'Profile update request submitted successfully';
+        state.successMessage = action.payload.message;
+        // Refresh profile data in state
+        state.profile = { ...state.profile, ...action.meta.arg };
       })
       .addCase(updateStudentProfile.rejected, (state, action) => {
         state.isLoading = false;

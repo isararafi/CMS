@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginStudent, loginTeacher, loginAdmin } from '../features/auth/authSlice';
 import styles from '../styles/pages/login.module.scss';
+import { useToast } from '../context/ToastContext';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation(); // Add this import and usage
   const { isLoading, error, token, userType } = useSelector((state) => state.auth);
+  const { showToast } = useToast();
   
   // State to store user role (e.g., student, teacher, admin)
   const [userRole, setUserRole] = useState(null);
@@ -136,97 +138,45 @@ const Login = () => {
     }));
   };
 
-  // Handle form submission - IMPROVED ERROR HANDLING
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
       let response;
-      let credentials;
-      
-      // Validate form data before submission
       if (userRole === 'student') {
-        if (!formData.semester || !formData.department || !formData.regNumber || !formData.password) {
-          console.error('All student fields are required');
-          return;
-        }
-      } else if (userRole === 'teacher' || userRole === 'admin') {
-        if (!formData.email || !formData.password) {
-          console.error('Email and password are required');
-          return;
-        }
+        const [semester, department, regNumber] = formData.regNumber.split('-');
+        response = await dispatch(loginStudent({ 
+          semester, 
+          department, 
+          rollNo: regNumber, 
+          password: formData.password 
+        })).unwrap();
+      } else if (userRole === 'teacher') {
+        response = await dispatch(loginTeacher({ 
+          email: formData.email, 
+          password: formData.password 
+        })).unwrap();
+      } else if (userRole === 'admin') {
+        response = await dispatch(loginAdmin({ 
+          email: formData.email, 
+          password: formData.password 
+        })).unwrap();
       }
-      
-      console.log('Attempting login for role:', userRole);
-      console.log('Form data:', formData);
-      
-      switch (userRole) {
-        case 'student':
-          credentials = {
-            batch: formData.semester,
-            department: formData.department,
-            rollNo: formData.regNumber,
-            password: formData.password
-          };
-          console.log('Student credentials:', credentials);
-          response = await dispatch(loginStudent(credentials)).unwrap();
-          break;
 
-        case 'teacher':
-          credentials = {
-            email: formData.email,
-            password: formData.password
-          };
-          console.log('Teacher credentials:', credentials);
-          response = await dispatch(loginTeacher(credentials)).unwrap();
-          break;
-          
-        case 'admin':
-          credentials = {
-            email: formData.email,
-            password: formData.password
-          };
-          console.log('Admin credentials:', credentials);
-          response = await dispatch(loginAdmin(credentials)).unwrap();
-          break;
-          
-        default:
-          throw new Error('Invalid user role');
-      }
-      
-      console.log('Login response:', response);
-      
-      // Check if response contains token
-      if (response && response.token) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('userRole', userRole); // Also store user role
-        console.log('Token stored successfully:', response.token);
+      if (response) {
+        showToast('Login successful', 'success');
         setIsSuccess(true);
-        
-        // Reduced delay for better UX
-        setTimeout(() => {
-          switch (userRole) {
-            case 'student':
-              navigate('/student/dashboard');
-              break;
-            case 'teacher':
-              navigate('/teacher');
-              break;
-            case 'admin':
-              navigate('/admin');
-              break;
-            default:
-              break;
-          }
-        }, 1000); // Reduced from 30000 to 1000ms
-      } else {
-        console.error('No token received in response:', response);
-        throw new Error('Authentication failed - no token received');
+        const redirectPath = userRole === 'student' 
+          ? '/student/dashboard'
+          : userRole === 'teacher'
+          ? '/teacher'
+          : '/admin';
+        navigate(redirectPath);
       }
     } catch (err) {
-      console.error('Login failed:', err);
-      console.error('Error details:', err.message);
-      // The error will be displayed via Redux state
+      showToast(err.message || 'Login failed. Please check your credentials.', 'error');
+      setIsSuccess(false);
     }
   };
 

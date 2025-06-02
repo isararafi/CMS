@@ -6,22 +6,38 @@ import styles from '../styles/pages/studentCoursesMids.module.scss';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllCourseMarks, setActiveType } from '../features/courses/courseMarksSlice';
 import { fetchStudentProfile } from '../features/student/studentProfileSlice';
+import { useToast } from '../context/ToastContext';
 
 const StudentCoursesMids = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('midterm'); // 'sessional', 'midterm', 'final'
 
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const { filteredMarks, loading: marksLoading, error: marksError } = useSelector(state => state.courseMarks || {});
   const { profile, loading: profileLoading, error: profileError } = useSelector(state => state.studentProfile || {});
 
   useEffect(() => {
-    dispatch(fetchAllCourseMarks());
-    dispatch(fetchStudentProfile());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchAllCourseMarks()).unwrap();
+        await dispatch(fetchStudentProfile()).unwrap();
+        showToast('Course marks loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load course marks', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(setActiveType(activeTab));
+    try {
+      dispatch(setActiveType(activeTab));
+      showToast(`Switched to ${activeTab} evaluations`, 'info');
+    } catch (error) {
+      showToast('Failed to switch evaluation type', 'error');
+    }
   }, [activeTab, dispatch]);
 
   const toggleSidebar = () => {
@@ -53,21 +69,23 @@ const StudentCoursesMids = () => {
 
   // Render loading state
   if (marksLoading || profileLoading) {
-        return (
+    return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
-          </div>
-        );
+      </div>
+    );
   }
       
   // Render error state
   if (marksError || profileError) {
-        return (
-      <div style={{color: 'red', padding: '20px'}}>
-        Error: {marksError || profileError}
-          </div>
-        );
-    }
+    return (
+      <div className={styles.errorContainer}>
+        <AlertCircle size={48} />
+        <h3>Error Loading Data</h3>
+        <p>{marksError || profileError}</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.dashboardLayout}>

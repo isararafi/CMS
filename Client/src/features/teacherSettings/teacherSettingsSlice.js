@@ -23,8 +23,8 @@ export const updateTeacherProfile = createAsyncThunk(
     try {
       console.log('Sending update request:', profileData); // Debug log
       const response = await ApiHandler.request(
-        '/teacher/profile/update-request',
-        'POST',
+        '/teacher/profile/update',
+        'PUT',
         profileData
       );
       console.log('Update response:', response); // Debug log
@@ -59,7 +59,7 @@ const initialState = {
     name: '',
     email: '',
     department: '',
-    position: ''
+    education: ''
   },
   updateRequests: [],
   isLoading: false,
@@ -89,7 +89,7 @@ const teacherSettingsSlice = createSlice({
           name: action.payload.name || '',
           email: action.payload.email || '',
           department: action.payload.department || '',
-          position: action.payload.position || ''
+          education: action.payload.education || ''
         };
         state.error = null;
       })
@@ -105,7 +105,8 @@ const teacherSettingsSlice = createSlice({
       })
       .addCase(updateTeacherProfile.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.successMessage = 'Profile update request submitted successfully';
+        state.successMessage = action.payload.message;
+        state.profile = { ...state.profile, ...action.meta.arg };
         state.error = null;
       })
       .addCase(updateTeacherProfile.rejected, (state, action) => {

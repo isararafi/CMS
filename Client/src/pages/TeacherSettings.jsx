@@ -1,46 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import styles from '../styles/pages/teacherSettings.module.scss';
 import { 
   fetchTeacherProfile, 
-  updateTeacherProfile,
-  getProfileUpdateRequests 
+  updateTeacherProfile
 } from '../features/teacherSettings/teacherSettingsSlice';
+import { useToast } from '../context/ToastContext';
 
 const TeacherSettings = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { profile, updateRequests, isLoading, error, successMessage } = useSelector(state => state.teacherSettings);
+  const { profile, isLoading, error, successMessage } = useSelector(state => state.teacherSettings);
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
     department: '',
-    position: ''
+    education: ''
   });
+  const { showToast } = useToast();
 
   useEffect(() => {
-    // Fetch initial data
     const fetchData = async () => {
       try {
         await dispatch(fetchTeacherProfile()).unwrap();
-        await dispatch(getProfileUpdateRequests()).unwrap();
-      } catch (err) {
-        console.error('Error fetching data:', err);
+        showToast('Profile loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load profile', 'error');
       }
     };
+    
     fetchData();
   }, [dispatch]);
 
   useEffect(() => {
-    // Update form when profile changes
     if (profile) {
       setForm({
         name: profile.name || '',
         email: profile.email || '',
         department: profile.department || '',
-        position: profile.position || ''
+        education: profile.education || ''
       });
     }
   }, [profile]);
@@ -50,37 +48,18 @@ const TeacherSettings = () => {
       try {
         await dispatch(updateTeacherProfile(form)).unwrap();
         setIsEditing(false);
+        showToast('Profile updated successfully', 'success');
       } catch (err) {
-        console.error('Failed to submit profile update request:', err);
+        showToast(err.message || 'Failed to update profile', 'error');
       }
     } else {
       setIsEditing(true);
+      showToast('Now editing profile', 'info');
     }
   };
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleLogout = () => {
-    // Clear all storage
-    // localStorage.removeItem('token');
-    // localStorage.removeItem('user');
-    // localStorage.removeItem('userType');
-    // localStorage.removeItem('userRole');
-    localStorage.removeItem('loglevel');
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Clear cookies
-    document.cookie.split(";").forEach(cookie => {
-      document.cookie = cookie
-        .replace(/^ +/, "")
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
-    });
-    
-    // Navigate to home page
-    navigate('/');
   };
 
   // Show loading state
@@ -152,16 +131,16 @@ const TeacherSettings = () => {
           )}
         </div>
         <div className={styles.profileField}>
-          <label>Position:</label>
+          <label>Education:</label>
           {isEditing ? (
             <input 
-              name="position" 
-              value={form.position} 
+              name="education" 
+              value={form.education} 
               onChange={handleChange}
               className={styles.input}
             />
           ) : (
-            <span>{form.position || 'Not set'}</span>
+            <span>{form.education || 'Not set'}</span>
           )}
         </div>
         <div className={styles.buttonGroup}>
@@ -170,37 +149,10 @@ const TeacherSettings = () => {
             className={`${styles.editButton} ${isLoading ? styles.loading : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? 'Submitting...' : isEditing ? 'Submit Request' : 'Edit'}
-          </button>
-          <button 
-            onClick={handleLogout}
-            className={`${styles.editButton} ${styles.logoutButton}`}
-          >
-            Logout
+            {isLoading ? 'Updating...' : isEditing ? 'Save Changes' : 'Edit'}
           </button>
         </div>
       </div>
-
-      {updateRequests?.length > 0 && (
-        <div className={`${styles.profileSection} ${styles.requestsSection}`}>
-          <h3>Pending Update Requests</h3>
-          {updateRequests.map((request, index) => (
-            <div key={request._id || index} className={styles.updateRequest}>
-              <div className={styles.requestDetails}>
-                {Object.entries(request.updates || {}).map(([field, value]) => (
-                  <div key={field} className={styles.fieldUpdate}>
-                    <span className={styles.fieldName}>{field}:</span>
-                    <span className={styles.fieldValue}>{value}</span>
-                  </div>
-                ))}
-              </div>
-              <div className={styles.requestStatus}>
-                Status: <span>{request.status || 'Pending'}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

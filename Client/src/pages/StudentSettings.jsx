@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Key, MapPin, Calendar, Edit2, Camera, Save, AlertCircle } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
@@ -10,8 +9,7 @@ import { fetchStudentProfile, updateStudentProfile } from '../features/student/s
 
 const StudentSettings = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { profile, isLoading, error, successMessage } = useSelector(state => state.studentSettings);
+  const { profile, isLoading, error } = useSelector(state => state.studentSettings);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
@@ -41,10 +39,6 @@ const StudentSettings = () => {
     }
   }, [profile]);
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setIsEditing(false);
@@ -53,10 +47,11 @@ const StudentSettings = () => {
   const handleEdit = async () => {
     if (isEditing) {
       try {
-        await dispatch(updateStudentProfile(form)).unwrap();
+        const result = await dispatch(updateStudentProfile(form)).unwrap();
         setIsEditing(false);
+        showNotification('success', result.message);
       } catch (err) {
-        console.error('Failed to submit profile update request:', err);
+        showNotification('error', err.message || 'Failed to update profile');
       }
     } else {
       setIsEditing(true);
@@ -67,21 +62,7 @@ const StudentSettings = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogout = () => {
-    // Clear all storage
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Clear cookies
-    document.cookie.split(";").forEach(cookie => {
-      document.cookie = cookie
-        .replace(/^ +/, "")
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
-    });
-    
-    // Navigate to home page
-    navigate('/');
-  };
+ 
 
   const showNotification = (type, message) => {
     setNotification({ type, message });
@@ -317,10 +298,6 @@ const StudentSettings = () => {
                             <p>{profile?.address || "123 University Avenue, College Town, State - 10001"}</p>
                           )}
                         </div>
-                        <button className={settingStyles.saveButton} onClick={handleLogout}>
-                          <Save size={16} />
-                          <span>Logout</span>
-                        </button>
                       </div>
                     </div>
                   </div>

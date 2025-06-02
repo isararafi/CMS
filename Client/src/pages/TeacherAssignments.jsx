@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styles from '../styles/pages/teacherAssignments.module.scss';
 import { uploadAssignment } from '../features/teacherAssignments/teacherAssignmentsSlice';
 import { fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
+import { useToast } from '../context/ToastContext';
 
 const TeacherAssignments = () => {
   const dispatch = useDispatch();
@@ -17,14 +18,25 @@ const TeacherAssignments = () => {
 
   const { isLoading, error, successMessage } = useSelector(state => state.teacherAssignments);
   const { courses } = useSelector(state => state.teacherDashboard);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    dispatch(fetchTeacherCourses());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchTeacherCourses()).unwrap();
+        showToast('Courses loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load courses', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   const handleCourseClick = (course) => {
     setSelectedCourse(course);
     setShowUploadSection(true);
+    showToast(`Selected ${course.courseName} for assignment upload`, 'info');
   };
 
   const handleInputChange = (e) => {
@@ -40,7 +52,7 @@ const TeacherAssignments = () => {
     
     const file = fileInputRef.current.files[0];
     if (!file) {
-      alert('Please select a file');
+      showToast('Please select a file', 'error');
       return;
     }
 
@@ -52,6 +64,7 @@ const TeacherAssignments = () => {
 
     try {
       await dispatch(uploadAssignment(assignmentData)).unwrap();
+      showToast('Assignment uploaded successfully', 'success');
       setFormData({
         title: '',
         description: '',
@@ -59,7 +72,7 @@ const TeacherAssignments = () => {
       });
       fileInputRef.current.value = '';
     } catch (err) {
-      console.error('Failed to upload assignment:', err);
+      showToast(err.message || 'Failed to upload assignment', 'error');
     }
   };
 

@@ -3,6 +3,7 @@ import styles from '../styles/pages/teacherAttendance.module.scss';
 import ApiHandler from '../services/apiHandler';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTeacherCourses, addLecture, fetchStudents, markAttendance, fetchLectures } from '../features/teacherDashboard/teacherDashboardSlice';
+import { useToast } from '../context/ToastContext';
 
 const TeacherAttendance = () => {
   const dispatch = useDispatch();
@@ -13,54 +14,78 @@ const TeacherAttendance = () => {
   const [newLecture, setNewLecture] = useState({ title: '', date: '', courseId: '', description: '' });
   const [attendance, setAttendance] = useState({});
   const [selectedLectures, setSelectedLectures] = useState([]);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    dispatch(fetchTeacherCourses());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchTeacherCourses()).unwrap();
+        showToast('Courses loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load courses', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
-  const toggleAddSection = (course) => {
+  const toggleAddSection = async (course) => {
     setSelectedCourse(course);
     setShowAddSection(!showAddSection);
     setShowDeleteSection(false);
     if (!showAddSection) {
-      dispatch(fetchStudents(course._id));
+      try {
+        await dispatch(fetchStudents(course._id)).unwrap();
+        showToast('Students list loaded successfully', 'success');
+      } catch (error) {
+        showToast('Failed to load students list', 'error');
+      }
     }
   };
 
-  const toggleDeleteSection = (course) => {
+  const toggleDeleteSection = async (course) => {
     setSelectedCourse(course);
     setShowDeleteSection(!showDeleteSection);
     setShowAddSection(false);
     if (!showDeleteSection) {
-      dispatch(fetchLectures(course._id));
+      try {
+        await dispatch(fetchLectures(course._id)).unwrap();
+        showToast('Lectures loaded successfully', 'success');
+      } catch (error) {
+        showToast('Failed to load lectures', 'error');
+      }
     }
   };
 
-  const handleAddLecture = () => {
-    const newLectureData = { ...newLecture, courseId: selectedCourse._id };
-    dispatch(addLecture(newLectureData));
-    setNewLecture({ title: '', date: '', courseId: '', description: '' });
+  const handleAddLecture = async () => {
+    try {
+      const newLectureData = { ...newLecture, courseId: selectedCourse._id };
+      await dispatch(addLecture(newLectureData)).unwrap();
+      showToast('Lecture added successfully', 'success');
+      setNewLecture({ title: '', date: '', courseId: '', description: '' });
+    } catch (error) {
+      showToast(error.message || 'Failed to add lecture', 'error');
+    }
   };
 
   const handleAttendanceChange = (studentId) => {
     setAttendance({ ...attendance, [studentId]: !attendance[studentId] });
   };
 
-  const handleSave = () => {
-    const newLectureData = { ...newLecture, courseId: selectedCourse._id };
-    dispatch(addLecture(newLectureData)).then((action) => {
-      if (action.type === 'teacherDashboard/addLecture/fulfilled') {
-        const lectureId = action.payload._id;
-        const attendanceData = students?.students?.map(student => ({
-          studentId: student._id,
-          status: attendance[student._id] ? 'present' : 'absent'
-        }));
-        if (attendanceData) {
-          dispatch(markAttendance({ lectureId, attendanceData }));
-          alert('Lecture and attendance saved successfully');
-        }
-      }
-    });
+  const handleMarkAttendance = async () => {
+    try {
+      await dispatch(markAttendance({
+        courseId: selectedCourse._id,
+        attendance: Object.entries(attendance).map(([studentId, isPresent]) => ({
+          studentId,
+          isPresent
+        }))
+      })).unwrap();
+      showToast('Attendance marked successfully', 'success');
+      setAttendance({});
+    } catch (error) {
+      showToast(error.message || 'Failed to mark attendance', 'error');
+    }
   };
 
   const handleLectureSelect = (lectureId) => {
@@ -109,7 +134,7 @@ const TeacherAttendance = () => {
               </div>
             ))}
           </div>
-          <button className={styles.addButton} onClick={handleSave}>Add</button>
+          <button className={styles.addButton} onClick={handleAddLecture}>Add</button>
         </div>
       )}
       {showDeleteSection && selectedCourse && (

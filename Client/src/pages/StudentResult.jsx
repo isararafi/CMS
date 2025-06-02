@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart2, Download, ChevronDown, Search, FileText } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentResult.module.scss';
+import { useToast } from '../context/ToastContext';
 
 const StudentResult = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedSemester, setSelectedSemester] = useState('Fall 2023');
   const [searchTerm, setSearchTerm] = useState('');
   const [semesterDropdownOpen, setSemesterDropdownOpen] = useState(false);
+  const { showToast } = useToast();
 
   // Mock data - would be fetched from API
   const studentData = {
@@ -46,6 +48,11 @@ const StudentResult = () => {
     }
   };
 
+  useEffect(() => {
+    // Simulating API call
+    showToast('Result data loaded successfully', 'success');
+  }, [showToast]);
+
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
@@ -57,10 +64,20 @@ const StudentResult = () => {
   const handleSemesterSelect = (semester) => {
     setSelectedSemester(semester);
     setSemesterDropdownOpen(false);
+    showToast(`Switched to ${semester} results`, 'info');
   };
 
   const toggleSemesterDropdown = () => {
     setSemesterDropdownOpen(!semesterDropdownOpen);
+  };
+
+  const handleDownloadResult = () => {
+    try {
+      // Add your download logic here
+      showToast('Result downloaded successfully', 'success');
+    } catch (error) {
+      showToast('Failed to download result', 'error');
+    }
   };
 
   const currentResult = studentData.results[selectedSemester];
@@ -149,7 +166,7 @@ const StudentResult = () => {
                 </div>
               </div> */}
 
-              <button className={styles.downloadButton}>
+              <button className={styles.downloadButton} onClick={handleDownloadResult}>
                 <Download size={16} strokeWidth={1.5} />
                 Download Result
               </button>

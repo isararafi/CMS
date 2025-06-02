@@ -5,15 +5,28 @@ import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/teacherDashboard.module.scss';
 import { fetchTeacherProfile, fetchTeacherCourses } from '../features/teacherDashboard/teacherDashboardSlice';
+import { useToast } from '../context/ToastContext';
 
 const TeacherDashboard = () => {
   const dispatch = useDispatch();
   const { profile, courses, isLoading, error } = useSelector(state => state.teacherDashboard);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    dispatch(fetchTeacherProfile());
-    dispatch(fetchTeacherCourses());
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(fetchTeacherProfile()).unwrap(),
+          dispatch(fetchTeacherCourses()).unwrap()
+        ]);
+        showToast('Dashboard data loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load dashboard data', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   return (

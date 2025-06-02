@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchTeacherCourses, fetchStudents, getMarks } from '../features/teacherDashboard/teacherDashboardSlice';
 import CustomTable from '../components/common/CustomTable';
 import { addMarks } from '../features/teacherDashboard/addMarksSlice';
+import { useToast } from '../context/ToastContext';
 
 const TeacherMarks = () => {
   const dispatch = useDispatch();
@@ -12,9 +13,19 @@ const TeacherMarks = () => {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [studentsMarks, setStudentsMarks] = useState([]);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    dispatch(fetchTeacherCourses());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchTeacherCourses()).unwrap();
+        showToast('Courses loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load courses', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   // Update marks when students, marks, or selectedType changes
@@ -39,14 +50,20 @@ const TeacherMarks = () => {
     }
   }, [students, marks, selectedType]);
 
-  const handleSubjectClick = (course) => {
+  const handleSubjectClick = async (course) => {
     setSelectedSubject(course);
-    dispatch(fetchStudents(course._id));
-    dispatch(getMarks(course._id));
+    try {
+      await dispatch(fetchStudents(course._id)).unwrap();
+      await dispatch(getMarks(course._id)).unwrap();
+      showToast(`Loaded marks for ${course.courseName}`, 'success');
+    } catch (error) {
+      showToast(error.message || 'Failed to load students and marks', 'error');
+    }
   };
 
   const handleTypeSelect = (type) => {
     setSelectedType(type);
+    showToast(`Switched to ${type} evaluations`, 'info');
     if (students?.students) {
       const existingMarks = marks.filter(mark => mark.type === type);
       
@@ -81,17 +98,22 @@ const TeacherMarks = () => {
     );
   };
 
-  const handleSaveAllMarks = () => {
-    const marksData = {
-      courseId: selectedSubject._id,
-      type: selectedType,
-      marks: studentsMarks.map(student => ({
-        studentId: student.studentId,
-        marks: student.marks,
-        totalMarks: getMaxMarks(selectedType)
-      }))
-    };
-    dispatch(addMarks(marksData));
+  const handleSaveAllMarks = async () => {
+    try {
+      const marksData = {
+        courseId: selectedSubject._id,
+        type: selectedType,
+        marks: studentsMarks.map(student => ({
+          studentId: student.studentId,
+          marks: student.marks,
+          totalMarks: getMaxMarks(selectedType)
+        }))
+      };
+      await dispatch(addMarks(marksData)).unwrap();
+      showToast('Marks saved successfully', 'success');
+    } catch (error) {
+      showToast(error.message || 'Failed to save marks', 'error');
+    }
   };
 
   const getMaxMarks = (type) => {

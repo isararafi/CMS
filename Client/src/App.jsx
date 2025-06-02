@@ -16,46 +16,49 @@ import StudentAssignments from './pages/StudentAssignments';  // Importing Stude
 import TeacherPage from './pages/TeacherPage';  // Importing Teacher Page component
 import AdminPage from './pages/AdminPage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';  // Importing React Router components for routing
+import { ToastProvider } from './context/ToastContext';
 
 function App() {
   return (
-    <Router>
-      {/* Defining all the routes and their respective components */}
-      <Routes>
-        {/* Default route - Home page */}
-        <Route path="/" element={<Home />} />
+    <ToastProvider>
+      <Router>
+        {/* Defining all the routes and their respective components */}
+        <Routes>
+          {/* Default route - Home page */}
+          <Route path="/" element={<Home />} />
 
-        {/* Route for the Login page */}
-        <Route path="/login" element={<Login />} />
+          {/* Route for the Login page */}
+          <Route path="/login" element={<Login />} />
 
-        {/* Student Dashboard Routes */}
-        <Route path="/student/*">
-          <Route index element={<StudentDashboard />} />
-          <Route path="dashboard" element={<StudentDashboard />} />
-          
-          {/* Courses and its subroutes */}
-          <Route path="courses">
-            <Route path="mids" element={<StudentCoursesMids />} />
-            <Route path="summary" element={<StudentCoursesSummary />} />
+          {/* Student Dashboard Routes */}
+          <Route path="/student/*">
+            <Route index element={<StudentDashboard />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
+            
+            {/* Courses and its subroutes */}
+            <Route path="courses">
+              <Route path="mids" element={<StudentCoursesMids />} />
+              <Route path="summary" element={<StudentCoursesSummary />} />
+            </Route>
+
+            <Route path="registration" element={<CourseRegistration />} />
+            <Route path="result" element={<StudentResult />} />
+            <Route path="fees" element={<StudentFees />} />
+            <Route path="assignments" element={<StudentAssignments />} />
+            <Route path="settings" element={<StudentSettings />} />
           </Route>
 
-          <Route path="registration" element={<CourseRegistration />} />
-          <Route path="result" element={<StudentResult />} />
-          <Route path="fees" element={<StudentFees />} />
-          <Route path="assignments" element={<StudentAssignments />} />
-          <Route path="settings" element={<StudentSettings />} />
-        </Route>
+          {/* Route for the Teacher Dashboard */}
+          <Route path="/teacher/*" element={<TeacherPage />} />
 
-        {/* Route for the Teacher Dashboard */}
-        <Route path="/teacher/*" element={<TeacherPage />} />
+          {/* Route for the Admin Dashboard */}
+          <Route path="/admin/*" element={<AdminPage />} />
 
-        {/* Route for the Admin Dashboard */}
-        <Route path="/admin/*" element={<AdminPage />} />
-
-        {/* Fallback route - If no path matches, show Unauthorized page */}
-        <Route path="*" element={<UnauthorizedPage />} />
-      </Routes>
-    </Router>
+          {/* Fallback route - If no path matches, show Unauthorized page */}
+          <Route path="*" element={<UnauthorizedPage />} />
+        </Routes>
+      </Router>
+    </ToastProvider>
   );
 }
 

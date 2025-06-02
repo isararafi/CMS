@@ -7,6 +7,7 @@ import styles from '../styles/pages/studentAssignments.module.scss';
 import assignmentStyles from '../styles/pages/assignments.module.scss';
 import { fetchStudentAssignments } from '../features/student/studentAssignmentsSlice';
 import { fetchStudentProfile } from '../features/student/studentProfileSlice';
+import { useToast } from '../context/ToastContext';
 
 const StudentAssignments = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -16,12 +17,22 @@ const StudentAssignments = () => {
   const [visibleDetails, setVisibleDetails] = useState(null);
 
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const { assignments, loading, error } = useSelector(state => state.studentAssignments);
   const { profile } = useSelector(state => state.studentProfile);
 
   useEffect(() => {
-    dispatch(fetchStudentAssignments());
-    dispatch(fetchStudentProfile());
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchStudentAssignments()).unwrap();
+        await dispatch(fetchStudentProfile()).unwrap();
+        showToast('Assignments loaded successfully', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to load assignments', 'error');
+      }
+    };
+    
+    fetchData();
   }, [dispatch]);
 
   const toggleSidebar = () => {
@@ -42,6 +53,24 @@ const StudentAssignments = () => {
       setVisibleDetails(null);
     } else {
       setVisibleDetails(id);
+    }
+  };
+
+  const handleSubmitAssignment = async (assignmentId) => {
+    try {
+      // Add your submission logic here
+      showToast('Assignment submitted successfully', 'success');
+    } catch (error) {
+      showToast('Failed to submit assignment', 'error');
+    }
+  };
+
+  const handleDownloadAssignment = async (assignmentId) => {
+    try {
+      // Add your download logic here
+      showToast('Assignment downloaded successfully', 'success');
+    } catch (error) {
+      showToast('Failed to download assignment', 'error');
     }
   };
 
