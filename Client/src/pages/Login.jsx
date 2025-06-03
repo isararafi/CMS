@@ -145,11 +145,11 @@ const Login = () => {
     try {
       let response;
       if (userRole === 'student') {
-        const [semester, department, regNumber] = formData.regNumber.split('-');
+        // const [semester, department, regNumber] = formData.regNumber.split('-');
         response = await dispatch(loginStudent({ 
-          semester, 
-          department, 
-          rollNo: regNumber, 
+          batch: formData.semester, 
+          department: formData.department, 
+          rollNo: formData.regNumber, 
           password: formData.password 
         })).unwrap();
       } else if (userRole === 'teacher') {

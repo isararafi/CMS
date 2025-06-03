@@ -1,34 +1,38 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import ApiHandler from '../../services/apiHandler';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import ApiHandler from "../../services/apiHandler";
 
 // Async thunk to fetch all students
 export const fetchAllStudents = createAsyncThunk(
-  'adminDashboard/fetchAllStudents',
+  "adminDashboard/fetchAllStudents",
   async (_, { rejectWithValue }) => {
     try {
-      const data = await ApiHandler.request('/admin/students', 'GET');
+      const data = await ApiHandler.request("/admin/students", "GET");
       return data;
     } catch (error) {
-      return rejectWithValue({ message: error.message || 'Failed to fetch students' });
+      return rejectWithValue({
+        message: error.message || "Failed to fetch students",
+      });
     }
   }
 );
 
 // Async thunk to fetch all teachers
 export const fetchAllTeachers = createAsyncThunk(
-  'adminDashboard/fetchAllTeachers',
+  "adminDashboard/fetchAllTeachers",
   async (_, { rejectWithValue }) => {
     try {
-      const data = await ApiHandler.request('/admin/teachers', 'GET');
+      const data = await ApiHandler.request("/admin/teachers", "GET");
       return data;
     } catch (error) {
-      return rejectWithValue({ message: error.message || 'Failed to fetch teachers' });
+      return rejectWithValue({
+        message: error.message || "Failed to fetch teachers",
+      });
     }
   }
 );
 
 const adminDashboardSlice = createSlice({
-  name: 'adminDashboard',
+  name: "adminDashboard",
   initialState: {
     students: [],
     teachers: [],
@@ -51,7 +55,8 @@ const adminDashboardSlice = createSlice({
       })
       .addCase(fetchAllStudents.rejected, (state, action) => {
         state.loadingStudents = false;
-        state.errorStudents = action.payload?.message || 'Failed to fetch students';
+        state.errorStudents =
+          action.payload?.message || "Failed to fetch students";
       })
       // Teachers
       .addCase(fetchAllTeachers.pending, (state) => {
@@ -64,9 +69,10 @@ const adminDashboardSlice = createSlice({
       })
       .addCase(fetchAllTeachers.rejected, (state, action) => {
         state.loadingTeachers = false;
-        state.errorTeachers = action.payload?.message || 'Failed to fetch teachers';
+        state.errorTeachers =
+          action.payload?.message || "Failed to fetch teachers";
       });
   },
 });
 
-export default adminDashboardSlice.reducer; 
+export default adminDashboardSlice.reducer;

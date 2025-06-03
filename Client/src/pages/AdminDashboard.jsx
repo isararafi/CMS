@@ -5,7 +5,8 @@ import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllStudents, fetchAllTeachers, fetchAdminProfile } from '../features/adminDashboard/adminDashboardSlice';
+import { fetchAdminProfile } from '../features/auth/authSlice'; // Import auth actions
+import { fetchAllStudents, fetchAllTeachers } from '../features/adminDashboard/adminDashboardSlice';
 import { registerStudent, clearAddStudentState } from '../features/adminDashboard/addStudentSlice';
 import { deleteStudent, clearDeleteStudentState } from '../features/adminDashboard/deleteStudentSlice';
 import { updateStudent, clearUpdateStudentState } from '../features/adminDashboard/updateStudentSlice';

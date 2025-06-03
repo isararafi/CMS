@@ -244,18 +244,18 @@ $active-item-bg: rgba(255, 255, 255, 0.22);
     
     .toggleButton {
       background-color: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: #1a1a1a; /* Replace $black if you're not using SCSS */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem;
-  border-radius: 50%;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6px);
-  z-index: 10;
+      border: none;
+      color: #1a1a1a; /* Replace $black if you're not using SCSS */
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem;
+      border-radius: 50%;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(6px);
+      z-index: 10;
       
       &:hover {
         background-color: $menu-hover-bg;

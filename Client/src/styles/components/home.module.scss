@@ -103,6 +103,22 @@ $background-light: #f8f9fa;
   font-size: 1.3rem;
   color: $text-dark;
   margin-bottom: 0.75rem;
+  @media (max-width: 768px) {
+  // .featureTitle {
+  //   font-size: 18px;
+  //   color: aqua !important;
+  //   background-color: #4CAF50;
+  // }
+}
+  
+}
+
+@media (max-width: 768px) {
+  .featureTitle {
+    font-size: 18px;
+    color: aqua !important;
+    background-color: #4CAF50;
+  }
 }
 
 .featureDescription {
