@@ -14,12 +14,7 @@ const studentRoutes = require('./routes/studentRoutes');
 
 db();
 // Allow CORS for only http://localhost:5173
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 
@@ -39,4 +34,4 @@ app.use('/api/student', studentRoutes);
 app.listen(port, () => {
   console.log("server started...");
 });
-// module.exports = app;
+// module.exports = app; 
