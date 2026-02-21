@@ -49,14 +49,14 @@ const TeacherDashboard = () => {
                 <p>Error: {error}</p>
               ) : (
                 <div>
-                  {/* <h2>Your Courses</h2> */}
-                  {/* <ul>
+                  <h2>Your Courses</h2> 
+                   <ul>
                     {courses.map(course => (
                       <li key={course._id}>
                         {course.courseCode} - {course.courseName} (Students: {course.students.length})
                       </li>
                     ))}
-                  </ul> */}
+                  </ul>
                 </div>
               )}
               <Outlet />

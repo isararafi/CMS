@@ -43,8 +43,8 @@ function App() {
 
             <Route path="registration" element={<CourseRegistration />} />
             <Route path="result" element={<StudentResult />} />
-            <Route path="fees" element={<StudentFees />} />
-            <Route path="assignments" element={<StudentAssignments />} />
+            {/* <Route path="fees" element={<StudentFees />} /> */}
+            {/* <Route path="assignments" element={<StudentAssignments />} /> */}
             <Route path="settings" element={<StudentSettings />} />
           </Route>
 

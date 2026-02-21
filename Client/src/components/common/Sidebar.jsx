@@ -170,12 +170,12 @@ const Sidebar = ({ collapsed, setCollapsed, role }) => {
                   {!collapsed && <span className={styles.menuText}>Fees</span>}
                 </Link>
               </li> */}
-              <li className={isActive('/assignments') ? styles.active : ''}>
+              {/* <li className={isActive('/assignments') ? styles.active : ''}>
                 <Link to="/student/assignments">
                   <span className={styles.icon}><ClipboardList size={20} strokeWidth={1.5} /></span>
                   {!collapsed && <span className={styles.menuText}>Assignments</span>}
                 </Link>
-              </li>
+              </li> */}
               <li className={isActive('/settings') ? styles.active : ''}>
                 <Link to="/student/settings">
                   <span className={styles.icon}><Settings size={20} strokeWidth={1.5} /></span>
@@ -186,24 +186,24 @@ const Sidebar = ({ collapsed, setCollapsed, role }) => {
           )}
           {role === 'tutor' && (
             <>
-              <li className={isActive('/teacher/attendance') ? styles.active : ''}>
+              {/* <li className={isActive('/teacher/attendance') ? styles.active : ''}>
                 <Link to="/teacher/attendance">
                   <span className={styles.icon}><ClipboardList size={20} strokeWidth={1.5} /></span>
                   {!collapsed && <span className={styles.menuText}>Attendance</span>}
                 </Link>
-              </li>
+              </li> */}
               <li className={isActive('/teacher/marks') ? styles.active : ''}>
                 <Link to="/teacher/marks">
                   <span className={styles.icon}><CheckSquare size={20} strokeWidth={1.5} /></span>
                   {!collapsed && <span className={styles.menuText}>Marks</span>}
                 </Link>
               </li>
-              <li className={isActive('/teacher/assignments') ? styles.active : ''}>
+              {/* <li className={isActive('/teacher/assignments') ? styles.active : ''}>
                 <Link to="/teacher/assignments">
                   <span className={styles.icon}><PenTool size={20} strokeWidth={1.5} /></span>
                   {!collapsed && <span className={styles.menuText}>Assignments</span>}
                 </Link>
-              </li>
+              </li> */}
               <li className={isActive('/teacher/settings') ? styles.active : ''}>
                 <Link to="/teacher/settings">
                   <span className={styles.icon}><Settings size={20} strokeWidth={1.5} /></span>

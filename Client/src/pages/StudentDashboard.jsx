@@ -123,13 +123,13 @@ const StudentDashboard = () => {
                   <p className={styles.statLabel}>Courses Enrolled</p>
                 </div>
               </div>
-              <div className={styles.statCard}>
+              {/* <div className={styles.statCard}>
                 <div className={styles.statIcon}><Clock size={24} /></div>
                 <div className={styles.statContent}>
                   <h3 className={styles.statValue}>{dashboardInfo.attendanceRate}%</h3>
                   <p className={styles.statLabel}>Attendance Rate</p>
                 </div>
-              </div>
+              </div> */}
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><GraduationCap size={24} /></div>
                 <div className={styles.statContent}>
