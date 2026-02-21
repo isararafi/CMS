@@ -1,37 +1,34 @@
 require("dotenv").config();
-
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const path = require("path");
-
-const port = process.env.PORT || 5000;
-
-const db = require("./db");
+const db = require("./config/db");
 const adminRoutes = require('./routes/adminRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const swaggerDocs = require("./config/swagger");
 
+const port = process.env.PORT || 5000;
+// Connect database
 db();
-// Allow CORS for only http://localhost:5173
-app.use(cors());
-app.use(express.json());
 
+// Middleware
+const corsOptions = {
+  origin: "http://localhost:5173", // <-- only this URL is allowed
+  credentials: true, // if you want to allow cookies/auth headers
+};
 
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use(cors(corsOptions));
 
-// Admin routes
+// Swagger
+swaggerDocs(app);
+
+// Routes
 app.use('/api/admin', adminRoutes);
-
-// Teacher routes
 app.use('/api/teacher', teacherRoutes);
-
-// Student routes
 app.use('/api/student', studentRoutes);
 
-
+// Start server
 app.listen(port, () => {
-  console.log("server started...");
+  console.log(`Server started at http://localhost:${port}`);
 });
-// module.exports = app; 

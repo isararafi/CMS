@@ -2,35 +2,16 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const teacherSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    education: { type: String, required: true, trim: true },
+    department: { 
+        type: String, 
+        required: true, 
+        enum: ["BSSE", "BSCS", "BBA", "BCE"] 
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true
-    },
-    education: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    department: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    password: {
-        type: String,
-        required: true
-    }
-}, {
-    timestamps: true
-});
+    password: { type: String, required: true }
+}, { timestamps: true });
 
 // Hash password before saving
 teacherSchema.pre('save', async function(next) {
@@ -40,5 +21,9 @@ teacherSchema.pre('save', async function(next) {
     next();
 });
 
-const Teacher = mongoose.model('Teacher', teacherSchema);
-module.exports = Teacher; 
+// Compare password
+teacherSchema.methods.comparePassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
+
+module.exports = mongoose.model('Teacher', teacherSchema);

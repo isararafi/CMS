@@ -3,41 +3,27 @@ const router = express.Router();
 const studentController = require('../controllers/studentController');
 const studentAuth = require('../middleware/studentAuth');
 
-// Student Authentication
+// ---------------------------
+// Public Route - Student Login
+// ---------------------------
 router.post('/login', studentController.login);
 
+// ---------------------------
 // Protected Routes (require student authentication)
+// ---------------------------
 router.use(studentAuth);
 
-// Dashboard
+// Dashboard / Core Academic Info
 router.get('/dashboard', studentController.getDashboardInfo);
-router.get('/gpa-progress', studentController.getGpaProgress);
+router.get('/gpa-progress', studentController.getGpaProgress); // View GPA/CGPA progress
 
 // Course Management
-router.get('/courses/available', studentController.getAvailableCourses);
-router.post('/courses/register', studentController.registerCourses);
-
-// Marks
-router.get('/courses/marks', studentController.getAllCourseMarks);
-
-// Attendance
-router.get('/courses/:courseId/attendance/summary', studentController.getCourseAttendanceSummary);
-router.get('/courses/:courseId/attendance/detailed', studentController.getDetailedCourseAttendance);
-
-// Results
-router.get('/results/:semester', studentController.getSemesterResult);
-
-// Fee Management
-router.get('/fees/history', studentController.getFeeHistory);
-router.get('/fees/current-challan', studentController.getCurrentFeeChallan);
-
-// Assignments
-router.get('/assignments', studentController.getAssignments);
+router.get('/courses/available', studentController.getAvailableCourses); // View available courses
+router.post('/courses/register', studentController.registerCourses); // Register for courses
 
 // Profile Management
-router.get('/profile', studentController.getProfile);
-router.post('/profile/update-request', studentController.requestProfileUpdate);
-router.put('/profile/change-password', studentController.changePassword);
-router.put('/profile/update', studentController.updateProfile);
+router.get('/profile', studentController.getProfile); // View profile
+router.put('/profile/update', studentController.updateProfile); // Update profile
+router.put('/profile/change-password', studentController.changePassword); // Change password
 
-module.exports = router; 
+module.exports = router;

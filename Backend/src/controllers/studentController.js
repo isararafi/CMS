@@ -1,38 +1,26 @@
 const Student = require("../models/Student");
 const Course = require("../models/Course");
-const Marks = require("../models/Marks");
-const Attendance = require("../models/Attendance");
-const Assignment = require("../models/Assignment");
-const Lecture = require("../models/Lecture");
-const StudentUpdateRequest = require("../models/StudentUpdateRequest");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
+// ---------------------------
 // Student Login
+// ---------------------------
 exports.login = async (req, res) => {
-  console.log("Login request received");
   try {
     const { batch, department, rollNo, password } = req.body;
 
-    // Validate required fields
     if (!batch || !department || !rollNo || !password) {
       return res.status(400).json({
-        error:
-          "Batch, department, registration number, and password are required",
+        error: "Batch, department, roll number, and password are required",
       });
     }
 
-    // Find student by batch, department and rollNo
-    const student = await Student.findOne({
-      batch,
-      department,
-      rollNo,
-    });
+    const student = await Student.findOne({ batch, department, rollNo });
 
     if (!student || !(await student.comparePassword(password))) {
       return res.status(401).json({
-        error:
-          "Invalid credentials. Please check your registration details and password.",
+        error: "Invalid credentials. Please check your details and password.",
       });
     }
 
@@ -58,38 +46,18 @@ exports.login = async (req, res) => {
   }
 };
 
+// ---------------------------
 // Get Dashboard Info
+// ---------------------------
 exports.getDashboardInfo = async (req, res) => {
   try {
-    const student = await Student.findById(req.student._id).populate(
-      "enrolledCourses.course"
+    const student = await Student.findById(req.student._id)
+      .populate("enrolledCourses.course");
+
+    const totalCredits = student.enrolledCourses.reduce(
+      (sum, enrollment) => sum + enrollment.course.creditHours,
+      0
     );
-
-    // Calculate overall attendance rate
-    const attendanceRates = await Promise.all(
-      student.enrolledCourses.map(async (enrollment) => {
-        const rate = await student.getAttendanceRate(enrollment.course._id);
-        return rate;
-      })
-    );
-
-    const averageAttendance =
-      attendanceRates.length > 0
-        ? parseFloat(
-            (
-              attendanceRates.reduce((a, b) => a + b, 0) /
-              attendanceRates.length
-            ).toFixed(2)
-          )
-        : 0.0;
-
-    const totalCredits = student.enrolledCourses.reduce((sum, enrollment) => {
-      return sum + enrollment.course.creditHours;
-    }, 0);
-
-
-
-
 
     res.json({
       name: student.name,
@@ -97,27 +65,23 @@ exports.getDashboardInfo = async (req, res) => {
       semester: student.semester,
       cgpa: student.cgpa,
       enrolledCourses: student.enrolledCourses,
-      attendanceRate: averageAttendance,
-      totalCredits: totalCredits,
+      totalCredits,
     });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// Get GPA Progress
+// ---------------------------
+// Get GPA/CGPA Progress
+// ---------------------------
 exports.getGpaProgress = async (req, res) => {
   try {
-    const student = await Student.findById(req.student._id).select(
-      "semesterResults"
-    );
+    const student = await Student.findById(req.student._id).select("semesterResults");
 
     const gpaData = student.semesterResults
       .sort((a, b) => a.semester - b.semester)
-      .map((result) => ({
-        semester: result.semester,
-        gpa: result.gpa,
-      }));
+      .map((result) => ({ semester: result.semester, gpa: result.gpa }));
 
     res.json(gpaData);
   } catch (error) {
@@ -125,140 +89,9 @@ exports.getGpaProgress = async (req, res) => {
   }
 };
 
-// Get Course Marks
-exports.getAllCourseMarks = async (req, res) => {
-  try {
-    const studentId = req.student._id;
-
-    // Fetch student with enrolled courses
-    const student = await Student.findById(studentId).populate({
-      path: "enrolledCourses.course",
-      select: "courseName courseCode"
-    });
-
-    if (!student) {
-      return res.status(404).json({ error: "Student not found" });
-    }
-
-    const allCourseIds = student.enrolledCourses.map((enrollment) => enrollment.course._id);
-
-    // Fetch all marks of the student in those courses
-    const marks = await Marks.find({
-      student: studentId,
-      course: { $in: allCourseIds }
-    }).populate("course", "courseName courseCode");
-
-    // Group marks by course
-    const marksByCourse = {};
-
-    marks.forEach((mark) => {
-      const courseId = mark.course._id.toString();
-      if (!marksByCourse[courseId]) {
-        marksByCourse[courseId] = {
-          courseCode: mark.course.courseCode,
-          courseName: mark.course.courseName,
-          marks: []
-        };
-      }
-
-      marksByCourse[courseId].marks.push({
-        type: mark.type,
-        marks: mark.marks,
-        totalMarks: mark.totalMarks
-      });
-    });
-
-    res.json(Object.values(marksByCourse));
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-
-// Get Course Attendance Summary
-exports.getCourseAttendanceSummary = async (req, res) => {
-  try {
-    const { courseId } = req.params;
-    const course = await Course.findById(courseId);
-    // Verify student is enrolled in the course
-    const student = await Student.findById(req.student._id);
-    const isEnrolled = student.enrolledCourses.some(
-      (enrollment) => enrollment.course.toString() === courseId
-    );
-
-    if (!isEnrolled) {
-      return res.status(403).json({ error: "Not enrolled in this course" });
-    }
-
-    const attendanceRate = await student.getAttendanceRate(courseId);
-    const totalLectures = await Attendance.countDocuments({ course: courseId });
-    const presentLectures = await Attendance.countDocuments({
-      course: courseId,
-      student: req.student._id,
-      status: "present",
-    });
-
-    res.json({
-      totalLectures,
-      presentLectures,
-      absentLectures: totalLectures - presentLectures,
-      attendanceRate,
-      courseName: course.courseName,
-      courseCode: course.courseCode,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-// Get Detailed Course Attendance
-exports.getDetailedCourseAttendance = async (req, res) => {
-  try {
-    const { courseId } = req.params;
-
-    // Step 1: Verify student is enrolled
-    const student = await Student.findById(req.student._id);
-    const isEnrolled = student.enrolledCourses.some(
-      (enrollment) => enrollment.course.toString() === courseId
-    );
-
-    if (!isEnrolled) {
-      return res.status(403).json({ error: "Not enrolled in this course" });
-    }
-
-    // Step 2: Get all lectures of the course
-    const lectures = await Lecture.find({ course: courseId }).sort({ date: 1 });
-
-    // Step 3: Get student's attendance records for this course
-    const attendanceRecords = await Attendance.find({
-      course: courseId,
-      student: req.student._id,
-    }).populate("lecture", "title date");
-
-    // Step 4: Create a map of attended lecture IDs
-    const attendedLectureIds = new Set(
-      attendanceRecords.map((record) => record.lecture._id.toString())
-    );
-
-    // Step 5: Build final attendance status list
-    const detailedAttendance = lectures.map((lecture) => ({
-      lectureId: lecture._id,
-      title: lecture.title,
-      date: lecture.date,
-      status: attendedLectureIds.has(lecture._id.toString())
-        ? "Present"
-        : "Absent",
-    }));
-
-    res.json(detailedAttendance);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
+// ---------------------------
 // Get Available Courses
+// ---------------------------
 exports.getAvailableCourses = async (req, res) => {
   try {
     const student = await Student.findById(req.student._id);
@@ -273,8 +106,9 @@ exports.getAvailableCourses = async (req, res) => {
   }
 };
 
-
+// ---------------------------
 // Register for Courses
+// ---------------------------
 exports.registerCourses = async (req, res) => {
   try {
     const { courseIds } = req.body;
@@ -286,28 +120,19 @@ exports.registerCourses = async (req, res) => {
     const student = await Student.findById(req.student._id);
     const courses = await Course.find({ _id: { $in: courseIds } });
 
-    // Verify all courses exist
     if (courses.length !== courseIds.length) {
       return res.status(400).json({ error: "One or more courses not found" });
     }
 
-    // Track newly added course references
     const newEnrollments = [];
 
     for (const course of courses) {
-      // Prevent duplicate enrollment
       const alreadyEnrolled = student.enrolledCourses.some(
         (enrollment) => enrollment.course.toString() === course._id.toString()
       );
 
       if (!alreadyEnrolled) {
-        // Add to student's enrolledCourses
-        newEnrollments.push({
-          course: course._id,
-          semester: student.semester,
-        });
-
-        // Add student to course.students if not already added
+        newEnrollments.push({ course: course._id, semester: student.semester });
         if (!course.students.includes(student._id)) {
           course.students.push(student._id);
         }
@@ -316,8 +141,8 @@ exports.registerCourses = async (req, res) => {
 
     if (newEnrollments.length > 0) {
       student.enrolledCourses.push(...newEnrollments);
-      await student.save(); // Save updated student
-      await Promise.all(courses.map((course) => course.save())); // Save updated courses
+      await student.save();
+      await Promise.all(courses.map((course) => course.save()));
     }
 
     res.json({ message: "Courses registered successfully" });
@@ -326,90 +151,9 @@ exports.registerCourses = async (req, res) => {
   }
 };
 
-// Get Semester Result
-exports.getSemesterResult = async (req, res) => {
-  try {
-    const { semester } = req.params;
-
-    const student = await Student.findById(req.student._id);
-    const semesterResult = student.semesterResults.find(
-      (result) => result.semester.toString() === semester
-    );
-
-    if (!semesterResult) {
-      return res
-        .status(404)
-        .json({ error: "Result not found for this semester" });
-    }
-
-    // Get course-wise marks for the semester
-    const courseMarks = await Marks.find({
-      student: req.student._id,
-      course: {
-        $in: student.enrolledCourses
-          .filter((e) => e.semester.toString() === semester)
-          .map((e) => e.course),
-      },
-    }).populate("course", "courseName courseCode creditHours");
-
-    res.json({
-      semesterResult,
-      courseMarks,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-// Get Fee History
-exports.getFeeHistory = async (req, res) => {
-  try {
-    const student = await Student.findById(req.student._id).select(
-      "feeHistory"
-    );
-    res.json(student.feeHistory);
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-// Get Current Fee Challan
-exports.getCurrentFeeChallan = async (req, res) => {
-  try {
-    const student = await Student.findById(req.student._id);
-    const currentFeeChallan = student.feeHistory.find(
-      (fee) => fee.status === "pending"
-    );
-
-    if (!currentFeeChallan) {
-      return res.status(404).json({ error: "No pending fee challan found" });
-    }
-
-    res.json(currentFeeChallan);
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-// Get Assignments
-exports.getAssignments = async (req, res) => {
-  try {
-    const student = await Student.findById(req.student._id);
-    const enrolledCourseIds = student.enrolledCourses.map((e) => e.course);
-
-    const assignments = await Assignment.find({
-      course: { $in: enrolledCourseIds },
-    })
-      .populate("course", "courseName courseCode")
-      .sort({ dueDate: 1 });
-
-    res.json(assignments);
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-// Get Profile Info
+// ---------------------------
+// Get Student Profile
+// ---------------------------
 exports.getProfile = async (req, res) => {
   try {
     const student = await Student.findById(req.student._id).select("-password");
@@ -419,57 +163,37 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// Request Profile Update
-exports.requestProfileUpdate = async (req, res) => {
+// ---------------------------
+// Update Profile
+// ---------------------------
+exports.updateProfile = async (req, res) => {
   try {
     const { name, email, phone, address } = req.body;
+    const student = await Student.findById(req.student._id);
 
-    if (!name && !email && !phone && !address) {
-      return res
-        .status(400)
-        .json({ error: "At least one field must be provided for update" });
-    }
+    if (!student) return res.status(404).json({ error: "Student not found" });
 
-    // Get current student data
-    const currentStudent = await Student.findById(req.student._id);
+    if (name) student.name = name;
+    if (email) student.email = email;
+    if (phone) student.phone = phone;
+    if (address) student.address = address;
 
-    const requestedChanges = {};
-    if (name) requestedChanges.name = name;
-    if (email) requestedChanges.email = email;
-    if (phone) requestedChanges.phone = phone;
-    if (address) requestedChanges.address = address;
-
-    const updateRequest = new StudentUpdateRequest({
-      student: req.student._id,
-      requestedChanges,
-      currentData: {
-        name: currentStudent.name,
-        email: currentStudent.email,
-        phone: currentStudent.phone,
-        address: currentStudent.address,
-      },
-    });
-
-    await updateRequest.save();
-    res.status(201).json({
-      message:
-        "Profile update request submitted successfully. Awaiting admin approval.",
-      requestId: updateRequest._id,
-    });
+    await student.save();
+    res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
+// ---------------------------
 // Change Password
+// ---------------------------
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
 
     if (!currentPassword || !newPassword || !confirmNewPassword) {
-      return res
-        .status(400)
-        .json({ error: "All password fields are required" });
+      return res.status(400).json({ error: "All password fields are required" });
     }
 
     if (newPassword !== confirmNewPassword) {
@@ -490,29 +214,3 @@ exports.changePassword = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
-//update profile
-exports.updateProfile = async (req, res) => {
-  try {
-    const { name, email, phone, address } = req.body;
-
-    const student = await Student.findById(req.student._id);
-
-    if (!student) {
-      return res.status(404).json({ error: "Student not found" });
-    } 
-
-    if (name) student.name = name;
-    if (email) student.email = email;
-    if (phone) student.phone = phone;
-    if (address) student.address = address;
-
-    await student.save(); 
-
-    res.status(200).json({ message: "Profile updated successfully" });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};  
-
-

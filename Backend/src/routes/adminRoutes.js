@@ -3,46 +3,88 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const auth = require('../middleware/auth');
 
-
-// Registration
+/**
+ * ========================
+ * Admin Authentication
+ * ========================
+ */
+// Admin registration
 router.post('/register/admin', adminController.registerAdmin);
 
-
-// Admin Authentication
+// Admin login
 router.post('/login', adminController.login);
 
-// Protected Routes (require authentication)
+// Protect all routes below
 router.use(auth);
 
-// Registration
-router.post('/register/student', adminController.registerStudent);
-router.post('/register/teacher', adminController.registerTeacher);
-
-// Admin Profile
+/**
+ * ========================
+ * Admin Profile
+ * ========================
+ */
 router.get('/profile', adminController.getAdminInfo);
 router.patch('/profile', adminController.updateProfile);
 
-// Dashboard
+/**
+ * ========================
+ * Dashboard
+ * ========================
+ */
 router.get('/dashboard/stats', adminController.getDashboardStats);
 
-// Student Management
-router.post('/students', adminController.addStudent);
+/**
+ * ========================
+ * Student Management
+ * ========================
+ */
+// Add student
+router.post('/students', adminController.registerStudent);
+
+router.get('/students/:id', adminController.getStudentById);
+
+// View all students
 router.get('/students', adminController.getAllStudents);
+
+// Update student by ID
 router.patch('/students/:id', adminController.updateStudent);
-router.delete('/students/:id', adminController.deleteStudent);
-router.delete('/students', adminController.deleteStudent); // Alternative delete by batch, rollNo, department
 
-// Teacher Management
-router.post('/teachers', adminController.addTeacher);
+// Delete student
+router.delete('/students/:id', adminController.deleteStudent); // By ID
+
+/**
+ * ========================
+ * Teacher Management
+ * ========================
+ */
+// Add teacher
+router.post('/teachers', adminController.registerTeacher);
+
+router.get('/teachers/:id', adminController.getTeacherById);
+
+// View all teachers
 router.get('/teachers', adminController.getAllTeachers);
-router.patch('/teachers/:id', adminController.updateTeacher);
-router.delete('/teachers/:id', adminController.deleteTeacher);
-router.delete('/teachers', adminController.deleteTeacher); // Alternative delete by email
 
-// Course Management
+// Update teacher by ID
+router.patch('/teachers/:id', adminController.updateTeacher);
+
+// Delete teacher
+router.delete('/teachers/:id', adminController.deleteTeacher); // By ID
+
+/**
+ * ========================
+ * Course Management
+ * ========================
+ */
+// Create course (assign teacher here)
 router.post('/courses', adminController.createCourse);
+
+// View all courses
 router.get('/courses', adminController.getAllCourses);
+
+// Update course (including teacher assignment)
 router.patch('/courses/:id', adminController.updateCourse);
+
+// Delete course
 router.delete('/courses/:id', adminController.deleteCourse);
 
-module.exports = router; 
+module.exports = router;
