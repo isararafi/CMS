@@ -1,18 +1,13 @@
 // Importing necessary React components
 import Login from './pages/Login';  // Importing Login page component
-import DashboardLayout from './layouts/DashboardLayout';  // Importing Dashboard Layout component
 import UnauthorizedPage from './components/common/UnauthorizedPage';  // Importing Unauthorized page component
 import Home from './pages/Home';  // Importing Home page component
 import StudentDashboard from './pages/StudentDashboard';  // Importing Student Dashboard page component
-import TeacherDashboard from './pages/TeacherDashboard';  // Importing Teacher Dashboard page component
-import AdminDashboard from './pages/AdminDashboard';  // Importing Admin Dashboard page component
 import CourseRegistration from './pages/CourseRegistration';  // Importing Course Registration page component
 import StudentResult from './pages/StudentResult';  // Importing Student Result page component
-import StudentFees from './pages/StudentFees';  // Importing Student Fees page component
 import StudentCoursesMids from './pages/StudentCoursesMids';  // Importing Student Courses Mids page component
 import StudentCoursesSummary from './pages/StudentCoursesSummary';  // Importing Student Courses Summary page component
 import StudentSettings from './pages/StudentSettings';  // Importing Student Settings page component
-import StudentAssignments from './pages/StudentAssignments';  // Importing Student Assignments page component
 import TeacherPage from './pages/TeacherPage';  // Importing Teacher Page component
 import AdminPage from './pages/AdminPage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';  // Importing React Router components for routing
@@ -43,8 +38,6 @@ function App() {
 
             <Route path="registration" element={<CourseRegistration />} />
             <Route path="result" element={<StudentResult />} />
-            {/* <Route path="fees" element={<StudentFees />} /> */}
-            {/* <Route path="assignments" element={<StudentAssignments />} /> */}
             <Route path="settings" element={<StudentSettings />} />
           </Route>
 

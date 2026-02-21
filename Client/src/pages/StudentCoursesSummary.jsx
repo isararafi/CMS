@@ -5,7 +5,6 @@ import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/studentCoursesSummary.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAttendanceSummary, fetchAttendanceDetailed } from '../features/courses/attendanceSlice';
 import { fetchStudentProfile } from '../features/student/studentProfileSlice';
 import { useToast } from '../context/ToastContext';
 
@@ -33,24 +32,6 @@ const StudentCoursesSummary = () => {
     };
     
     fetchData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    const fetchAttendanceData = async () => {
-      if (profile?.enrolledCourses) {
-        try {
-          await Promise.all(profile.enrolledCourses.map(async course => {
-            await dispatch(fetchAttendanceSummary(course.course)).unwrap();
-            await dispatch(fetchAttendanceDetailed(course.course)).unwrap();
-          }));
-          showToast('Attendance data loaded successfully', 'success');
-        } catch (error) {
-          showToast('Failed to load attendance data for some courses', 'error');
-        }
-      }
-    };
-
-    fetchAttendanceData();
   }, [dispatch]);
 
   const toggleSidebar = () => {
@@ -187,29 +168,6 @@ const StudentCoursesSummary = () => {
               />
             </div>
 
-            {/* Attendance Modal */}
-            {showAttendanceModal && selectedAttendance && (
-              <div className={styles.modalOverlay}>
-                <div className={styles.modalContent}>
-                  <button className={styles.modalClose} onClick={handleCloseModal}>
-                    <X size={24} />
-                  </button>
-                  
-                  <h2>{selectedAttendance.courseCode} - {selectedAttendance.courseName} Attendance</h2>
-                  
-                  <CustomTable 
-                    headers={['Topic', 'Date', 'Time', 'Status']}
-                    data={selectedAttendance.records}
-                    showActionColumn={false}
-                    statusColors={{
-                      Present: '#C3F4D0',
-                      Absent: '#FFCECE',
-                      Pending: '#FFE9C0'
-                    }}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
