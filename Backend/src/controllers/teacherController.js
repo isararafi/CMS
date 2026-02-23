@@ -114,36 +114,61 @@ exports.getStudentsForCourse = async (req, res) => {
 // Add or Update Marks for Students in a Course
 // ---------------------------
 exports.addOrUpdateMarks = async (req, res) => {
-    try {
-        const { courseId } = req.params;
-        const { marks } = req.body; // [{ studentId, marks }]
+  try {
+    const { courseId } = req.params;
+    const { marks, examType } = req.body;
 
-        if (!marks || !Array.isArray(marks)) {
-            return res.status(400).json({ error: 'Marks must be an array of { studentId, marks }' });
-        }
-
-        // Verify course belongs to this teacher
-        const course = await Course.findOne({ _id: courseId, teacher: req.teacher._id });
-        if (!course) return res.status(404).json({ error: 'Course not found or not authorized' });
-
-        // Update marks for each student
-        for (const item of marks) {
-            const { studentId, marks: score } = item;
-            const student = await Student.findById(studentId);
-            if (!student || !course.students.includes(student._id)) continue;
-
-            // Check if marks for this course already exist
-            const markIndex = student.marks.findIndex(m => m.course.toString() === course._id.toString());
-            if (markIndex !== -1) {
-                student.marks[markIndex].marks = score; // Update
-            } else {
-                student.marks.push({ course: course._id, marks: score }); // Add new
-            }
-            await student.save();
-        }
-
-        res.json({ message: 'Marks added/updated successfully' });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    if (!marks || !Array.isArray(marks)) {
+      return res.status(400).json({
+        error: "Marks must be an array of { studentId, marks }"
+      });
     }
+
+    const course = await Course.findOne({
+      _id: courseId,
+      teacher: req.teacher._id
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        error: "Course not found or not authorized"
+      });
+    }
+
+    for (const item of marks) {
+      const { studentId, marks: score } = item;
+
+      if (score < 0 || score > 100) continue;
+
+      const student = await Student.findById(studentId);
+      if (
+        !student ||
+        !course.students.some(id => id.toString() === student._id.toString())
+      ) continue;
+
+      const markIndex = student.marks.findIndex(
+        m =>
+          m.course.toString() === course._id.toString() &&
+          m.examType === examType
+      );
+
+      if (markIndex !== -1) {
+        student.marks[markIndex].marks = score;
+      } else {
+        student.marks.push({
+          course: course._id,
+          marks: score,
+          semester: student.semester,
+          examType
+        });
+      }
+
+      await student.save();
+    }
+
+    res.json({ message: "Marks added/updated successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

@@ -26,7 +26,7 @@ swaggerDocs(app);
 
 // Routes
 app.use('/api/admin', adminRoutes);
-app.use('/api/teacher', teacherRoutes);
+app.use('/api/teachers', teacherRoutes);
 app.use('/api/students', studentRoutes);
 
 // Start server

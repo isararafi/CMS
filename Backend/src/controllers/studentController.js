@@ -52,10 +52,14 @@ exports.login = async (req, res) => {
 exports.getDashboardInfo = async (req, res) => {
   try {
     const student = await Student.findById(req.student._id)
-      .populate("enrolledCourses.course");
+      .populate("courses");  // ✅ correct field
 
-    const totalCredits = student.enrolledCourses.reduce(
-      (sum, enrollment) => sum + enrollment.course.creditHours,
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const totalCredits = student.courses.reduce(
+      (sum, course) => sum + (course.creditHours || 0),
       0
     );
 
@@ -63,12 +67,12 @@ exports.getDashboardInfo = async (req, res) => {
       name: student.name,
       rollNo: student.rollNo,
       semester: student.semester,
-      cgpa: student.cgpa,
-      enrolledCourses: student.enrolledCourses,
+      courses: student.courses,
       totalCredits,
     });
+
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -77,13 +81,22 @@ exports.getDashboardInfo = async (req, res) => {
 // ---------------------------
 exports.getGpaProgress = async (req, res) => {
   try {
-    const student = await Student.findById(req.student._id).select("semesterResults");
+    const student = await Student.findById(req.student._id)
+      .select("semesterResults");
 
-    const gpaData = student.semesterResults
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const gpaData = (student.semesterResults || [])
       .sort((a, b) => a.semester - b.semester)
-      .map((result) => ({ semester: result.semester, gpa: result.gpa }));
+      .map((result) => ({
+        semester: result.semester,
+        gpa: result.gpa
+      }));
 
     res.json(gpaData);
+
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
@@ -118,36 +131,48 @@ exports.registerCourses = async (req, res) => {
     }
 
     const student = await Student.findById(req.student._id);
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
     const courses = await Course.find({ _id: { $in: courseIds } });
 
     if (courses.length !== courseIds.length) {
       return res.status(400).json({ error: "One or more courses not found" });
     }
 
-    const newEnrollments = [];
+    const newCourses = [];
 
     for (const course of courses) {
-      const alreadyEnrolled = student.enrolledCourses.some(
-        (enrollment) => enrollment.course.toString() === course._id.toString()
+
+      const alreadyEnrolled = student.courses.some(
+        id => id.toString() === course._id.toString()
       );
 
       if (!alreadyEnrolled) {
-        newEnrollments.push({ course: course._id, semester: student.semester });
-        if (!course.students.includes(student._id)) {
+
+        // Add course to student
+        student.courses.push(course._id);
+
+        // Add student to course (if not already present)
+        if (!course.students.some(
+          id => id.toString() === student._id.toString())
+          
+        ) {
           course.students.push(student._id);
         }
+
+        newCourses.push(course);
       }
     }
 
-    if (newEnrollments.length > 0) {
-      student.enrolledCourses.push(...newEnrollments);
-      await student.save();
-      await Promise.all(courses.map((course) => course.save()));
-    }
+    await student.save();
+    await Promise.all(newCourses.map(course => course.save()));
 
     res.json({ message: "Courses registered successfully" });
+
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
