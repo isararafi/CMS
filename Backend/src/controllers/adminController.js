@@ -12,6 +12,7 @@ const bcrypt = require('bcryptjs');
 // Register Admin
 exports.registerAdmin = async (req, res) => {
     try {
+        console.log(req.body);
         const { name, email, password } = req.body;
         if (!name || !email || !password)
             return res.status(400).json({ error: 'All fields are required' });

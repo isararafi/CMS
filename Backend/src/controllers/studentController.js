@@ -68,7 +68,7 @@ exports.getDashboardInfo = async (req, res) => {
       totalCredits,
     });
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error });
   }
 };
 

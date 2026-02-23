@@ -19,6 +19,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(express.json());
 
 // Swagger
 swaggerDocs(app);
@@ -26,7 +27,7 @@ swaggerDocs(app);
 // Routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/teacher', teacherRoutes);
-app.use('/api/student', studentRoutes);
+app.use('/api/students', studentRoutes);
 
 // Start server
 app.listen(port, () => {
