@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { GraduationCap, Users, BookOpen } from 'lucide-react';//icon packages
 import styles from '../styles/components/home.module.scss';

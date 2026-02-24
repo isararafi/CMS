@@ -1,56 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, Layers, GraduationCap } from 'lucide-react';
+import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, Layers } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
-import Navbar from '../components/common/Navbar';
 import styles from '../styles/pages/studentCoursesMids.module.scss';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllCourseMarks, setActiveType } from '../features/courses/courseMarksSlice';
-import { fetchStudentProfile } from '../features/student/studentProfileSlice';
 import { useToast } from '../context/ToastContext';
 
 const StudentCoursesMids = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('midterm'); // 'sessional', 'midterm', 'final'
+  const [profile, setProfile] = useState({});
+  const [marks, setMarks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const dispatch = useDispatch();
   const { showToast } = useToast();
-  const { filteredMarks, loading: marksLoading, error: marksError } = useSelector(state => state.courseMarks || {});
-  const { profile, loading: profileLoading, error: profileError } = useSelector(state => state.studentProfile || {});
 
   useEffect(() => {
+    // Placeholder for fetching profile and marks
     const fetchData = async () => {
       try {
-        await dispatch(fetchAllCourseMarks()).unwrap();
-        await dispatch(fetchStudentProfile()).unwrap();
+        setLoading(true);
+
+        // TODO: Replace with your API calls
+        const mockProfile = { rollNo: '12345', semester: '3', department: 'CSE' };
+        const mockMarks = [
+          {
+            courseCode: 'CSE101',
+            courseName: 'Introduction to CS',
+            currentMarks: { marks: 45, totalMarks: 50 },
+            sessionalMarks: { marks: 20, totalMarks: 25 },
+            finalMarks: { marks: 80, totalMarks: 100 },
+          },
+          {
+            courseCode: 'MAT101',
+            courseName: 'Calculus I',
+            currentMarks: { marks: 35, totalMarks: 50 },
+            sessionalMarks: { marks: 15, totalMarks: 25 },
+            finalMarks: { marks: 60, totalMarks: 100 },
+          },
+        ];
+
+        setProfile(mockProfile);
+        setMarks(mockMarks);
         showToast('Course marks loaded successfully', 'success');
-      } catch (error) {
-        showToast(error.message || 'Failed to load course marks', 'error');
+      } catch (err) {
+        setError('Failed to load course marks');
+        showToast('Failed to load course marks', 'error');
+      } finally {
+        setLoading(false);
       }
     };
-    
+
     fetchData();
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    try {
-      dispatch(setActiveType(activeTab));
-      showToast(`Switched to ${activeTab} evaluations`, 'info');
-    } catch (error) {
-      showToast('Failed to switch evaluation type', 'error');
-    }
-  }, [activeTab, dispatch]);
+    showToast(`Switched to ${activeTab} evaluations`, 'info');
+  }, [activeTab, showToast]);
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
-  // Calculate performance percentage
   const calculatePerformance = (obtained, total) => {
-    if (obtained === null || total === 0) return null;
+    if (obtained === null || total === 0) return 0;
     return Math.round((obtained / total) * 100);
   };
 
-  // Get performance color
   const getPerformanceColor = (percentage) => {
     if (percentage === null) return '#aaa';
     if (percentage >= 80) return '#2E7D32';
@@ -59,30 +72,28 @@ const StudentCoursesMids = () => {
     return '#F44336';
   };
 
-  // Add evaluation grid styles
-  const evaluationGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '24px',
-    padding: '8px 4px'
-  };
+  // Filter marks based on activeTab
+  const filteredMarks = marks.map(course => {
+    let currentMarks = course.currentMarks;
+    if (activeTab === 'sessional') currentMarks = course.sessionalMarks;
+    if (activeTab === 'final') currentMarks = course.finalMarks;
+    return { ...course, currentMarks };
+  });
 
-  // Render loading state
-  if (marksLoading || profileLoading) {
+  if (loading) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
       </div>
     );
   }
-      
-  // Render error state
-  if (marksError || profileError) {
+
+  if (error) {
     return (
       <div className={styles.errorContainer}>
         <AlertCircle size={48} />
         <h3>Error Loading Data</h3>
-        <p>{marksError || profileError}</p>
+        <p>{error}</p>
       </div>
     );
   }
@@ -93,11 +104,9 @@ const StudentCoursesMids = () => {
       <div className={styles.decorativeWave}></div>
       <div className={styles.decorativeTriangle}></div>
       <div className={styles.decorativeCircle}></div>
-      
+
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
-        
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
@@ -135,18 +144,18 @@ const StudentCoursesMids = () => {
               >
                 <BarChart2 size={18} />
                 <span>Mid Term</span>
-                      </button>
+              </button>
               <button 
                 onClick={() => setActiveTab('final')}
                 className={`${styles.tabButton} ${activeTab === 'final' ? styles.active : ''}`}
               >
                 <Award size={18} />
                 <span>Final Term</span>
-                      </button>
+              </button>
             </div>
 
             <div className={styles.evaluationGrid}>
-              {(filteredMarks || []).map(course => (
+              {filteredMarks.map(course => (
                 <div key={course.courseCode} className={styles.midtermCard}>
                   <div className={styles.midtermHeader}>
                     <h3>
@@ -184,6 +193,7 @@ const StudentCoursesMids = () => {
                 </div>
               ))}
             </div>
+
           </div>
         </div>
       </div>
@@ -191,4 +201,4 @@ const StudentCoursesMids = () => {
   );
 };
 
-export default StudentCoursesMids; 
+export default StudentCoursesMids;

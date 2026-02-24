@@ -1,45 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, FileText, BookOpen, AlertCircle, Award, CheckCircle } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from '../components/common/Sidebar';
-import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/courseRegistration.module.scss';
-import { fetchAvailableCourses, registerCourses, toggleCourseSelection, clearRegistrationStatus } from '../features/courses/courseRegistrationSlice';
-import { fetchStudentProfile } from '../features/student/studentProfileSlice';
 import { useToast } from '../context/ToastContext';
 
 const CourseRegistration = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedCourses, setSelectedCourses] = useState([]);
-  const dispatch = useDispatch();
+  const [availableCourses, setAvailableCourses] = useState([]); // Course data
+  const [selectedCourses, setSelectedCourses] = useState([]); // Selected course IDs
+  const [loading, setLoading] = useState(true);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [registrationError, setRegistrationError] = useState(null);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [profile, setProfile] = useState({}); // Student profile
+
   const { showToast } = useToast();
-  
-  const { 
-    availableCourses, 
-    loading, 
-    registrationLoading, 
-    error, 
-    registrationError,
-    registrationSuccess,
-    successMessage 
-  } = useSelector(state => state.courseRegistration);
-  
-  const { profile } = useSelector(state => state.studentProfile);
 
   useEffect(() => {
+    // Placeholder for fetching courses and profile
     const fetchData = async () => {
       try {
-        await dispatch(fetchAvailableCourses()).unwrap();
-        await dispatch(fetchStudentProfile()).unwrap();
+        setLoading(true);
+        setError(null);
+
+        // TODO: Replace below with your API calls
+        const mockProfile = { rollNo: '12345', semester: '3' };
+        const mockCourses = [
+          { _id: 'c1', courseCode: 'CSE101', courseName: 'Intro to CS', creditHours: 3, department: 'CSE', instructor: { name: 'Dr. Smith' }, seats: 30, enrolled: 10 },
+          { _id: 'c2', courseCode: 'MAT101', courseName: 'Calculus I', creditHours: 4, department: 'Math', instructor: { name: 'Dr. Johnson' }, seats: 25, enrolled: 25 },
+        ];
+
+        setProfile(mockProfile);
+        setAvailableCourses(mockCourses);
         showToast('Available courses loaded successfully', 'success');
-      } catch (error) {
-        showToast(error.message || 'Failed to load available courses', 'error');
+      } catch (err) {
+        setError('Failed to load courses');
+        showToast('Failed to load courses', 'error');
+      } finally {
+        setLoading(false);
       }
     };
-    
+
     fetchData();
-  }, [dispatch]);
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
@@ -63,21 +69,31 @@ const CourseRegistration = () => {
 
   const handleSubmitRegistration = async () => {
     try {
+      setRegistrationLoading(true);
+      setRegistrationError(null);
+      setRegistrationSuccess(false);
+
+      // TODO: Replace below with your API call
       if (selectedCourses.length > 0) {
-        await dispatch(registerCourses(selectedCourses));
-        showToast('Course registration submitted successfully', 'success');
+        console.log('Registering courses:', selectedCourses);
+        setTimeout(() => {
+          setRegistrationSuccess(true);
+          setSuccessMessage('Course registration submitted successfully');
+          showToast('Course registration submitted successfully', 'success');
+        }, 1000);
       }
-    } catch (error) {
+    } catch (err) {
+      setRegistrationError('Failed to submit course registration');
       showToast('Failed to submit course registration', 'error');
+    } finally {
+      setRegistrationLoading(false);
     }
   };
 
-  // Transform available courses data for the table
   const coursesData = availableCourses.map(course => ({
     id: course._id,
     code: course.courseCode,
     courseName: course.courseName,
-    // name: course.courseName,
     creditHours: course.creditHours,
     department: course.department,
     instructor: course.instructor?.name || 'TBA',
@@ -94,7 +110,6 @@ const CourseRegistration = () => {
     }
   }));
 
-  // Show loading state
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -105,17 +120,14 @@ const CourseRegistration = () => {
 
   return (
     <div className={styles.dashboardLayout}>
-      {/* Decorative elements */}
       <div className={styles.decorativeWave}></div>
       <div className={styles.decorativeTriangle}></div>
       <div className={styles.decorativeCircle}></div>
       <div className={styles.decorativeDots}></div>
       <div className={styles.decorativeDiamond}></div>
-      
+
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
-        
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
@@ -151,7 +163,7 @@ const CourseRegistration = () => {
               )}
 
               <CustomTable 
-                headers={['Code', 'Course Name', 'Credit Hours', 'Department' , 'Action']}
+                headers={['Code', 'Course Name', 'Credit Hours', 'Department', 'Action']}
                 data={coursesData}
                 onView={handleCourseSelect}
               />
@@ -176,16 +188,13 @@ const CourseRegistration = () => {
                   onClick={handleSubmitRegistration}
                   disabled={selectedCourses.length === 0 || registrationLoading}
                 >
-                  {registrationLoading ? (
-                    'Registering...'
-                  ) : registrationSuccess ? (
-                    <>
-                      <CheckCircle size={16} />
-                      Registration Submitted
-                    </>
-                  ) : (
-                    'Submit Registration'
-                  )}
+                  {registrationLoading ? 'Registering...' :
+                   registrationSuccess ? (
+                     <>
+                       <CheckCircle size={16} />
+                       Registration Submitted
+                     </>
+                   ) : 'Submit Registration'}
                 </button>
               </div>
             </div>
@@ -196,4 +205,4 @@ const CourseRegistration = () => {
   );
 };
 
-export default CourseRegistration; 
+export default CourseRegistration;

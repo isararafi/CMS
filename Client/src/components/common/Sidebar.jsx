@@ -21,8 +21,11 @@ import {
   LogOut
 } from 'lucide-react';
 import styles from '../../styles/components/sidebar.module.scss';
+import {logout} from '../../features/auth/authSlice'
+import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = ({ collapsed, setCollapsed, role }) => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const [coursesSubmenuOpen, setCoursesSubmenuOpen] = useState(false);
@@ -69,9 +72,7 @@ const Sidebar = ({ collapsed, setCollapsed, role }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    localStorage.clear(); // Clear all localStorage data
+    dispatch(logout());
     navigate('/'); // Redirect to home page
   };
 

@@ -1,60 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import styles from '../styles/pages/teacherSettings.module.scss';
-import { 
-  fetchTeacherProfile, 
-  updateTeacherProfile
-} from '../features/teacherSettings/teacherSettingsSlice';
-import { useToast } from '../context/ToastContext';
 
 const TeacherSettings = () => {
-  const dispatch = useDispatch();
-  const { profile, isLoading, error, successMessage } = useSelector(state => state.teacherSettings);
-  const [isEditing, setIsEditing] = useState(false);
+  // Mock profile data
+  const mockProfile = {
+    name: 'Ali Khan',
+    email: 'ali.khan@example.com',
+    department: 'Computer Science',
+    education: 'BSSE'
+  };
+
+  const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
     name: '',
     email: '',
     department: '',
     education: ''
   });
-  const { showToast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchTeacherProfile()).unwrap();
-        showToast('Profile loaded successfully', 'success');
-      } catch (error) {
-        showToast(error.message || 'Failed to load profile', 'error');
-      }
-    };
-    
-    fetchData();
-  }, [dispatch]);
+    // Simulate loading profile
+    setTimeout(() => {
+      setProfile(mockProfile);
+      setForm(mockProfile);
+      setIsLoading(false);
+    }, 500); // simulate network delay
+  }, []);
 
-  useEffect(() => {
-    if (profile) {
-      setForm({
-        name: profile.name || '',
-        email: profile.email || '',
-        department: profile.department || '',
-        education: profile.education || ''
-      });
-    }
-  }, [profile]);
-
-  const handleEdit = async () => {
+  const handleEdit = () => {
     if (isEditing) {
-      try {
-        await dispatch(updateTeacherProfile(form)).unwrap();
-        setIsEditing(false);
-        showToast('Profile updated successfully', 'success');
-      } catch (err) {
-        showToast(err.message || 'Failed to update profile', 'error');
-      }
+      // Save changes (mock)
+      setProfile(form);
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setIsEditing(false);
     } else {
       setIsEditing(true);
-      showToast('Now editing profile', 'info');
+      setMessage({ type: 'info', text: 'Now editing profile' });
     }
   };
 
@@ -62,22 +46,10 @@ const TeacherSettings = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className={styles.settingsPage}>
-        <div className={styles.loading}>Loading...</div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <div className={styles.settingsPage}>
-        <div className={styles.error}>
-          Error loading profile: {error}
-        </div>
+        <div className={styles.loading}>Loading profile...</div>
       </div>
     );
   }
@@ -85,71 +57,38 @@ const TeacherSettings = () => {
   return (
     <div className={styles.settingsPage}>
       <h2>Profile Settings</h2>
-      
-      {error && <div className={styles.error}>{error}</div>}
-      {successMessage && <div className={styles.success}>{successMessage}</div>}
-      
+
+      {message.text && (
+        <div className={message.type === 'error' ? styles.error : styles.success}>
+          {message.text}
+        </div>
+      )}
+
       <div className={styles.profileSection}>
-        <div className={styles.profileField}>
-          <label>Name:</label>
-          {isEditing ? (
-            <input 
-              name="name" 
-              value={form.name} 
-              onChange={handleChange}
-              className={styles.input}
-            />
-          ) : (
-            <span>{form.name || 'Not set'}</span>
-          )}
-        </div>
-        <div className={styles.profileField}>
-          <label>Email:</label>
-          {isEditing ? (
-            <input 
-              name="email" 
-              value={form.email} 
-              onChange={handleChange}
-              className={styles.input}
-              type="email"
-            />
-          ) : (
-            <span>{form.email || 'Not set'}</span>
-          )}
-        </div>
-        <div className={styles.profileField}>
-          <label>Department:</label>
-          {isEditing ? (
-            <input 
-              name="department" 
-              value={form.department} 
-              onChange={handleChange}
-              className={styles.input}
-            />
-          ) : (
-            <span>{form.department || 'Not set'}</span>
-          )}
-        </div>
-        <div className={styles.profileField}>
-          <label>Education:</label>
-          {isEditing ? (
-            <input 
-              name="education" 
-              value={form.education} 
-              onChange={handleChange}
-              className={styles.input}
-            />
-          ) : (
-            <span>{form.education || 'Not set'}</span>
-          )}
-        </div>
+        {['name', 'email', 'department', 'education'].map(field => (
+          <div key={field} className={styles.profileField}>
+            <label>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+            {isEditing ? (
+              <input
+                name={field}
+                value={form[field]}
+                onChange={handleChange}
+                className={styles.input}
+                type={field === 'email' ? 'email' : 'text'}
+              />
+            ) : (
+              <span>{form[field] || 'Not set'}</span>
+            )}
+          </div>
+        ))}
+
         <div className={styles.buttonGroup}>
-          <button 
-            onClick={handleEdit} 
-            className={`${styles.editButton} ${isLoading ? styles.loading : ''}`}
+          <button
+            onClick={handleEdit}
+            className={styles.editButton}
             disabled={isLoading}
           >
-            {isLoading ? 'Updating...' : isEditing ? 'Save Changes' : 'Edit'}
+            {isEditing ? 'Save Changes' : 'Edit'}
           </button>
         </div>
       </div>
@@ -157,4 +96,4 @@ const TeacherSettings = () => {
   );
 };
 
-export default TeacherSettings; 
+export default TeacherSettings;

@@ -27,7 +27,6 @@ function App() {
 
           {/* Student Dashboard Routes */}
           <Route path="/student/*">
-            <Route index element={<StudentDashboard />} />
             <Route path="dashboard" element={<StudentDashboard />} />
             
             {/* Courses and its subroutes */}

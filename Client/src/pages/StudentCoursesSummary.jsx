@@ -1,48 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, FileText, BookOpen, AlertCircle, Award, BarChart2, PieChart, Layers, X, User, MapPin, Calendar } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import Sidebar from '../components/common/Sidebar';
-import Navbar from '../components/common/Navbar';
 import CustomTable from '../components/common/CustomTable';
 import styles from '../styles/pages/studentCoursesSummary.module.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchStudentProfile } from '../features/student/studentProfileSlice';
 import { useToast } from '../context/ToastContext';
 
 const StudentCoursesSummary = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [summaries, setSummaries] = useState([]);
+  const [details, setDetails] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedAttendance, setSelectedAttendance] = useState(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
 
-  const dispatch = useDispatch();
   const { showToast } = useToast();
-  const { profile } = useSelector(state => state.studentProfile || {});
-  const { summaries, details, loading, error } = useSelector(state => state.attendance || {});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch(fetchStudentProfile()).unwrap();
-        showToast('Profile data loaded successfully', 'success');
-      } catch (error) {
-        showToast(error.message || 'Failed to load profile data', 'error');
+        setLoading(true);
+        // TODO: Replace with your API calls
+        const mockProfile = {
+          rollNo: '12345',
+          semester: '3',
+          enrolledCourses: [
+            { course: 'cse101' },
+            { course: 'mat101' }
+          ]
+        };
+
+        const mockSummaries = {
+          cse101: {
+            courseCode: 'CSE101',
+            courseName: 'Introduction to CS',
+            instructor: 'Dr. Smith',
+            attendanceRate: 85,
+            totalLectures: 20,
+            presentLectures: 17,
+            absentLectures: 3
+          },
+          mat101: {
+            courseCode: 'MAT101',
+            courseName: 'Calculus I',
+            instructor: 'Prof. Jones',
+            attendanceRate: 78,
+            totalLectures: 18,
+            presentLectures: 14,
+            absentLectures: 4
+          }
+        };
+
+        const mockDetails = {
+          cse101: [
+            { title: 'Arrays', date: '2026-02-20T10:00:00Z', status: 'Present' },
+            { title: 'Loops', date: '2026-02-21T10:00:00Z', status: 'Absent' }
+          ],
+          mat101: [
+            { title: 'Limits', date: '2026-02-19T09:00:00Z', status: 'Present' },
+            { title: 'Derivatives', date: '2026-02-21T09:00:00Z', status: 'Present' }
+          ]
+        };
+
+        setProfile(mockProfile);
+        setSummaries(mockSummaries);
+        setDetails(mockDetails);
+
+        showToast('Profile and attendance data loaded', 'success');
+      } catch (err) {
+        setError('Failed to load data');
+        showToast('Failed to load data', 'error');
+      } finally {
+        setLoading(false);
       }
     };
-    
+
     fetchData();
-  }, [dispatch]);
+  }, [showToast]);
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
-  const handleCourseSelect = (courseId) => {
-    setSelectedCourse(courseId === selectedCourse ? null : courseId);
-  };
-
-  // View attendance handler
   const handleViewAttendance = (course) => {
     const courseDetails = details[course.id];
     if (courseDetails) {
@@ -56,42 +93,19 @@ const StudentCoursesSummary = () => {
           status: record.status
         }))
       });
-      setShowAttendanceModal(true);
       showToast(`Viewing attendance for ${course.code}`, 'info');
     } else {
       showToast(`No attendance records found for ${course.code}`, 'error');
     }
   };
 
-  // Close modal handler
-  const handleCloseModal = () => {
-    setShowAttendanceModal(false);
-    setSelectedAttendance(null);
-  };
-
-  // Calculate performance percentage
-  const calculatePerformance = (obtained, total) => {
-    if (obtained === null || total === 0) return null;
-    return Math.round((obtained / total) * 100);
-  };
-
-  // Get performance color
-  const getPerformanceColor = (percentage) => {
-    if (percentage === null) return '#aaa';
-    if (percentage >= 80) return '#2E7D32';
-    if (percentage >= 70) return '#4CAF50';
-    if (percentage >= 60) return '#FFC107';
-    return '#F44336';
-  };
-
-  // Prepare course data from API responses
   const coursesData = profile?.enrolledCourses?.map(enrollment => {
     const summary = summaries[enrollment.course] || {};
     return {
       id: enrollment.course,
-      code: summary.courseCode, // You might want to map this to a proper course code
-      name: summary.courseName, // You might want to fetch course names separately
-      instructor: summary.instructor, // You might want to fetch instructor names separately
+      code: summary.courseCode || enrollment.course,
+      name: summary.courseName || 'N/A',
+      instructor: summary.instructor || 'N/A',
       attendance: summary.attendanceRate || 0,
       totalLectures: summary.totalLectures || 0,
       presentLectures: summary.presentLectures || 0,
@@ -99,7 +113,6 @@ const StudentCoursesSummary = () => {
     };
   }) || [];
 
-  // Show loading state
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -108,7 +121,6 @@ const StudentCoursesSummary = () => {
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className={styles.errorContainer}>
@@ -121,15 +133,13 @@ const StudentCoursesSummary = () => {
 
   return (
     <div className={styles.dashboardLayout}>
-      {/* Decorative elements */}
       <div className={styles.decorativeWave}></div>
       <div className={styles.decorativeTriangle}></div>
       <div className={styles.decorativeCircle}></div>
-      
+
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+
       <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.expanded : ''}`}>
-        {/* <Navbar toggleSidebar={toggleSidebar} /> */}
-        
         <div className={styles.contentWrapper}>
           <div className={styles.pageContent}>
             <div className={styles.dashboardHeader}>
@@ -149,11 +159,10 @@ const StudentCoursesSummary = () => {
               </div>
             </div>
 
-            {/* Custom Table */}
             <div className={styles.tableSection}>
               <h2>Courses Overview</h2>
-              <CustomTable 
-                headers={['Code', 'Course Name',  'Attendance', 'Total Lectures', 'Present', 'Absent', 'Actions']}
+              <CustomTable
+                headers={['Code', 'Course Name', 'Attendance', 'Total Lectures', 'Present', 'Absent', 'Actions']}
                 data={coursesData.map(course => ({
                   code: course.code,
                   'Course Name': course.name,
@@ -167,7 +176,6 @@ const StudentCoursesSummary = () => {
                 onView={handleViewAttendance}
               />
             </div>
-
           </div>
         </div>
       </div>
@@ -175,4 +183,4 @@ const StudentCoursesSummary = () => {
   );
 };
 
-export default StudentCoursesSummary; 
+export default StudentCoursesSummary;
