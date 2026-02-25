@@ -17,54 +17,99 @@ const studentSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // -------------------- GENERIC PENDING --------------------
-    builder.addMatcher(
-      (action) => action.type.endsWith('/pending'),
-      (state) => {
+
+    // ================= LOGIN STUDENT =================
+    builder
+      .addCase(thunks.loginStudent.pending, (state) => {
         state.loading = true;
         state.error = null;
-      }
-    );
-
-    // -------------------- GENERIC REJECTED --------------------
-    builder.addMatcher(
-      (action) => action.type.endsWith('/rejected'),
-      (state, action: any) => {
+      })
+      .addCase(thunks.loginStudent.fulfilled, (state, action: PayloadAction<StudentProfile>) => {
+        state.loading = false;
+        state.profile = action.payload;
+      })
+      .addCase(thunks.loginStudent.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload || action.error.message || 'Something went wrong';
-      }
-    );
+      });
 
-    // -------------------- FULFILLED CASES --------------------
-    builder.addCase(thunks.loginStudent.fulfilled, (state, action: PayloadAction<StudentProfile>) => {
-      state.loading = false;
-      state.profile = action.payload;
-    });
+    // ================= DASHBOARD INFO =================
+    builder
+      .addCase(thunks.getDashboardInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        thunks.getDashboardInfo.fulfilled,
+        (state, action: PayloadAction<{ totalCredits: number; courses: Course[] }>) => {
+          state.loading = false;
+          state.dashboard = action.payload;
+        }
+      )
+      .addCase(thunks.getDashboardInfo.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message || 'Something went wrong';
+      });
 
-    builder.addCase(thunks.getDashboardInfo.fulfilled, (state, action: PayloadAction<{ totalCredits: number; courses: Course[] }>) => {
-      state.loading = false;
-      state.dashboard = action.payload;
-    });
+    // ================= GPA PROGRESS =================
+    builder
+      .addCase(thunks.getGpaProgress.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(thunks.getGpaProgress.fulfilled, (state, action: PayloadAction<SemesterResult[]>) => {
+        state.loading = false;
+        state.gpaProgress = action.payload;
+      })
+      .addCase(thunks.getGpaProgress.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message || 'Something went wrong';
+      });
 
-    builder.addCase(thunks.getGpaProgress.fulfilled, (state, action: PayloadAction<SemesterResult[]>) => {
-      state.loading = false;
-      state.gpaProgress = action.payload;
-    });
+    // ================= AVAILABLE COURSES =================
+    builder
+      .addCase(thunks.getAvailableCourses.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(thunks.getAvailableCourses.fulfilled, (state, action: PayloadAction<Course[]>) => {
+        state.loading = false;
+        state.courses = action.payload;
+      })
+      .addCase(thunks.getAvailableCourses.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message || 'Something went wrong';
+      });
 
-    builder.addCase(thunks.getAvailableCourses.fulfilled, (state, action: PayloadAction<Course[]>) => {
-      state.loading = false;
-      state.courses = action.payload;
-    });
+    // ================= GET PROFILE =================
+    builder
+      .addCase(thunks.getProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(thunks.getProfile.fulfilled, (state, action: PayloadAction<StudentProfile>) => {
+        state.loading = false;
+        state.profile = action.payload;
+      })
+      .addCase(thunks.getProfile.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message || 'Something went wrong';
+      });
 
-    builder.addCase(thunks.getProfile.fulfilled, (state, action: PayloadAction<StudentProfile>) => {
-      state.loading = false;
-      state.profile = action.payload;
-    });
-
-    builder.addCase(thunks.updateProfile.fulfilled, (state, action: PayloadAction<StudentProfile>) => {
-      state.loading = false;
-      state.profile = action.payload;
-    });
+    // ================= UPDATE PROFILE =================
+    builder
+      .addCase(thunks.updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(thunks.updateProfile.fulfilled, (state, action: PayloadAction<StudentProfile>) => {
+        state.loading = false;
+        state.profile = action.payload;
+      })
+      .addCase(thunks.updateProfile.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message || 'Something went wrong';
+      });
   },
 });
 

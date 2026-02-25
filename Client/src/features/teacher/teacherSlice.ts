@@ -13,46 +13,104 @@ const initialState: TeacherState = {
 const teacherSlice = createSlice({
   name: 'teacher',
   initialState,
-  reducers: {},
+  reducers: {},  
   extraReducers: (builder) => {
-    // -------------------- GENERIC PENDING --------------------
-    builder.addMatcher(
-      (action) => action.type.endsWith('/pending'),
-      (state) => {
-        state.loading = true;
-        state.error = null;
-      }
-    );
 
-    // -------------------- GENERIC REJECTED --------------------
-    builder.addMatcher(
-      (action) => action.type.endsWith('/rejected'),
-      (state, action: any) => {
+    // ============================
+    // LOGIN TEACHER
+    // ============================
+
+    builder.addCase(thunks.loginTeacher.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(
+      thunks.loginTeacher.fulfilled,
+      (state, action: PayloadAction<TeacherProfile>) => {
         state.loading = false;
-        state.error = action.payload || action.error.message || 'Something went wrong';
+        state.profile = action.payload;
       }
     );
 
-    // -------------------- FULFILLED CASES --------------------
-    builder.addCase(thunks.loginTeacher.fulfilled, (state, action: PayloadAction<TeacherProfile>) => {
+    builder.addCase(thunks.loginTeacher.rejected, (state, action: any) => {
       state.loading = false;
-      state.profile = action.payload;
+      state.error =
+        action.payload || action.error.message || 'Login failed';
     });
 
-    builder.addCase(thunks.getProfile.fulfilled, (state, action: PayloadAction<TeacherProfile>) => {
-      state.loading = false;
-      state.profile = action.payload;
+
+    // ============================
+    // GET PROFILE
+    // ============================
+
+    builder.addCase(thunks.getProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
     });
 
-    builder.addCase(thunks.updateProfile.fulfilled, (state, action: PayloadAction<TeacherProfile>) => {
+    builder.addCase(
+      thunks.getProfile.fulfilled,
+      (state, action: PayloadAction<TeacherProfile>) => {
+        state.loading = false;
+        state.profile = action.payload;
+      }
+    );
+
+    builder.addCase(thunks.getProfile.rejected, (state, action: any) => {
       state.loading = false;
-      state.profile = action.payload;
+      state.error =
+        action.payload || action.error.message || 'Failed to fetch profile';
     });
 
-    builder.addCase(thunks.getCourses.fulfilled, (state, action: PayloadAction<CourseInfo[]>) => {
-      state.loading = false;
-      state.courses = action.payload;
+
+    // ============================
+    // UPDATE PROFILE
+    // ============================
+
+    builder.addCase(thunks.updateProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
     });
+
+    builder.addCase(
+      thunks.updateProfile.fulfilled,
+      (state, action: PayloadAction<TeacherProfile>) => {
+        state.loading = false;
+        state.profile = action.payload;
+      }
+    );
+
+    builder.addCase(thunks.updateProfile.rejected, (state, action: any) => {
+      state.loading = false;
+      state.error =
+        action.payload || action.error.message || 'Failed to update profile';
+    });
+
+
+    // ============================
+    // GET COURSES
+    // ============================
+
+    builder.addCase(thunks.getCourses.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(
+      thunks.getCourses.fulfilled,
+      (state, action: PayloadAction<CourseInfo[]>) => {
+        state.loading = false;
+        state.courses = action.payload;
+      }
+    );
+
+    builder.addCase(thunks.getCourses.rejected, (state, action: any) => {
+      state.loading = false;
+      state.error =
+        action.payload || action.error.message || 'Failed to fetch courses';
+    });
+
   },
 });
 

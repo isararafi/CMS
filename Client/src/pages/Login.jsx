@@ -13,11 +13,12 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation(); // Add this import and usage
-  const { user, token, userType, loading, error } = useSelector(
+  const { user, token, userType, loading} = useSelector(
     (state) => state.auth,
   );
   const { showToast } = useToast();
 
+  const [errors, setErrors] = useState({});
   // State to store user role (e.g., student, teacher, admin)
   const [userRole, setUserRole] = useState(null);
 
@@ -58,6 +59,14 @@ const Login = () => {
     const params = new URLSearchParams(location.search);
     const roleFromUrl = params.get("role") || "student";
     setUserRole(roleFromUrl);
+    // Reset form when role changes
+    setFormData({
+      batch: "",
+      department: "",
+      rollNo: "",
+      email: "",
+      password: "",
+    });
   }, [location.search]);
 
   // Configurations for different user roles
@@ -134,6 +143,46 @@ const Login = () => {
     },
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    currentConfig?.fields.forEach((field) => {
+      const value = formData[field.name];
+
+      // Required validation
+      if (field.required && !value?.trim()) {
+        newErrors[field.name] = `${field.label} is required`;
+        return;
+      }
+
+      // Email validation
+      if (field.type === "email" && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          newErrors[field.name] = "Invalid email format";
+        }
+      }
+
+      // Password validation
+      if (field.name === "password" && value) {
+        if (value.length < 6) {
+          newErrors[field.name] = "Password must be at least 6 characters";
+        }
+      }
+
+      // Roll number validation
+      if (field.name === "rollNo" && value) {
+        if (value.length < 3) {
+          newErrors[field.name] = "Roll number is too short";
+        }
+      }
+    });
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   // Handle changes in form input fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -141,16 +190,24 @@ const Login = () => {
       ...prevState,
       [name]: value,
     }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const isValid = validateForm();
+
+    if (!isValid) return;
+
     try {
       let response;
+
       if (userRole === "student") {
-        // const [semester, department, batch] = formData.batch.split('-');
         response = await dispatch(
           loginStudent({
             batch: formData.batch,
@@ -180,7 +237,7 @@ const Login = () => {
       }
     } catch (err) {
       showToast(
-        err.message || "Login failed. Please check your credentials.",
+        err?.message,
         "error",
       );
     }
@@ -219,17 +276,7 @@ const Login = () => {
             </h1>
           </div>
 
-          {error && (
-            <div className={styles.errorMessage}>
-              {typeof error === "string"
-                ? error
-                : "Login failed. Please try again."}
-            </div>
-          )}
-
-          <p className={styles.welcomeText}>
-            {currentConfig?.welcomeMessage || "Please log in to continue"}
-          </p>
+          <p className={styles.welcomeText}>{currentConfig?.welcomeMessage}</p>
 
           <form onSubmit={handleSubmit} className={styles.loginForm}>
             {/* Render fields based on current role */}
@@ -247,7 +294,6 @@ const Login = () => {
                       name={fieldConfig.name}
                       value={formData[fieldConfig.name] || ""}
                       onChange={handleInputChange}
-                      required={fieldConfig.required}
                       className={styles.formSelect}
                     >
                       <option value="">Select {fieldConfig.label}</option>
@@ -259,15 +305,18 @@ const Login = () => {
                     </select>
                   ) : (
                     <input
-                      type={fieldConfig.type}
                       id={fieldConfig.name}
                       name={fieldConfig.name}
                       value={formData[fieldConfig.name] || ""}
                       onChange={handleInputChange}
-                      required={fieldConfig.required}
                       placeholder={fieldConfig.label}
                       className={styles.formInput}
                     />
+                  )}
+                  {errors[fieldConfig.name] && (
+                    <span className={styles.errorText}>
+                      {errors[fieldConfig.name]}
+                    </span>
                   )}
                 </div>
               );
